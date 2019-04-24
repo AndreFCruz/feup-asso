@@ -110,8 +110,8 @@ function iterate(f: Filter) {
     }  
 }
 
-const f1 = new SlowFileLineReader('./best15.txt')
-const f2 = new FileLineReader('./best-mieic.txt')
+const f1 = new SlowFileLineReader('./assets/best15.txt')
+const f2 = new FileLineReader('./assets/best-mieic.txt')
 
 const r1 = new Writer(new ToUpperCase(new Join(f1, f2)))
 
