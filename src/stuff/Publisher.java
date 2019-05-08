@@ -1,15 +1,10 @@
 package stuff;
 
-public class Publisher extends AbstractEntity implements Runnable {
-    public double MAX_NUMBER_GENERATED = Math.exp(6);
+public abstract class Publisher<T> extends AbstractEntity<T> implements Runnable {
 
+    public abstract T generateMessage() throws InterruptedException;
 
-    public Object generateMessage() throws InterruptedException {
-        Thread.sleep(1000);
-        return Math.floor(Math.random()*MAX_NUMBER_GENERATED);
-    }
-
-    private void publishMessage(Object message){
+    private void publishMessage(T message) {
         queue.add(message);
     }
 
@@ -17,7 +12,7 @@ public class Publisher extends AbstractEntity implements Runnable {
     public void run() {
         double start = System.currentTimeMillis();
         while(start + runTime > System.currentTimeMillis()){
-            Object message = null;
+            T message = null;
             try {
                 message = generateMessage();
             } catch (InterruptedException e) {

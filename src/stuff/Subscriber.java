@@ -1,6 +1,6 @@
 package stuff;
 
-public class Subscriber extends AbstractEntity implements Runnable {
+public class Subscriber<T> extends AbstractEntity<T> implements Runnable {
     private int id;
 
     public Subscriber(int id){
@@ -11,8 +11,8 @@ public class Subscriber extends AbstractEntity implements Runnable {
         System.out.println("Subscriber id " + id + " | Received the message: " + message);
     }
 
-    private Object pullMessage() throws InterruptedException {
-        Object message = queue.take();
+    private T pullMessage() throws InterruptedException {
+        T message = queue.take();
         logMessage(message);
         return message;
     }

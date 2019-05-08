@@ -4,20 +4,20 @@ public class Main {
 
     public static void main(String[] args) {
         // Create Broker
-        Broker broker = new Broker(5000);
+        Broker<Integer> broker = new Broker<Integer>(5000);
 
         // Create Publishers and populate registry
-        Publisher pubA = new Publisher();
+        Publisher<Integer> pubA = new IntPublisher();
         int keyA = broker.addPublisher(pubA, true);
 
-        Publisher pubB = new Publisher();
+        Publisher<Integer> pubB = new IntPublisher();
         int keyB = broker.addPublisher(pubB, false);
 
         // Create Subscribers
-        Subscriber subsA = new Subscriber(1);
-        Subscriber subsB = new Subscriber(2);
-        Subscriber subsC = new Subscriber(3);
-        Subscriber subsD = new Subscriber(4);
+        Subscriber<Integer> subsA = new Subscriber<Integer>(1);
+        Subscriber<Integer> subsB = new Subscriber<Integer>(2);
+        Subscriber<Integer> subsC = new Subscriber<Integer>(3);
+        Subscriber<Integer> subsD = new Subscriber<Integer>(4);
 
         // // Manage subscriptions
         broker.addSubscriber(subsA, keyA, true);

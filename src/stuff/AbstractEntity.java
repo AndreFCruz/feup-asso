@@ -2,12 +2,12 @@ package stuff;
 
 import java.util.concurrent.BlockingQueue;
 
-public class AbstractEntity{
+public class AbstractEntity<T> {
 
-    protected BlockingQueue queue;
+    protected BlockingQueue<T> queue;
     protected double runTime;
 
-    void initVariables(BlockingQueue queue, double runTime){
+    void initVariables(BlockingQueue<T> queue, double runTime){
         this.queue = queue;
         this.runTime = runTime;
     }

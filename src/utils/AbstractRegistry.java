@@ -3,7 +3,7 @@ package utils;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class AbstractRegistry <K,T> {
+public abstract class AbstractRegistry<K,T> {
     private Map<K,T> map = new HashMap<>();
 
     protected abstract K generateKey(T obj);
