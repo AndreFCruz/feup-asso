@@ -14,20 +14,14 @@ public class Broker<T> implements Runnable {
     // publisherKey -> arraySubscriberKeys
     private Map<Integer, ArrayList<Integer>> observers = new HashMap<>();
 
-    private final double runTime;
-    private ScheduledExecutorService executor;
+    public Broker() {}
 
-    public Broker(double runTime) {
-        this.runTime = runTime;
-        this.executor = Executors.newScheduledThreadPool(10);
+    public int addPublisher(Publisher<T> obj) {
+        return this.initializeEntity(obj);
     }
 
-    public int addPublisher(Publisher<T> obj, boolean run){
-        return this.registAndRun(obj, run);
-    }
-
-    public void addSubscriber(Subscriber<T> obj, int publisherId, boolean run){
-        int key = this.registAndRun(obj, run);
+    public void addSubscriber(Subscriber<T> obj, int publisherId) {
+        int key = this.initializeEntity(obj);
         ArrayList<Integer> subscribersList = new ArrayList<>();
         if(this.observers.containsKey(publisherId)){
             subscribersList = this.observers.get(publisherId);
@@ -36,12 +30,10 @@ public class Broker<T> implements Runnable {
         this.observers.put(publisherId, subscribersList);
     }
 
-    private int registAndRun(AbstractEntity<T> obj, boolean run) {
+    private int initializeEntity(AbstractEntity<T> obj) {
         BlockingQueue<T> queue = new LinkedBlockingQueue<T>();
         Object key = registry.register(queue);
-        obj.initVariables(queue, this.runTime);
-        if(run)
-            executor.submit((Runnable) obj);
+        obj.initVariables(queue);
         return (int) key;
     }
 
@@ -66,13 +58,13 @@ public class Broker<T> implements Runnable {
 
     @Override
     public void run() {
-        double start = System.currentTimeMillis();
-        while(start + runTime > System.currentTimeMillis()){
+        while(! Thread.interrupted()) {
             try {
                 movesMessages();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+        System.out.println("Thread interrupted: " + Thread.interrupted());
     }
 }

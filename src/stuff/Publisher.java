@@ -1,6 +1,6 @@
 package stuff;
 
-public abstract class Publisher<T> extends AbstractEntity<T> implements Runnable {
+public abstract class Publisher<T> extends AbstractEntity<T> {
 
     public abstract T generateMessage() throws InterruptedException;
 

@@ -1,6 +1,6 @@
 package stuff;
 
-public class Subscriber<T> extends AbstractEntity<T> implements Runnable {
+public class Subscriber<T> extends AbstractEntity<T> {
     private int id;
 
     public Subscriber(int id){
