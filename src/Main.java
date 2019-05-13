@@ -1,8 +1,11 @@
+import stuff.Broker;
+import stuff.IntPublisher;
+import stuff.Publisher;
+import stuff.Subscriber;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import stuff.*;
 
 public class Main {
 
@@ -10,7 +13,7 @@ public class Main {
         final ExecutorService executor = Executors.newCachedThreadPool();
 
         // Create Broker
-        Broker<Integer> broker = new Broker<Integer>();
+        Broker<Integer> broker = new Broker<>();
 
         // Create Publishers and populate registry
         Publisher<Integer> pubA = new IntPublisher();

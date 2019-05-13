@@ -4,7 +4,7 @@ public class Subscriber<T> extends AbstractEntity<T> {
 
     public Subscriber() { }
 
-    void logMessage(Object message){
+    private void logMessage(Object message) {
         System.out.println("Subscriber id " + id + " | Received the message: " + message);
     }
 
@@ -16,7 +16,7 @@ public class Subscriber<T> extends AbstractEntity<T> {
 
     @Override
     public void run() {
-        double start = System.currentTimeMillis(); // TODO tirar tempo manhoso
+        double start = System.currentTimeMillis(); // TODO tirar runTime manhoso
         while (start + runTime > System.currentTimeMillis()) {
             try {
                 pullMessage();

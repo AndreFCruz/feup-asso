@@ -13,7 +13,7 @@ public abstract class Publisher<T> extends AbstractEntity<T> {
     @Override
     public void run() {
         double start = System.currentTimeMillis();
-        while(start + runTime > System.currentTimeMillis()){
+        while (start + runTime > System.currentTimeMillis()) {
             T message = null;
             try {
                 message = getMessage();

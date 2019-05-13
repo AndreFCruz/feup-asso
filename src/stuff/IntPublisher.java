@@ -1,7 +1,7 @@
 package stuff;
 
 public class IntPublisher extends Publisher<Integer> {
-    public Integer MAX_NUMBER_GENERATED = (int) Math.exp(6);
+    private Integer MAX_NUMBER_GENERATED = (int) Math.exp(6);
 
     @Override
     public Integer getMessage() throws InterruptedException {

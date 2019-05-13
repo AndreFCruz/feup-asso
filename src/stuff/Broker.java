@@ -5,7 +5,8 @@ import utils.Registry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * @T Message type
@@ -13,12 +14,17 @@ import java.util.concurrent.*;
 public class Broker<T> implements Runnable {
 
     // Registry key(Publisher | Subscriber) -> queue
+<<<<<<< HEAD
     private Registry<BlockingQueue<T>> registry = new Registry<BlockingQueue<T>>();
 
+=======
+    private Registry<BlockingQueue<T>> registry = new Registry<>();
+>>>>>>> c14831d2a404144076c3d6635eb9b040a504ad71
     // publisherKey -> arraySubscriberKeys
     private Map<Integer, ArrayList<Integer>> observers = new HashMap<>();
 
-    public Broker() {}
+    public Broker() {
+    }
 
     /**
      * Register a new Entity (Publisher | Subscriber)
@@ -64,7 +70,7 @@ public class Broker<T> implements Runnable {
 
     @Override
     public void run() {
-        while(! Thread.interrupted()) {
+        while (!Thread.interrupted()) {
             try {
                 moveMessages();
             } catch (InterruptedException e) {
