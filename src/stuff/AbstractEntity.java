@@ -4,6 +4,7 @@ import java.util.concurrent.BlockingQueue;
 
 public abstract class AbstractEntity<T> implements Runnable {
 
+    protected int id;
     protected BlockingQueue<T> queue;
 
     // Run time should be the responsibility of this Entity, not external objects
@@ -11,7 +12,15 @@ public abstract class AbstractEntity<T> implements Runnable {
     // External entities must not rely on good behaviour from Publishers/Subcribers...
     protected double runTime = 5000;
 
-    void initVariables(BlockingQueue<T> queue) {
+    void setQueue(BlockingQueue<T> queue) {
         this.queue = queue;
+    }
+
+    void setId(int id) {
+        this.id = id;
+    }
+
+    int getId() {
+        return this.id;
     }
 }

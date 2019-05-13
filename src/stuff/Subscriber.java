@@ -1,11 +1,8 @@
 package stuff;
 
 public class Subscriber<T> extends AbstractEntity<T> {
-    private int id;
 
-    public Subscriber(int id){
-        this.id = id;
-    }
+    public Subscriber() { }
 
     void logMessage(Object message){
         System.out.println("Subscriber id " + id + " | Received the message: " + message);
@@ -19,8 +16,8 @@ public class Subscriber<T> extends AbstractEntity<T> {
 
     @Override
     public void run() {
-        double start = System.currentTimeMillis();
-        while(start + runTime > System.currentTimeMillis()){
+        double start = System.currentTimeMillis(); // TODO tirar tempo manhoso
+        while (start + runTime > System.currentTimeMillis()) {
             try {
                 pullMessage();
             } catch (InterruptedException e) {

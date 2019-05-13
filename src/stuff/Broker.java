@@ -7,51 +7,57 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
 
+/**
+ * @T Message type
+ */
 public class Broker<T> implements Runnable {
 
     // Registry key(Publisher | Subscriber) -> queue
     private Registry<BlockingQueue<T>> registry = new Registry<BlockingQueue<T>>();
+
     // publisherKey -> arraySubscriberKeys
     private Map<Integer, ArrayList<Integer>> observers = new HashMap<>();
 
     public Broker() {}
 
-    public int addPublisher(Publisher<T> obj) {
-        return this.initializeEntity(obj);
+    /**
+     * Register a new Entity (Publisher | Subscriber)
+     */
+    public int register(AbstractEntity<T> entity) {
+        BlockingQueue<T> queue = new LinkedBlockingQueue<>(); // TODO eventually limit queue size
+        entity.setQueue(queue);
+        int entityId = this.registry.register(queue);
+        entity.setId(entityId);
+        return entityId;
     }
 
-    public void addSubscriber(Subscriber<T> obj, int publisherId) {
-        int key = this.initializeEntity(obj);
-        ArrayList<Integer> subscribersList = new ArrayList<>();
-        if(this.observers.containsKey(publisherId)){
-            subscribersList = this.observers.get(publisherId);
-        }
-        subscribersList.add(key);
+    public void addSubscriber(int subscriberId, int publisherId) {
+        ArrayList<Integer> subscribersList = this.observers.getOrDefault(publisherId, new ArrayList<>());
+        subscribersList.add(subscriberId);
         this.observers.put(publisherId, subscribersList);
     }
 
-    private int initializeEntity(AbstractEntity<T> obj) {
-        BlockingQueue<T> queue = new LinkedBlockingQueue<T>();
-        Object key = registry.register(queue);
-        obj.initVariables(queue);
-        return (int) key;
-    }
-
-    void movesMessages() throws InterruptedException {
+    // TODO
+    // Publisher should have reference to Broker in which it is registered
+    // And publish message directly to Broker (so as to not poll registered queues,
+    // going for event-based instead)
+    void moveMessages() throws InterruptedException {
         for (Map.Entry<Integer, ArrayList<Integer>> entry : this.observers.entrySet()) {
             int publisherKey = entry.getKey();
             BlockingQueue<T> publisherQueue = this.registry.get(publisherKey);
             if(publisherQueue.peek() == null) {
+                System.out.println(".");
                 continue;
             }
 
             T message = publisherQueue.take();
+            System.out.println("PRINTTT");
 
             ArrayList<Integer> subscribers = this.observers.get(publisherKey);
             for(int subscriber : subscribers){
                 BlockingQueue<T> subscriberQueue = this.registry.get(subscriber);
                 System.out.println(message);
-                subscriberQueue.add(message);
+                subscriberQueue.add(message); // TODO check blocking
             }
         }
     }
@@ -60,7 +66,7 @@ public class Broker<T> implements Runnable {
     public void run() {
         while(! Thread.interrupted()) {
             try {
-                movesMessages();
+                moveMessages();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

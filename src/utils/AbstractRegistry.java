@@ -8,7 +8,7 @@ public abstract class AbstractRegistry<K,T> {
 
     protected abstract K generateKey(T obj);
 
-    public K register(T obj){
+    public K register(T obj) {
         K key = this.generateKey(obj);
         this.map.put(key, obj);
         return key;

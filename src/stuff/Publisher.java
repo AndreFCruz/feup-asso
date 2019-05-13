@@ -2,10 +2,12 @@ package stuff;
 
 public abstract class Publisher<T> extends AbstractEntity<T> {
 
-    public abstract T generateMessage() throws InterruptedException;
+    // May block
+    public abstract T getMessage() throws InterruptedException;
 
-    private void publishMessage(T message) {
-        queue.add(message);
+    // May block if queue is full
+    private void publishMessage(T message) throws InterruptedException {
+        queue.put(message);
     }
 
     @Override
@@ -14,11 +16,12 @@ public abstract class Publisher<T> extends AbstractEntity<T> {
         while(start + runTime > System.currentTimeMillis()){
             T message = null;
             try {
-                message = generateMessage();
+                message = getMessage();
+                System.out.println("Generated message: " + (String) message);
+                publishMessage(message);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            publishMessage(message);
         }
     }
 }
