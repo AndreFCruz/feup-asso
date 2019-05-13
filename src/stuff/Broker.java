@@ -14,12 +14,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class Broker<T> implements Runnable {
 
     // Registry key(Publisher | Subscriber) -> queue
-<<<<<<< HEAD
     private Registry<BlockingQueue<T>> registry = new Registry<BlockingQueue<T>>();
 
-=======
-    private Registry<BlockingQueue<T>> registry = new Registry<>();
->>>>>>> c14831d2a404144076c3d6635eb9b040a504ad71
     // publisherKey -> arraySubscriberKeys
     private Map<Integer, ArrayList<Integer>> observers = new HashMap<>();
 
