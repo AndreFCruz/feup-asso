@@ -5,16 +5,18 @@ import utils.Registry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class Broker<T> implements Runnable {
 
     // Registry key(Publisher | Subscriber) -> queue
-    private Registry<BlockingQueue<T>> registry = new Registry<BlockingQueue<T>>();
+    private Registry<BlockingQueue<T>> registry = new Registry<>();
     // publisherKey -> arraySubscriberKeys
     private Map<Integer, ArrayList<Integer>> observers = new HashMap<>();
 
-    public Broker() {}
+    public Broker() {
+    }
 
     public int addPublisher(Publisher<T> obj) {
         return this.initializeEntity(obj);
@@ -23,7 +25,7 @@ public class Broker<T> implements Runnable {
     public void addSubscriber(Subscriber<T> obj, int publisherId) {
         int key = this.initializeEntity(obj);
         ArrayList<Integer> subscribersList = new ArrayList<>();
-        if(this.observers.containsKey(publisherId)){
+        if (this.observers.containsKey(publisherId)) {
             subscribersList = this.observers.get(publisherId);
         }
         subscribersList.add(key);
@@ -31,34 +33,32 @@ public class Broker<T> implements Runnable {
     }
 
     private int initializeEntity(AbstractEntity<T> obj) {
-        BlockingQueue<T> queue = new LinkedBlockingQueue<T>();
+        BlockingQueue<T> queue = new LinkedBlockingQueue<>();
         Object key = registry.register(queue);
         obj.initVariables(queue);
         return (int) key;
     }
 
-    void movesMessages() throws InterruptedException {
+    private void movesMessages() throws InterruptedException {
         for (Map.Entry<Integer, ArrayList<Integer>> entry : this.observers.entrySet()) {
             int publisherKey = entry.getKey();
             BlockingQueue<T> publisherQueue = this.registry.get(publisherKey);
-            if(publisherQueue.peek() == null) {
-                continue;
-            }
+            if (publisherQueue.peek() != null) {
+                T message = publisherQueue.take();
 
-            T message = publisherQueue.take();
-
-            ArrayList<Integer> subscribers = this.observers.get(publisherKey);
-            for(int subscriber : subscribers){
-                BlockingQueue<T> subscriberQueue = this.registry.get(subscriber);
-                System.out.println(message);
-                subscriberQueue.add(message);
+                ArrayList<Integer> subscribers = this.observers.get(publisherKey);
+                for (int subscriber : subscribers) {
+                    BlockingQueue<T> subscriberQueue = this.registry.get(subscriber);
+                    System.out.println(subscriber);
+                    subscriberQueue.add(message);
+                }
             }
         }
     }
 
     @Override
     public void run() {
-        while(! Thread.interrupted()) {
+        while (!Thread.interrupted()) {
             try {
                 movesMessages();
             } catch (InterruptedException e) {

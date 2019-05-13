@@ -1,6 +1,6 @@
 package utils;
 
-public class Registry<T> extends AbstractRegistry<Integer,T> {
+public class Registry<T> extends AbstractRegistry<Integer, T> {
 
     private int counter = 0;
 
