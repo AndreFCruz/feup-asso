@@ -48,17 +48,14 @@ public class Broker<T> implements Runnable {
             int publisherKey = entry.getKey();
             BlockingQueue<T> publisherQueue = this.registry.get(publisherKey);
             if(publisherQueue.peek() == null) {
-                System.out.println(".");
                 continue;
             }
 
             T message = publisherQueue.take();
-            System.out.println("PRINTTT");
 
             ArrayList<Integer> subscribers = this.observers.get(publisherKey);
             for(int subscriber : subscribers){
                 BlockingQueue<T> subscriberQueue = this.registry.get(subscriber);
-                System.out.println(message);
                 subscriberQueue.add(message); // TODO check blocking
             }
         }

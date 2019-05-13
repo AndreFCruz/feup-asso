@@ -17,7 +17,6 @@ public abstract class Publisher<T> extends AbstractEntity<T> {
             T message = null;
             try {
                 message = getMessage();
-                System.out.println("Generated message: " + (String) message);
                 publishMessage(message);
             } catch (InterruptedException e) {
                 e.printStackTrace();
