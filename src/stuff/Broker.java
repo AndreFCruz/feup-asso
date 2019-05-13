@@ -36,9 +36,8 @@ public class Broker<T> implements Runnable {
      */
     public int register(AbstractEntity<T> entity) {
         BlockingQueue<T> queue = new LinkedBlockingQueue<>(); // TODO eventually limit queue size
-        entity.setQueue(queue);
         int entityId = this.registry.register(queue);
-        entity.setId(entityId);
+        entity.initializeEntity(entityId, queue, this);
         return entityId;
     }
 

@@ -8,6 +8,7 @@ public class Subscriber<T> extends AbstractEntity<T> {
         System.out.println("Subscriber id " + id + " | Received the message: " + message);
     }
 
+    // May block if Queue is empty
     private T pullMessage() throws InterruptedException {
         T message = queue.take();
         logMessage(message);
