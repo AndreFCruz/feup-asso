@@ -1,7 +1,8 @@
 import stuff.Broker;
-import stuff.IntPublisher;
 import stuff.Publisher;
 import stuff.Subscriber;
+import stuff.implementations.ConcretePublisher;
+import stuff.implementations.ConcreteSubscriber;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,21 +17,22 @@ public class Main {
         Broker<Integer> broker = new Broker<>();
 
         // Create Publishers and populate registry
-        Publisher<Integer> pubA = new IntPublisher();
+        Publisher<Integer> pubA = new ConcretePublisher();
         int pubAKey = broker.register(pubA);
         executor.submit(pubA);
 
-        Publisher<Integer> pubB = new IntPublisher();
+        Publisher<Integer> pubB = new ConcretePublisher();
         int pubBKey = broker.register(pubB);
+        executor.submit(pubB);
 
         // Create Subscribers
-        Subscriber<Integer> subA = new Subscriber<Integer>();
+        Subscriber<Integer> subA = new ConcreteSubscriber();
         int subAKey = broker.register(subA);
-        Subscriber<Integer> subB = new Subscriber<Integer>();
+        Subscriber<Integer> subB = new ConcreteSubscriber();
         int subBKey = broker.register(subB);
-        Subscriber<Integer> subC = new Subscriber<Integer>();
+        Subscriber<Integer> subC = new ConcreteSubscriber();
         int subCKey = broker.register(subC);
-        Subscriber<Integer> subD = new Subscriber<Integer>();
+        Subscriber<Integer> subD = new ConcreteSubscriber();
         int subDKey = broker.register(subD);
 
         // // Manage subscriptions

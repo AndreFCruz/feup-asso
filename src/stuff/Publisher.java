@@ -1,27 +1,36 @@
 package stuff;
 
-public abstract class Publisher<T> extends AbstractEntity<T> {
-    
-    // May block
-    public abstract T getMessage() throws InterruptedException;
 
-    // May block if queue is full
+public interface Publisher<T> extends Entity<T> {
+    
+    /**
+     * Method for this Publisher to generate a Message.
+     * May block!
+     * @return The generated Message
+     * @throws InterruptedException Thrown when interrupted
+     */
+    T getMessage() throws InterruptedException;
+
+    /**
+     * Private method used for publishing new messages
+     * @param message Message to publish
+     * @throws InterruptedException Thrown when interrupted
+     */
     private void publishMessage(T message) throws InterruptedException {
-        queue.put(message);
-        broker.notifyNewMessage(this.getId(), message.hashCode());
+        this.getQueue().put(message);
+        getBroker().notifyNewMessage(this.getId(), message.hashCode());
     }
 
     @Override
-    public void run() {
-        double start = System.currentTimeMillis();
-        while (start + runTime > System.currentTimeMillis()) {
-            T message = null;
+    default void run() {
+        while (! Thread.interrupted()) {
             try {
-                message = getMessage();
-                publishMessage(message);
+                T message = this.getMessage();
+                this.publishMessage(message);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
+ 
 }

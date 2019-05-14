@@ -1,26 +1,31 @@
 package stuff;
 
-public class Subscriber<T> extends AbstractEntity<T> {
+public interface Subscriber<T> extends Entity<T> {
 
-    public Subscriber() { }
 
-    private void logMessage(Object message) {
-        System.out.println("Subscriber id " + id + " | Received the message: " + message);
-    }
+    /**
+     * Handle the given Message
+     * May block!
+     * @param message the message
+     * @throws InterruptedException thrown when interrupted
+     */
+    void handleMessage(T message) throws InterruptedException;
 
-    // May block if Queue is empty
+    /**
+     * May block if Queue is empty
+     * @return The pulled message
+     * @throws InterruptedException thrown when interrupted
+     */
     private T pullMessage() throws InterruptedException {
-        T message = queue.take();
-        logMessage(message);
-        return message;
+        return this.getQueue().take();
     }
 
     @Override
-    public void run() {
-        double start = System.currentTimeMillis(); // TODO tirar runTime manhoso
-        while (start + runTime > System.currentTimeMillis()) {
+    default void run() {
+        while (! Thread.interrupted()) {
             try {
-                pullMessage();
+                T msg = this.pullMessage();
+                this.handleMessage(msg);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -2,24 +2,31 @@ package stuff;
 
 import java.util.concurrent.BlockingQueue;
 
-public abstract class AbstractEntity<T> implements Runnable {
+public abstract class AbstractEntity<T> implements Runnable, Entity<T> {
 
-    // Run time should be the responsibility of this Entity, not external objects
-    // Moreover, this can ignore externally appointed run-times and crash earlier
-    // External entities must not rely on good behaviour from Publishers/Subscribers...
-    protected double runTime = 2500; // TODO delete runtime manhoso
+    private int id;
+    private BlockingQueue<T> queue;
+    private Broker<T> broker;
 
-    protected int id;
-    protected BlockingQueue<T> queue;
-    Broker<T> broker;
-
-    void initializeEntity(int id, BlockingQueue<T> queue, Broker<T> broker) {
+    public void initializeEntity(int id, BlockingQueue<T> queue, Broker<T> broker) {
         this.id = id;
         this.queue = queue;
         this.broker = broker;
     }
 
-    int getId() {
+    public int getId() {
         return this.id;
     }
+
+    @Override
+    public BlockingQueue<T> getQueue() {
+        return this.queue;
+    }
+
+    @Override
+    public Broker<T> getBroker() {
+        return this.broker;
+    }
+
+
 }

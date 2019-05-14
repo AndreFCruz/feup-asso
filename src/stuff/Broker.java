@@ -9,7 +9,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * @T Message type
+ *
+ * @param <T> Message type
  */
 public class Broker<T> implements Runnable {
     class MessageEvent {
@@ -30,12 +31,9 @@ public class Broker<T> implements Runnable {
         }
 
         boolean isAlive() {
-            if (this.timeToLive == null ||
-                this.arrivalTime + this.timeToLive > System.currentTimeMillis()) {
-                return true;
-            } else {
-                return false;
-            }
+            return this.timeToLive == null ||
+                   this.arrivalTime + this.timeToLive > System.currentTimeMillis();
+
         }
     }
 
@@ -53,7 +51,7 @@ public class Broker<T> implements Runnable {
     /**
      * Register a new Entity (Publisher | Subscriber)
      */
-    public int register(AbstractEntity<T> entity) {
+    public int register(Entity<T> entity) {
         BlockingQueue<T> queue = new LinkedBlockingQueue<>(); // TODO eventually limit queue size
         int entityId = this.registry.register(queue);
         entity.initializeEntity(entityId, queue, this);
@@ -80,11 +78,12 @@ public class Broker<T> implements Runnable {
     private void handleMessageEvent(MessageEvent event) {
         BlockingQueue<T> pubQueue = registry.get(event.publisherId);
         T msg = pubQueue.poll();
-        assert msg.hashCode() == event.messageHash;
         if (msg == null) {
             System.err.println("Was notified of inexistent Message");
             return;
         }
+
+        assert msg.hashCode() == event.messageHash;
         if (! event.isAlive()) {
             System.out.println("Discarded message with expired Time-to-Live");
             return;
