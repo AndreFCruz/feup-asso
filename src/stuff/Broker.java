@@ -12,11 +12,30 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @T Message type
  */
 public class Broker<T> implements Runnable {
-    class NewMessageEvent {
+    class MessageEvent {
         int publisherId;
+        int messageHash;
+        Long timeToLive;
+        long arrivalTime;
 
-        NewMessageEvent(int publisherId) {
+        MessageEvent(int publisherId, int messageHash) {
+            this(publisherId, messageHash, null);
+        }
+
+        MessageEvent(int publisherId, int messageHash, Long timeToLive) {
             this.publisherId = publisherId;
+            this.messageHash = messageHash;
+            this.timeToLive = timeToLive;
+            this.arrivalTime = System.currentTimeMillis();
+        }
+
+        boolean isAlive() {
+            if (this.timeToLive == null ||
+                this.arrivalTime + this.timeToLive > System.currentTimeMillis()) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
@@ -26,7 +45,7 @@ public class Broker<T> implements Runnable {
     // publisherKey -> arraySubscriberKeys
     private Map<Integer, ArrayList<Integer>> observers = new HashMap<>();
 
-    private BlockingQueue<NewMessageEvent> eventQueue = new LinkedBlockingQueue<>();
+    private BlockingQueue<MessageEvent> eventQueue = new LinkedBlockingQueue<>();
 
     public Broker() {
     }
@@ -77,15 +96,20 @@ public class Broker<T> implements Runnable {
      * @param publisherId Id of the publishing Publisher
      * @throws InterruptedException
      */
-    public void notifyNewMessage(int publisherId) throws InterruptedException {
-        eventQueue.put(new NewMessageEvent(publisherId));
+    public void notifyNewMessage(int publisherId, int messageHash) throws InterruptedException {
+        eventQueue.put(new MessageEvent(publisherId, messageHash));
     }
 
-    private void handleNewMessageEvent(NewMessageEvent event) {
+    private void handleMessageEvent(MessageEvent event) {
         BlockingQueue<T> pubQueue = registry.get(event.publisherId);
         T msg = pubQueue.poll();
+        assert msg.hashCode() == event.messageHash;
         if (msg == null) {
             System.err.println("Was notified of inexistent Message");
+            return;
+        }
+        if (! event.isAlive()) {
+            System.out.println("Discarded message with expired Time-to-Live");
             return;
         }
 
@@ -102,13 +126,13 @@ public class Broker<T> implements Runnable {
     @Override
     public void run() {
         while (!Thread.interrupted()) {
-            NewMessageEvent event;
+            MessageEvent event;
             try {
                 event = eventQueue.take(); // .take() blocks awaiting for new Events
             } catch (InterruptedException e1) {
                 break;
             }
-            this.handleNewMessageEvent(event);
+            this.handleMessageEvent(event);
 
         }
         System.out.println("Thread interrupted: " + Thread.interrupted());
