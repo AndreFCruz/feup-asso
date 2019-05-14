@@ -23,13 +23,13 @@ public interface Publisher<T> extends Entity<T> {
 
     @Override
     default void run() {
-        while (! Thread.interrupted()) {
-            try {
+        try {
+            while (! Thread.interrupted()) {
                 T message = this.getMessage();
                 this.publishMessage(message);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
+        } catch (InterruptedException e) {
+            System.out.println("Publisher " + getId() + " Thread interrupted");
         }
     }
  

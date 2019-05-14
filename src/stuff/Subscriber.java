@@ -22,13 +22,13 @@ public interface Subscriber<T> extends Entity<T> {
 
     @Override
     default void run() {
-        while (! Thread.interrupted()) {
-            try {
+        try {
+            while (! Thread.interrupted()) {
                 T msg = this.pullMessage();
                 this.handleMessage(msg);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
+        } catch (InterruptedException e) {
+            System.out.println("Subscriber " + getId() + " Thread interrupted");
         }
     }
 }

@@ -55,6 +55,7 @@ public class Main {
                 long brokerRunTime = 5000;
                 System.out.println("Trying to block Broker's execution in " + brokerRunTime + " millisecs");
                 brokerExec.awaitTermination(brokerRunTime, TimeUnit.MILLISECONDS);
+                executor.shutdownNow();
                 System.out.println("#...#");
             } catch (InterruptedException e) {
                 System.out.println("Interrupted kill-switch Thread, lol");
