@@ -5,7 +5,7 @@ public class IntPublisher extends Publisher<Integer> {
 
     @Override
     public Integer getMessage() throws InterruptedException {
-        Thread.sleep(1000);
+        Thread.sleep(500);
         return (int) Math.floor(Math.random() * MAX_NUMBER_GENERATED);
     }
 

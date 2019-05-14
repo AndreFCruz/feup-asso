@@ -7,7 +7,7 @@ public abstract class AbstractEntity<T> implements Runnable {
     // Run time should be the responsibility of this Entity, not external objects
     // Moreover, this can ignore externally appointed run-times and crash earlier
     // External entities must not rely on good behaviour from Publishers/Subscribers...
-    protected double runTime = 5000; // TODO delete runtime manhoso
+    protected double runTime = 2500; // TODO delete runtime manhoso
 
     protected int id;
     protected BlockingQueue<T> queue;

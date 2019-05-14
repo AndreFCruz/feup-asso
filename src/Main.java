@@ -38,19 +38,21 @@ public class Main {
         broker.addSubscriber(subAKey, pubBKey);
         broker.addSubscriber(subBKey, pubBKey);
         broker.addSubscriber(subCKey, pubAKey);
+        broker.addSubscriber(subDKey, pubAKey);
 
         executor.submit(subA);
         executor.submit(subB);
         executor.submit(subC);
-        // executor.submit(subD);
+        executor.submit(subD);
 
         ExecutorService brokerExec = Executors.newSingleThreadExecutor();
         brokerExec.execute(broker);
 
         new Thread(() -> {
             try {
-                System.out.println("Trying to block Broker's execution in 5 secs");
-                brokerExec.awaitTermination(5000, TimeUnit.MILLISECONDS);
+                long brokerRunTime = 5000;
+                System.out.println("Trying to block Broker's execution in " + brokerRunTime + " millisecs");
+                brokerExec.awaitTermination(brokerRunTime, TimeUnit.MILLISECONDS);
                 System.out.println("#...#");
             } catch (InterruptedException e) {
                 System.out.println("Interrupted kill-switch Thread, lol");
