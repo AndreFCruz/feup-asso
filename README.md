@@ -20,3 +20,4 @@ Review [general notes on pub/sub architectures](https://github.com/hugoferreira/
 _e.g.:_
 - [ ] **Data integrity**: return unacknowledged messages to a subscriber's message queue after a given delay;
 - [ ] **Queue _fanout_ / message delivery**: allow _fanout_ and _round-robin_ message deliveries for different purposes (_fanout_ for high troughput, _round-robin_ for ensuring pipeline integrity when needed).
+
