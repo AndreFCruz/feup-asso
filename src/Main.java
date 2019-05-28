@@ -8,6 +8,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static java.lang.System.exit;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -19,11 +21,9 @@ public class Main {
         // Create Publishers and populate registry
         Publisher<Integer> pubA = new ConcretePublisher();
         int pubAKey = broker.register(pubA);
-        executor.submit(pubA);
 
         Publisher<Integer> pubB = new ConcretePublisher();
         int pubBKey = broker.register(pubB);
-        executor.submit(pubB);
 
         // Create Subscribers
         Subscriber<Integer> subA = new ConcreteSubscriber();
@@ -41,6 +41,9 @@ public class Main {
         broker.addSubscriber(subBKey, pubBKey);
         broker.addSubscriber(subCKey, pubAKey);
         broker.addSubscriber(subDKey, pubAKey);
+
+        executor.submit(pubA);
+        executor.submit(pubB);
 
         executor.submit(subA);
         executor.submit(subB);
