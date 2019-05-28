@@ -16,18 +16,21 @@ interface Entity<T> extends Runnable {
 
     /**
      * Getter for this entity's ID (from Broker's registry)
+     *
      * @return This Entity's ID
      */
     int getId();
 
     /**
      * Getter for this entity's message Queue
+     *
      * @return This Entity's Queue
      */
     BlockingQueue<T> getQueue();
 
     /**
      * Getter for this entity's Broker
+     *
      * @return This Entity's Broker
      */
     Broker<T> getBroker();

@@ -2,10 +2,11 @@ package stuff;
 
 
 public interface Publisher<T> extends Entity<T> {
-    
+
     /**
      * Method for this Publisher to generate a Message.
      * May block!
+     *
      * @return The generated Message
      * @throws InterruptedException Thrown when interrupted
      */
@@ -13,6 +14,7 @@ public interface Publisher<T> extends Entity<T> {
 
     /**
      * Private method used for publishing new messages
+     *
      * @param message Message to publish
      * @throws InterruptedException Thrown when interrupted
      */
@@ -24,7 +26,7 @@ public interface Publisher<T> extends Entity<T> {
     @Override
     default void run() {
         try {
-            while (! Thread.interrupted()) {
+            while (!Thread.interrupted()) {
                 T message = this.getMessage();
                 this.publishMessage(message);
             }
@@ -32,5 +34,5 @@ public interface Publisher<T> extends Entity<T> {
             System.out.println("Publisher " + getId() + " Thread interrupted");
         }
     }
- 
+
 }

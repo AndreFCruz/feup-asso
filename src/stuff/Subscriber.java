@@ -6,6 +6,7 @@ public interface Subscriber<T> extends Entity<T> {
     /**
      * Handle the given Message
      * May block!
+     *
      * @param message the message
      * @throws InterruptedException thrown when interrupted
      */
@@ -13,6 +14,7 @@ public interface Subscriber<T> extends Entity<T> {
 
     /**
      * May block if Queue is empty
+     *
      * @return The pulled message
      * @throws InterruptedException thrown when interrupted
      */
@@ -23,7 +25,7 @@ public interface Subscriber<T> extends Entity<T> {
     @Override
     default void run() {
         try {
-            while (! Thread.interrupted()) {
+            while (!Thread.interrupted()) {
                 T msg = this.pullMessage();
                 this.handleMessage(msg);
             }

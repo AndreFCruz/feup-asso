@@ -9,40 +9,13 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- *
  * @param <T> Message type
  */
 public class Broker<T> implements Runnable {
-    class MessageEvent {
-        int publisherId;
-        int messageHash;
-        Long timeToLive;    // In milliseconds
-        long arrivalTime;   // In milliseconds
-
-        MessageEvent(int publisherId, int messageHash) {
-            this(publisherId, messageHash, null);
-        }
-
-        MessageEvent(int publisherId, int messageHash, Long timeToLive) {
-            this.publisherId = publisherId;
-            this.messageHash = messageHash;
-            this.timeToLive = timeToLive;
-            this.arrivalTime = System.currentTimeMillis();
-        }
-
-        boolean isAlive() {
-            return this.timeToLive == null ||
-                   this.arrivalTime + this.timeToLive > System.currentTimeMillis();
-
-        }
-    }
-
     // Registry key(Publisher | Subscriber) -> queue
     private Registry<BlockingQueue<T>> registry = new Registry<BlockingQueue<T>>();
-
     // publisherKey -> arraySubscriberKeys
     private Map<Integer, ArrayList<Integer>> observers = new HashMap<>();
-
     private BlockingQueue<MessageEvent> eventQueue = new LinkedBlockingQueue<>();
 
     public Broker() {
@@ -67,7 +40,7 @@ public class Broker<T> implements Runnable {
     /**
      * Method used for publishers to notify the Broker that there's a new message to
      * be handled.
-     * 
+     *
      * @param publisherId Id of the publishing Publisher
      * @throws InterruptedException
      */
@@ -84,7 +57,7 @@ public class Broker<T> implements Runnable {
         }
 
         assert msg.hashCode() == event.messageHash;
-        if (! event.isAlive()) {
+        if (!event.isAlive()) {
             System.out.println("Discarded message with expired Time-to-Live");
             return;
         }
@@ -113,5 +86,29 @@ public class Broker<T> implements Runnable {
 
         }
         System.out.println("Thread interrupted: " + Thread.interrupted());
+    }
+
+    class MessageEvent {
+        int publisherId;
+        int messageHash;
+        Long timeToLive;    // In milliseconds
+        long arrivalTime;   // In milliseconds
+
+        MessageEvent(int publisherId, int messageHash) {
+            this(publisherId, messageHash, null);
+        }
+
+        MessageEvent(int publisherId, int messageHash, Long timeToLive) {
+            this.publisherId = publisherId;
+            this.messageHash = messageHash;
+            this.timeToLive = timeToLive;
+            this.arrivalTime = System.currentTimeMillis();
+        }
+
+        boolean isAlive() {
+            return this.timeToLive == null ||
+                    this.arrivalTime + this.timeToLive > System.currentTimeMillis();
+
+        }
     }
 }
