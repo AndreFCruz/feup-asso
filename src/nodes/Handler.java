@@ -6,15 +6,15 @@ import java.util.concurrent.BlockingQueue;
 
 public abstract class Handler<T> implements Runnable {
 
-    private int inputId;
     private int outputId;
+    private int inputId;
     private BlockingQueue<T> publishQueue;
     private BlockingQueue<T> subscribeQueue;
     private Broker<T> broker;
 
-    public void initializeEntity(int inputId, int outputId, BlockingQueue<T> publishQueue, BlockingQueue<T> subscribeQueue, Broker<T> broker) {
-        this.inputId = inputId;
+    public void initializeEntity(int outputId, int inputId, BlockingQueue<T> publishQueue, BlockingQueue<T> subscribeQueue, Broker<T> broker) {
         this.outputId = outputId;
+        this.inputId = inputId;
         this.publishQueue = publishQueue;
         this.subscribeQueue = subscribeQueue;
         this.broker = broker;

@@ -44,17 +44,17 @@ public class Main {
 
 
         // // Manage subscriptions
-//        manager.addSubscriber(printerSinkKey, stringSourceKey);
-//        manager.addSubscriber(printerSinkKey, integerSourceKey);
+        manager.addSubscriber(printerSinkKey, stringSourceKey);
+        manager.addSubscriber(printerSinkKey, integerSourceKey);
         manager.addSubscriber(uppercaseKeys[0], stringSourceKey);
         manager.addSubscriber(fileWriterSinkKey, uppercaseKeys[1]);
 
         executor.submit(stringSource);
-//        executor.submit(integerSource);
+        executor.submit(integerSource);
 
         executor.submit(uppercase);
 
-//        executor.submit(printerSink);
+        executor.submit(printerSink);
         executor.submit(fileWriterSink);
 
         ExecutorService brokerExec = Executors.newSingleThreadExecutor();

@@ -43,7 +43,7 @@ public class Broker<Object> implements Runnable {
         EntityQueue entityQueuePublish = this.registerEntity();
         EntityQueue entityQueueSubscribe = this.registerEntity();
         handler.initializeEntity(entityQueuePublish.entityId, entityQueueSubscribe.entityId, entityQueuePublish.queue, entityQueueSubscribe.queue, this);
-        return new int[]{entityQueuePublish.entityId, entityQueueSubscribe.entityId};
+        return new int[]{entityQueueSubscribe.entityId, entityQueuePublish.entityId};
     }
 
     private EntityQueue registerEntity() {
