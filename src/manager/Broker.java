@@ -1,5 +1,8 @@
-package stuff;
+package manager;
 
+import nodes.Handler;
+import nodes.Sink;
+import nodes.Source;
 import utils.Registry;
 
 import java.util.ArrayList;
@@ -9,12 +12,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * @param <T> Message type
+ * @param <Object> Message type
  */
-public class Broker<T> implements Runnable {
-    // Registry key(Publisher | Subscriber) -> queue
-    private Registry<BlockingQueue<T>> registry = new Registry<>();
-    // publisherKey -> arraySubscriberKeys
+public class Broker<Object> implements Runnable {
+    // Registry key(Source | Sink | inputHandler | outputHandler) -> queue
+    private Registry<BlockingQueue<Object>> registry = new Registry<>();
+    // publisherKey(Source | InputHandler) -> arraySubscriberKeys (Sink | OutputHandler)
     private Map<Integer, ArrayList<Integer>> observers = new HashMap<>();
     private BlockingQueue<MessageEvent> eventQueue = new LinkedBlockingQueue<>();
 
@@ -22,13 +25,31 @@ public class Broker<T> implements Runnable {
     }
 
     /**
-     * Register a new Entity (Publisher | Subscriber)
+     * Register a new Entity
      */
-    public int register(Entity<T> entity) {
-        BlockingQueue<T> queue = new LinkedBlockingQueue<>(); // TODO eventually limit queue size
+    public int register(Source source) {
+        EntityQueue entityQueue = this.registerEntity();
+        source.initializeEntity(entityQueue.entityId, entityQueue.queue, this);
+        return entityQueue.entityId;
+    }
+
+    public int register(Sink sink) {
+        EntityQueue entityQueue = this.registerEntity();
+        sink.initializeEntity(entityQueue.entityId, entityQueue.queue);
+        return entityQueue.entityId;
+    }
+
+    public int[] register(Handler handler) {
+        EntityQueue entityQueuePublish = this.registerEntity();
+        EntityQueue entityQueueSubscribe = this.registerEntity();
+        handler.initializeEntity(entityQueuePublish.entityId, entityQueueSubscribe.entityId, entityQueuePublish.queue, entityQueueSubscribe.queue, this);
+        return new int[]{entityQueuePublish.entityId, entityQueueSubscribe.entityId};
+    }
+
+    private EntityQueue registerEntity() {
+        BlockingQueue<Object> queue = new LinkedBlockingQueue<>(); // TODO eventually limit queue size
         int entityId = this.registry.register(queue);
-        entity.initializeEntity(entityId, queue, this);
-        return entityId;
+        return new EntityQueue(entityId, queue);
     }
 
     public void addSubscriber(int subscriberId, int publisherId) {
@@ -49,8 +70,8 @@ public class Broker<T> implements Runnable {
     }
 
     private void handleMessageEvent(MessageEvent event) {
-        BlockingQueue<T> pubQueue = registry.get(event.publisherId);
-        T msg = pubQueue.poll();
+        BlockingQueue<Object> pubQueue = registry.get(event.publisherId);
+        Object msg = pubQueue.poll();
         if (msg == null) {
             System.err.println("Was notified of inexistent Message");
             return;
@@ -86,6 +107,16 @@ public class Broker<T> implements Runnable {
 
         }
         System.out.println("Thread interrupted: " + Thread.interrupted());
+    }
+
+    class EntityQueue {
+        BlockingQueue<Object> queue;
+        int entityId;
+
+        EntityQueue(int entityId, BlockingQueue<Object> queue) {
+            this.entityId = entityId;
+            this.queue = queue;
+        }
     }
 
     class MessageEvent {

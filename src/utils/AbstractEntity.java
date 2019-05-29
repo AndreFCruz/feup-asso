@@ -1,38 +1,38 @@
-package stuff;
+package utils;
 
-import java.util.concurrent.BlockingQueue;
+import manager.Broker;
 
+public abstract class AbstractEntity<T> implements Runnable {
 
-interface Entity<T> extends Runnable {
+    private int id;
+    private Broker<T> broker;
 
     /**
      * Initialize this Entity with the appropriate references
      *
      * @param id     This entity's ID (from Broker's registry)
-     * @param queue  This entity's message Queue
      * @param broker Reference to message Broker
      */
-    void initializeEntity(int id, BlockingQueue<T> queue, Broker<T> broker);
+    public AbstractEntity(int id, Broker<T> broker) {
+        this.id = id;
+        this.broker = broker;
+    }
 
     /**
      * Getter for this entity's ID (from Broker's registry)
      *
      * @return This Entity's ID
      */
-    int getId();
-
-    /**
-     * Getter for this entity's message Queue
-     *
-     * @return This Entity's Queue
-     */
-    BlockingQueue<T> getQueue();
+    protected int getId() {
+        return this.id;
+    }
 
     /**
      * Getter for this entity's Broker
      *
      * @return This Entity's Broker
      */
-    Broker<T> getBroker();
-
+    protected Broker<T> getBroker() {
+        return this.broker;
+    }
 }

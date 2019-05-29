@@ -1,8 +1,45 @@
 package nodes;
 
-import stuff.AbstractEntity;
-import stuff.Subscriber;
+import java.util.concurrent.BlockingQueue;
 
-abstract class Sink<T> extends AbstractEntity<T> implements Subscriber<T> {
+public abstract class Sink<T> implements Runnable {
 
+    protected int id;
+    private BlockingQueue<Object> queue;
+
+    public void initializeEntity(int id, BlockingQueue<Object> queue) {
+        this.id = id;
+        this.queue = queue;
+    }
+
+    /**
+     * Handle the given Message
+     * May block!
+     *
+     * @param message the message
+     * @throws InterruptedException thrown when interrupted
+     */
+    protected abstract void handleMessage(T message) throws InterruptedException;
+
+    /**
+     * May block if Queue is empty
+     *
+     * @return The pulled message
+     * @throws InterruptedException thrown when interrupted
+     */
+    private T pullMessage() throws InterruptedException {
+        return (T) this.queue.take();
+    }
+
+    @Override
+    public void run() {
+        try {
+            while (!Thread.interrupted()) {
+                T msg = this.pullMessage();
+                this.handleMessage(msg);
+            }
+        } catch (InterruptedException e) {
+            System.out.println("Subscriber " + this.id + " Thread interrupted");
+        }
+    }
 }
