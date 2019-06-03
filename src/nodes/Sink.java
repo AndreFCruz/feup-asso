@@ -5,9 +5,9 @@ import java.util.concurrent.BlockingQueue;
 public abstract class Sink<T> implements Runnable {
 
     protected int id;
-    private BlockingQueue<Object> queue;
+    private BlockingQueue<T> queue;
 
-    public void initializeEntity(int id, BlockingQueue<Object> queue) {
+    public void initializeEntity(int id, BlockingQueue<T> queue) {
         this.id = id;
         this.queue = queue;
     }
@@ -28,7 +28,7 @@ public abstract class Sink<T> implements Runnable {
      * @throws InterruptedException thrown when interrupted
      */
     private T pullMessage() throws InterruptedException {
-        return (T) this.queue.take();
+        return this.queue.take();
     }
 
     @Override

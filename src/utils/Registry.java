@@ -28,4 +28,14 @@ public abstract class Registry<K, T> {
             }
         };
     }
+
+    static public <V> Registry<String, V> makeStringRegistry() {
+        return new Registry<>() {
+            @Override
+            protected String generateKey(V obj) {
+                return Integer.toString(obj.hashCode());
+            }
+        };
+    }
+
 }

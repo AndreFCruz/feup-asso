@@ -29,10 +29,10 @@ public class Main {
         int integerSourceKey = manager.register(integerSource);
 
         // Create Handlers
-        Handler<Object> md5Converter = new MD5Converter();
+        Handler<Object, String> md5Converter = new MD5Converter();
         int[] md5ConverterKeys = manager.register(md5Converter);
 
-        Handler<String> uppercase = new Uppercase();
+        Handler<String, String> uppercase = new Uppercase();
         int[] uppercaseKeys = manager.register(uppercase);
 
         // Create Sinks

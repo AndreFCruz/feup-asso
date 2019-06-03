@@ -6,7 +6,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class MD5Converter extends Handler<Object> {
+public class MD5Converter extends Handler<Object, String> {
 
     private static String getMd5(String input) {
         try {
@@ -36,7 +36,8 @@ public class MD5Converter extends Handler<Object> {
     }
 
     @Override
-    protected Object handleMessage(Object message) {
+    protected String handleMessage(Object message) {
+        System.out.println("Message: " + message.toString());
         return getMd5(message.toString());
     }
 }

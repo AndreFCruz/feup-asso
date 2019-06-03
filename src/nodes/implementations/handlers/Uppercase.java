@@ -2,7 +2,7 @@ package nodes.implementations.handlers;
 
 import nodes.Handler;
 
-public class Uppercase extends Handler<String> {
+public class Uppercase extends Handler<String, String> {
 
     @Override
     protected String handleMessage(String message) {

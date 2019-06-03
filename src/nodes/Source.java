@@ -7,10 +7,10 @@ import java.util.concurrent.BlockingQueue;
 public abstract class Source<T> implements Runnable {
 
     private int id;
-    private BlockingQueue<Object> queue;
-    private Broker<Object> broker;
+    private BlockingQueue<T> queue;
+    private Broker<T> broker;
 
-    public void initializeEntity(int id, BlockingQueue<Object> queue, Broker<Object> broker) {
+    public void initializeEntity(int id, BlockingQueue<T> queue, Broker<T> broker) {
         this.id = id;
         this.queue = queue;
         this.broker = broker;
@@ -23,7 +23,7 @@ public abstract class Source<T> implements Runnable {
      * @return The generated Message
      * @throws InterruptedException Thrown when interrupted
      */
-    protected abstract T getMessage() throws InterruptedException;
+    protected abstract T produceMessage() throws InterruptedException;
 
     /**
      * Private method used for publishing new messages
@@ -40,7 +40,7 @@ public abstract class Source<T> implements Runnable {
     public void run() {
         try {
             while (!Thread.interrupted()) {
-                T message = this.getMessage();
+                T message = this.produceMessage();
                 this.publishMessage(message);
             }
         } catch (InterruptedException e) {
