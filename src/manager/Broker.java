@@ -1,9 +1,7 @@
 package manager;
 
-import nodes.Handler;
-import nodes.Sink;
-import nodes.Source;
 import utils.Registry;
+import nodes.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,20 +27,21 @@ public class Broker<T> implements Runnable {
      */
     public int register(Source source) {
         EntityQueue entityQueue = this.registerEntity();
-        source.initializeEntity(entityQueue.entityId, entityQueue.queue, this);
+        source.initialize(entityQueue.entityId, entityQueue.queue, this);
         return entityQueue.entityId;
     }
 
     public int register(Sink sink) {
         EntityQueue entityQueue = this.registerEntity();
-        sink.initializeEntity(entityQueue.entityId, entityQueue.queue);
+        sink.initialize(entityQueue.entityId, entityQueue.queue);
         return entityQueue.entityId;
     }
 
     public int[] register(Handler handler) {
         EntityQueue entityQueuePublish = this.registerEntity();
         EntityQueue entityQueueSubscribe = this.registerEntity();
-        handler.initializeEntity(entityQueuePublish.entityId, entityQueueSubscribe.entityId, entityQueuePublish.queue, entityQueueSubscribe.queue, this);
+        handler.initializeSink(entityQueueSubscribe.entityId,  entityQueueSubscribe.queue);
+        handler.initializeSource(entityQueuePublish.entityId, entityQueuePublish.queue, this);
         return new int[]{entityQueueSubscribe.entityId, entityQueuePublish.entityId};
     }
 

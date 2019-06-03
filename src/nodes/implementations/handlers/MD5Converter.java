@@ -36,7 +36,7 @@ public class MD5Converter extends Handler<Object, String> {
     }
 
     @Override
-    protected String handleMessage(Object message) {
+    public String handleMessage(Object message) {
         System.out.println("Message: " + message.toString());
         return getMd5(message.toString());
     }

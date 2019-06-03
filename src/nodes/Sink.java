@@ -1,25 +1,21 @@
 package nodes;
 
+import pubsub.Subscriber;
+
 import java.util.concurrent.BlockingQueue;
 
-public abstract class Sink<T> implements Runnable {
+public abstract class Sink<In, Out> implements Subscriber<In, Out>, Runnable {
+    private int id;
+    private BlockingQueue<In> queue;
 
-    protected int id;
-    private BlockingQueue<T> queue;
-
-    public void initializeEntity(int id, BlockingQueue<T> queue) {
+    public void initialize(int id, BlockingQueue<In> queue) {
         this.id = id;
         this.queue = queue;
     }
 
-    /**
-     * Handle the given Message
-     * May block!
-     *
-     * @param message the message
-     * @throws InterruptedException thrown when interrupted
-     */
-    protected abstract void handleMessage(T message) throws InterruptedException;
+    public int getId() {
+        return this.id;
+    }
 
     /**
      * May block if Queue is empty
@@ -27,7 +23,7 @@ public abstract class Sink<T> implements Runnable {
      * @return The pulled message
      * @throws InterruptedException thrown when interrupted
      */
-    private T pullMessage() throws InterruptedException {
+    In pullMessage() throws InterruptedException {
         return this.queue.take();
     }
 
@@ -35,8 +31,7 @@ public abstract class Sink<T> implements Runnable {
     public void run() {
         try {
             while (!Thread.interrupted()) {
-                T msg = this.pullMessage();
-                this.handleMessage(msg);
+                this.handleMessage(this.pullMessage());
             }
         } catch (InterruptedException e) {
             System.out.println("Subscriber " + this.id + " Thread interrupted");

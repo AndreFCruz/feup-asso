@@ -1,29 +1,36 @@
 package nodes;
 
 import manager.Broker;
+import pubsub.Publisher;
 
 import java.util.concurrent.BlockingQueue;
 
-public abstract class Source<T> implements Runnable {
+public abstract class Source<Out> implements Publisher<Out>, Runnable {
 
+    /**
+     * This entity's unique ID.
+     */
     private int id;
-    private BlockingQueue<T> queue;
-    private Broker<T> broker;
 
-    public void initializeEntity(int id, BlockingQueue<T> queue, Broker<T> broker) {
+    /**
+     * Queue of outgoing items of type T.
+     */
+    private BlockingQueue<Out> queue;
+
+    /**
+     * Reference of Broker to signal when an item is produced.
+     */
+    private Broker<Out> broker;
+
+    public void initialize(int id, BlockingQueue<Out> queue, Broker<Out> broker) {
         this.id = id;
         this.queue = queue;
         this.broker = broker;
     }
 
-    /**
-     * Method for this Source to generate a Message.
-     * May block!
-     *
-     * @return The generated Message
-     * @throws InterruptedException Thrown when interrupted
-     */
-    protected abstract T produceMessage() throws InterruptedException;
+    public int getId() {
+        return this.id;
+    }
 
     /**
      * Private method used for publishing new messages
@@ -31,7 +38,7 @@ public abstract class Source<T> implements Runnable {
      * @param message Message to publish
      * @throws InterruptedException Thrown when interrupted
      */
-    private void publishMessage(T message) throws InterruptedException {
+    void publishMessage(Out message) throws InterruptedException {
         this.queue.put(message);
         this.broker.notifyNewMessage(this.id, message.hashCode());
     }
@@ -40,13 +47,11 @@ public abstract class Source<T> implements Runnable {
     public void run() {
         try {
             while (!Thread.interrupted()) {
-                T message = this.produceMessage();
-                this.publishMessage(message);
+                this.publishMessage(this.produceMessage());
             }
         } catch (InterruptedException e) {
             System.out.println("Publisher " + this.id + " Thread interrupted");
         }
     }
-
 
 }

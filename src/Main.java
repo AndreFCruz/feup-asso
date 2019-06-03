@@ -36,10 +36,10 @@ public class Main {
         int[] uppercaseKeys = manager.register(uppercase);
 
         // Create Sinks
-        Sink<Object> printerSink = new Printer();
+        Sink<Object, Void> printerSink = new Printer();
         int printerSinkKey = manager.register(printerSink);
 
-        Sink<Object> fileWriterSink = new FileWriter();
+        Sink<Object, Void> fileWriterSink = new FileWriter();
         int fileWriterSinkKey = manager.register(fileWriterSink);
 
 

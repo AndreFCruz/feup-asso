@@ -1,66 +1,58 @@
 package nodes;
 
 import manager.Broker;
+import pubsub.Publisher;
+import pubsub.Subscriber;
 
 import java.util.concurrent.BlockingQueue;
 
-public abstract class Handler<In, Out> implements Runnable {
+public abstract class Handler<In, Out> implements Subscriber<In, Out>, Publisher<Out>, Runnable {
 
-    private int outputId;
-    private int inputId;
-    private BlockingQueue<Out> publishQueue;
-    private BlockingQueue<In> subscribeQueue;
-    private Broker<Object> broker;
 
-    public void initializeEntity(int outputId, int inputId, BlockingQueue<Out> publishQueue, BlockingQueue<In> subscribeQueue, Broker<Object> broker) {
-        this.outputId = outputId;
-        this.inputId = inputId;
-        this.publishQueue = publishQueue;
-        this.subscribeQueue = subscribeQueue;
-        this.broker = broker;
+    private Source<Out> source;
+    private Sink<In, Out> sink;
+
+    public Handler() {
+        Handler<In, Out> thisHandler = this;
+        this.source = new Source<>() {
+            @Override
+            public Out produceMessage() throws InterruptedException {
+                return thisHandler.produceMessage();
+            }
+        };
+
+        this.sink = new Sink<>() {
+            @Override
+            public Out handleMessage(In message) throws InterruptedException {
+                return thisHandler.handleMessage(message);
+            }
+        };
     }
 
-    /**
-     * Handle the given Message
-     * May block!
-     *
-     * @param message the message
-     * @return The processed message
-     * @throws InterruptedException thrown when interrupted
-     */
-    protected abstract Out handleMessage(In message) throws InterruptedException;
-
-    /**
-     * May block if Queue is empty
-     *
-     * @return The pulled message
-     * @throws InterruptedException thrown when interrupted
-     */
-    private In pullMessage() throws InterruptedException {
-        return this.subscribeQueue.take();
+    public void initializeSource(int id, BlockingQueue<Out> queue, Broker<Out> broker) {
+        source.initialize(id, queue, broker);
     }
 
-    /**
-     * Private method used for publishing new messages
-     *
-     * @param message Message to publish
-     * @throws InterruptedException Thrown when interrupted
-     */
-    private void publishMessage(Out message) throws InterruptedException {
-        this.publishQueue.put(message);
-        this.broker.notifyNewMessage(this.outputId, message.hashCode());
+    public void initializeSink(int id, BlockingQueue<In> queue) {
+        sink.initialize(id, queue);
     }
 
+    @Override
+    public Out produceMessage() throws InterruptedException {
+        In message = sink.pullMessage();
+        return this.handleMessage(message);
+    }
+
+    // This method can cease to exist, and instead launch threads for this handler's sink/source references;
+    // Sink will pull message, handle message, and pass to source, which publishes it and notifies the Broker.
     @Override
     public void run() {
         try {
             while (!Thread.interrupted()) {
-                In message = this.pullMessage();
-                Out processedMessage = this.handleMessage(message);
-                this.publishMessage(processedMessage);
+                source.publishMessage(this.produceMessage());
             }
         } catch (InterruptedException e) {
-            System.out.println("Handler " + this.inputId + "|" + this.outputId + " Thread interrupted");
+            System.out.println("Handler " + this.sink.getId() + "|" + this.source.getId() + " Thread interrupted");
         }
     }
 }

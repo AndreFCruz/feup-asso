@@ -1,12 +1,13 @@
 package nodes.implementations.sources;
 
+
 import nodes.Source;
 
 public class StringGenerator extends Source<String> {
     private int MAX_STRING_LENGTH = 10;
 
     @Override
-    protected String produceMessage() throws InterruptedException {
+    public String produceMessage() throws InterruptedException {
         Thread.sleep(500);
         String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                 + "0123456789"
