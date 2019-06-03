@@ -1,11 +1,31 @@
 package utils;
 
-public class Registry<T> extends AbstractRegistry<Integer, T> {
+import java.util.HashMap;
+import java.util.Map;
 
-    private int counter = 0;
+public abstract class Registry<K, T> {
+    private Map<K, T> map = new HashMap<>();
 
-    @Override
-    protected Integer generateKey(T obj) {
-        return counter++;
+    protected abstract K generateKey(T obj);
+
+    public K register(T obj) {
+        K key = this.generateKey(obj);
+        this.map.put(key, obj);
+        return key;
+    }
+
+    public T get(K key) {
+        return this.map.get(key);
+    }
+
+    static public <V> Registry<Integer, V> makeIntRegistry() {
+        return new Registry<>() {
+            private int counter = 0;
+
+            @Override
+            protected Integer generateKey(V obj) {
+                return counter++;
+            }
+        };
     }
 }

@@ -12,11 +12,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * @param <Object> Message type
+ * @param <T> Message type
  */
-public class Broker<Object> implements Runnable {
+public class Broker<T> implements Runnable {
     // Registry key(Source | Sink | inputHandler | outputHandler) -> queue
-    private Registry<BlockingQueue<Object>> registry = new Registry<>();
+    private Registry<Integer, BlockingQueue<T>> registry = Registry.makeIntRegistry();
     // publisherKey(Source | InputHandler) -> arraySubscriberKeys (Sink | OutputHandler)
     private Map<Integer, ArrayList<Integer>> observers = new HashMap<>();
     private BlockingQueue<MessageEvent> eventQueue = new LinkedBlockingQueue<>();
@@ -47,7 +47,7 @@ public class Broker<Object> implements Runnable {
     }
 
     private EntityQueue registerEntity() {
-        BlockingQueue<Object> queue = new LinkedBlockingQueue<>(); // TODO eventually limit queue size
+        BlockingQueue<T> queue = new LinkedBlockingQueue<>(); // TODO eventually limit queue size
         int entityId = this.registry.register(queue);
         return new EntityQueue(entityId, queue);
     }
@@ -70,8 +70,8 @@ public class Broker<Object> implements Runnable {
     }
 
     private void handleMessageEvent(MessageEvent event) {
-        BlockingQueue<Object> pubQueue = registry.get(event.publisherId);
-        Object msg = pubQueue.poll();
+        BlockingQueue<T> pubQueue = registry.get(event.publisherId);
+        T msg = pubQueue.poll();
         if (msg == null) {
             System.err.println("Was notified of inexistent Message");
             return;
@@ -110,10 +110,10 @@ public class Broker<Object> implements Runnable {
     }
 
     class EntityQueue {
-        BlockingQueue<Object> queue;
+        BlockingQueue<T> queue;
         int entityId;
 
-        EntityQueue(int entityId, BlockingQueue<Object> queue) {
+        EntityQueue(int entityId, BlockingQueue<T> queue) {
             this.entityId = entityId;
             this.queue = queue;
         }
