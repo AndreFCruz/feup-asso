@@ -10,3 +10,76 @@ Generate permutations of test scenarios
 // TODO if queue is full take oldest message and publish most recent ?
 Filewriter -> write to a file :D
 create handlers? on gui?
+
+
+
+
+não é 100% num ou no outro, mas neste momento precisamos de rotas REST para criar/remover nós
+editar subscrições
+(edges)
+o front-end tbem precisa de saber quais os tipos de nós disponíveis de cada tipo
+no frontend é preciso desenhar isto e ter callbacks para chamar as rotas
+
+duvidas:
+1) Web sockets para que entao? para retornar os resultados dos publishers/handlers?
+2) A posiçao e assim dos nodes é relevante?
+3) criar nós, é suposto passar o que? uma string a dizer o tipo? 🙂 
+4) Editar subcrições é necessario passar os id's dos gajos?
+5) Entao no front end temos de mostar os tipos de nós existentes, strings? e Ter ao lado os id's de cad nó?
+1) ya, para comunicação do backend para o frontend, não sei outra maneira
+2) a posição é irrelevante, só conta as ligações
+3) o front-end sabe que tipos de nós há, e pode haver uma rota create/{tipo}
+(parece trolha mas isto não é o foco de asso, acho que vale)
+na criação devolve o id
+depois para criar subscrições o front-end já tem os ids necessários
+e ya, no frontend tens que mostrar os tipos de nós existentes
+temos que associar um tipo a uma string desse tipo no backend e mandar tudo para o front-end no início
+ya um enum manhoso
+👍1
+agora duvidas de comunicaçao. Vale a pena ter REST se tivermos apenas web sockets?
+ou temos Rest para client -> server
+e web sockets para server -> client?
+eu diria a segunda
+só porque é mais fácil
+se for tudo por sockets temos que inventar um protocolo
+certo
+vale a pena ter uma class graph?
+ou um Document?
+sim
+até porque vamos ter que serializar
+
+
+rotas para adicionar/apagar nós
+rotas para adicionar edges (subscrições)
+o Graph tem um Broker e um array de nós (?)
+e cenas tipo mapeamento de strings para classes de nós
+ou fazes uma AbstractFactory que recebe uma string e cria um nó
+acho que também tens que ter maneira de saber se uma subscrição é valida
+tipo, se tentares subscrever uma Sink, não devia dar, mas tem na mesma um I'd no Broker
+um id*
+se calhar é preciso manter 3 arrays de nós, 1 para cada tipo
+e pronto, à medida que for fazendo vou me lembrando de mais rotas
+
+
+
+frontend vai ser botoes para criar nós de cada tipo
+criar arestas
+e manter toda a info no frontend necessária para isso
+também botões para guardar/serializar e fazer load
+👍1
+e para correr
+e callbacks para isso tudo
+e hopefully não fica MT feio porque eu não sei css bonito
+
+https://github.com/uber/react-digraph
+
+
+https://stackoverflow.com/questions/3732109/simple-http-server-in-java-using-only-java-se-api
+https://www.logicbig.com/tutorials/core-java-tutorial/http-server/http-server-basic.html
+https://www.codeproject.com/Tips/1040097/Create-a-Simple-Web-Server-in-Java-HTTP-Server
+https://docs.oracle.com/javase/10/docs/api/com/sun/net/httpserver/HttpServer.html
+
+
+https://www.stubbornjava.com/posts/lightweight-embedded-java-rest-server-without-a-framework
+^
+

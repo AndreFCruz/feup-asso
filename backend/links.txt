@@ -8,3 +8,13 @@ https://github.com/codedamn/reactjs-graphs#readme
 só precisamos de ter uma classe que repreqente o grafo da rede
 e depois mandar todas as alterações a esse grafo para o backend
 há: adicionar nós, apagar nós, ligar nós, editar settings de um nó
+
+
+https://visjs.org/
+https://visjs.org/examples/network/events/interactionEvents.html
+https://github.com/uber/react-digraph
+http://ggeditor.com/
+
+http://bl.ocks.org/fancellu/2c782394602a93921faff74e594d1bb1
+https://bl.ocks.org/cjrd/6863459
+https://github.com/vasturiano/3d-force-graph
