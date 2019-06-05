@@ -1,5 +1,8 @@
-package stuff;
+package manager;
 
+import nodes.Handler;
+import nodes.Sink;
+import nodes.Source;
 import utils.Registry;
 
 import java.util.ArrayList;
@@ -9,53 +12,45 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- *
  * @param <T> Message type
  */
 public class Broker<T> implements Runnable {
-    class MessageEvent {
-        int publisherId;
-        int messageHash;
-        Long timeToLive;    // In milliseconds
-        long arrivalTime;   // In milliseconds
-
-        MessageEvent(int publisherId, int messageHash) {
-            this(publisherId, messageHash, null);
-        }
-
-        MessageEvent(int publisherId, int messageHash, Long timeToLive) {
-            this.publisherId = publisherId;
-            this.messageHash = messageHash;
-            this.timeToLive = timeToLive;
-            this.arrivalTime = System.currentTimeMillis();
-        }
-
-        boolean isAlive() {
-            return this.timeToLive == null ||
-                   this.arrivalTime + this.timeToLive > System.currentTimeMillis();
-
-        }
-    }
-
-    // Registry key(Publisher | Subscriber) -> queue
-    private Registry<BlockingQueue<T>> registry = new Registry<BlockingQueue<T>>();
-
-    // publisherKey -> arraySubscriberKeys
+    // Registry key(Source | Sink | inputHandler | outputHandler) -> queue
+    private Registry<Integer, BlockingQueue<T>> registry = Registry.makeIntRegistry();
+    // publisherKey(Source | InputHandler) -> arraySubscriberKeys (Sink | OutputHandler)
     private Map<Integer, ArrayList<Integer>> observers = new HashMap<>();
-
     private BlockingQueue<MessageEvent> eventQueue = new LinkedBlockingQueue<>();
 
     public Broker() {
     }
 
     /**
-     * Register a new Entity (Publisher | Subscriber)
+     * Register a new Entity
      */
-    public int register(Entity<T> entity) {
+    public int register(Source source) {
+        EntityQueue entityQueue = this.registerEntity();
+        source.initialize(entityQueue.entityId, entityQueue.queue, this);
+        return entityQueue.entityId;
+    }
+
+    public int register(Sink sink) {
+        EntityQueue entityQueue = this.registerEntity();
+        sink.initialize(entityQueue.entityId, entityQueue.queue);
+        return entityQueue.entityId;
+    }
+
+    public int[] register(Handler handler) {
+        EntityQueue entityQueuePublish = this.registerEntity();
+        EntityQueue entityQueueSubscribe = this.registerEntity();
+        handler.initializeSink(entityQueueSubscribe.entityId, entityQueueSubscribe.queue);
+        handler.initializeSource(entityQueuePublish.entityId, entityQueuePublish.queue, this);
+        return new int[]{entityQueueSubscribe.entityId, entityQueuePublish.entityId};
+    }
+
+    private EntityQueue registerEntity() {
         BlockingQueue<T> queue = new LinkedBlockingQueue<>(); // TODO eventually limit queue size
         int entityId = this.registry.register(queue);
-        entity.initializeEntity(entityId, queue, this);
-        return entityId;
+        return new EntityQueue(entityId, queue);
     }
 
     public void addSubscriber(int subscriberId, int publisherId) {
@@ -67,9 +62,9 @@ public class Broker<T> implements Runnable {
     /**
      * Method used for publishers to notify the Broker that there's a new message to
      * be handled.
-     * 
+     *
      * @param publisherId Id of the publishing Publisher
-     * @throws InterruptedException
+     * @param messageHash Hash of the message
      */
     public void notifyNewMessage(int publisherId, int messageHash) throws InterruptedException {
         eventQueue.put(new MessageEvent(publisherId, messageHash));
@@ -84,7 +79,7 @@ public class Broker<T> implements Runnable {
         }
 
         assert msg.hashCode() == event.messageHash;
-        if (! event.isAlive()) {
+        if (!event.isAlive()) {
             System.out.println("Discarded message with expired Time-to-Live");
             return;
         }
@@ -110,8 +105,41 @@ public class Broker<T> implements Runnable {
                 break;
             }
             this.handleMessageEvent(event);
-
         }
         System.out.println("Thread interrupted: " + Thread.interrupted());
+    }
+
+    class EntityQueue {
+        BlockingQueue<T> queue;
+        int entityId;
+
+        EntityQueue(int entityId, BlockingQueue<T> queue) {
+            this.entityId = entityId;
+            this.queue = queue;
+        }
+    }
+
+    class MessageEvent {
+        int publisherId;
+        int messageHash;
+        Long timeToLive;    // In milliseconds
+        long arrivalTime;   // In milliseconds
+
+        MessageEvent(int publisherId, int messageHash) {
+            this(publisherId, messageHash, null);
+        }
+
+        MessageEvent(int publisherId, int messageHash, Long timeToLive) {
+            this.publisherId = publisherId;
+            this.messageHash = messageHash;
+            this.timeToLive = timeToLive;
+            this.arrivalTime = System.currentTimeMillis();
+        }
+
+        boolean isAlive() {
+            return this.timeToLive == null ||
+                    this.arrivalTime + this.timeToLive > System.currentTimeMillis();
+
+        }
     }
 }

@@ -1,8 +1,13 @@
-import stuff.Broker;
-import stuff.Publisher;
-import stuff.Subscriber;
-import stuff.implementations.ConcretePublisher;
-import stuff.implementations.ConcreteSubscriber;
+import manager.Broker;
+import nodes.Handler;
+import nodes.Sink;
+import nodes.Source;
+import nodes.implementations.handlers.MD5Converter;
+import nodes.implementations.handlers.Uppercase;
+import nodes.implementations.sinks.FileWriter;
+import nodes.implementations.sinks.Printer;
+import nodes.implementations.sources.IntegerGenerator;
+import nodes.implementations.sources.StringGenerator;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,41 +19,46 @@ public class Main {
         final ExecutorService executor = Executors.newCachedThreadPool();
 
         // Create Broker
-        Broker<Integer> broker = new Broker<>();
+        Broker<Object> manager = new Broker<>();
 
         // Create Publishers and populate registry
-        Publisher<Integer> pubA = new ConcretePublisher();
-        int pubAKey = broker.register(pubA);
-        executor.submit(pubA);
+        Source<String> stringSource = new StringGenerator();
+        int stringSourceKey = manager.register(stringSource);
 
-        Publisher<Integer> pubB = new ConcretePublisher();
-        int pubBKey = broker.register(pubB);
-        executor.submit(pubB);
+        Source<Integer> integerSource = new IntegerGenerator();
+        int integerSourceKey = manager.register(integerSource);
 
-        // Create Subscribers
-        Subscriber<Integer> subA = new ConcreteSubscriber();
-        int subAKey = broker.register(subA);
-        Subscriber<Integer> subB = new ConcreteSubscriber();
-        int subBKey = broker.register(subB);
-        Subscriber<Integer> subC = new ConcreteSubscriber();
-        int subCKey = broker.register(subC);
-        Subscriber<Integer> subD = new ConcreteSubscriber();
-        int subDKey = broker.register(subD);
+        // Create Handlers
+        Handler<Object, String> md5Converter = new MD5Converter();
+        int[] md5ConverterKeys = manager.register(md5Converter);
+
+        Handler<String, String> uppercase = new Uppercase();
+        int[] uppercaseKeys = manager.register(uppercase);
+
+        // Create Sinks
+        Sink<Object, Void> printerSink = new Printer();
+        int printerSinkKey = manager.register(printerSink);
+
+        Sink<Object, Void> fileWriterSink = new FileWriter();
+        int fileWriterSinkKey = manager.register(fileWriterSink);
+
 
         // // Manage subscriptions
-        broker.addSubscriber(subAKey, pubAKey);
-        broker.addSubscriber(subAKey, pubBKey);
-        broker.addSubscriber(subBKey, pubBKey);
-        broker.addSubscriber(subCKey, pubAKey);
-        broker.addSubscriber(subDKey, pubAKey);
+        manager.addSubscriber(printerSinkKey, stringSourceKey);
+        manager.addSubscriber(printerSinkKey, integerSourceKey);
+        manager.addSubscriber(uppercaseKeys[0], stringSourceKey);
+        manager.addSubscriber(fileWriterSinkKey, uppercaseKeys[1]);
 
-        executor.submit(subA);
-        executor.submit(subB);
-        executor.submit(subC);
-        executor.submit(subD);
+        executor.submit(stringSource);
+        executor.submit(integerSource);
+
+        executor.submit(uppercase);
+
+        executor.submit(printerSink);
+        executor.submit(fileWriterSink);
 
         ExecutorService brokerExec = Executors.newSingleThreadExecutor();
-        brokerExec.execute(broker);
+        brokerExec.execute(manager);
 
         new Thread(() -> {
             try {
