@@ -4,17 +4,12 @@ import pubsub.Subscriber;
 
 import java.util.concurrent.BlockingQueue;
 
-public abstract class Sink<In, Out> implements Subscriber<In, Out>, Runnable {
-    private int id;
+public abstract class Sink<In, Out> extends Node implements Subscriber<In, Out>, Runnable {
     private BlockingQueue<In> queue;
 
     public void initialize(int id, BlockingQueue<In> queue) {
-        this.id = id;
+        super.initialize(id);
         this.queue = queue;
-    }
-
-    public int getId() {
-        return this.id;
     }
 
     /**
@@ -34,7 +29,7 @@ public abstract class Sink<In, Out> implements Subscriber<In, Out>, Runnable {
                 this.handleMessage(this.pullMessage());
             }
         } catch (InterruptedException e) {
-            System.out.println("Subscriber " + this.id + " Thread interrupted");
+            System.out.println("Subscriber " + this.getId() + " Thread interrupted");
         }
     }
 }

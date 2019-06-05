@@ -5,12 +5,9 @@ import pubsub.Publisher;
 
 import java.util.concurrent.BlockingQueue;
 
-public abstract class Source<Out> implements Publisher<Out>, Runnable {
+public abstract class Source<Out> extends Node implements Publisher<Out>, Runnable {
 
-    /**
-     * This entity's unique ID.
-     */
-    private int id;
+
 
     /**
      * Queue of outgoing items of type T.
@@ -23,13 +20,9 @@ public abstract class Source<Out> implements Publisher<Out>, Runnable {
     private Broker<Out> broker;
 
     public void initialize(int id, BlockingQueue<Out> queue, Broker<Out> broker) {
-        this.id = id;
+        super.initialize(id);
         this.queue = queue;
         this.broker = broker;
-    }
-
-    public int getId() {
-        return this.id;
     }
 
     /**
@@ -40,7 +33,7 @@ public abstract class Source<Out> implements Publisher<Out>, Runnable {
      */
     void publishMessage(Out message) throws InterruptedException {
         this.queue.put(message);
-        this.broker.notifyNewMessage(this.id, message.hashCode());
+        this.broker.notifyNewMessage(this.getId(), message.hashCode());
     }
 
     @Override
@@ -50,7 +43,7 @@ public abstract class Source<Out> implements Publisher<Out>, Runnable {
                 this.publishMessage(this.produceMessage());
             }
         } catch (InterruptedException e) {
-            System.out.println("Publisher " + this.id + " Thread interrupted");
+            System.out.println("Publisher " + this.getId() + " Thread interrupted");
         }
     }
 
