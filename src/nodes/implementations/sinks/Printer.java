@@ -2,7 +2,7 @@ package nodes.implementations.sinks;
 
 import nodes.Sink;
 
-public class Printer extends Sink<Object, Void> {
+public class Printer extends Sink.EndSink<Object> {
 
     // May block when handling message
     @Override

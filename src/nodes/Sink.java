@@ -5,6 +5,13 @@ import pubsub.Subscriber;
 import java.util.concurrent.BlockingQueue;
 
 public abstract class Sink<In, Out> extends Node implements Subscriber<In, Out>, Runnable {
+
+    /**
+     * Helper class definition for Sinks with no return type.
+     * @param <T> The input data type.
+     */
+    public static abstract class EndSink<T> extends Sink<T, Void> {}
+
     private BlockingQueue<In> queue;
 
     public void initialize(int id, BlockingQueue<In> queue) {
