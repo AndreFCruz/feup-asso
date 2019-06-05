@@ -1,0 +1,12 @@
+Implement type checking (error handling)
+Group Nodes
+Serialize Recipes
+Recursive Nodes (receive 2 inputs, one for the data and one for the number of loops (recursive calls) to execute)
+GUI for creating recipes
+Implement Several nodes
+Generate permutations of test scenarios
+
+// TODO eventually limit queue size
+// TODO if queue is full take oldest message and publish most recent ?
+Filewriter -> write to a file :D
+create handlers? on gui?

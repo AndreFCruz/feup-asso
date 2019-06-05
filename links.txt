@@ -1,0 +1,10 @@
+https://github.com/danielcaldas/react-d3-graph
+https://github.com/lightsinthesky/react-node-graph#readme
+https://github.com/idflood/ThreeNodes.js
+http://idflood.github.io/ThreeNodes.js/
+https://github.com/codedamn/reactjs-graphs#readme
+
+
+só precisamos de ter uma classe que repreqente o grafo da rede
+e depois mandar todas as alterações a esse grafo para o backend
+há: adicionar nós, apagar nós, ligar nós, editar settings de um nó
