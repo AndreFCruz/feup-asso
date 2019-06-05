@@ -1,6 +1,5 @@
 package nodes.implementations.sinks;
 
-
 import nodes.Sink;
 
 public class FileWriter extends Sink<Object, Void> {

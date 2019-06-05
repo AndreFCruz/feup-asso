@@ -22,11 +22,11 @@ public class MD5Converter extends Handler<Object, String> {
             BigInteger no = new BigInteger(1, messageDigest);
 
             // Convert message digest into hex value
-            StringBuilder hashtext = new StringBuilder(no.toString(16));
-            while (hashtext.length() < 32) {
-                hashtext.insert(0, "0");
+            StringBuilder hashText = new StringBuilder(no.toString(16));
+            while (hashText.length() < 32) {
+                hashText.insert(0, "0");
             }
-            return hashtext.toString();
+            return hashText.toString();
         }
 
         // For specifying wrong message digest algorithms

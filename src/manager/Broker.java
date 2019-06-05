@@ -1,7 +1,9 @@
 package manager;
 
+import nodes.Handler;
+import nodes.Sink;
+import nodes.Source;
 import utils.Registry;
-import nodes.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +42,7 @@ public class Broker<T> implements Runnable {
     public int[] register(Handler handler) {
         EntityQueue entityQueuePublish = this.registerEntity();
         EntityQueue entityQueueSubscribe = this.registerEntity();
-        handler.initializeSink(entityQueueSubscribe.entityId,  entityQueueSubscribe.queue);
+        handler.initializeSink(entityQueueSubscribe.entityId, entityQueueSubscribe.queue);
         handler.initializeSource(entityQueuePublish.entityId, entityQueuePublish.queue, this);
         return new int[]{entityQueueSubscribe.entityId, entityQueuePublish.entityId};
     }
@@ -62,7 +64,7 @@ public class Broker<T> implements Runnable {
      * be handled.
      *
      * @param publisherId Id of the publishing Publisher
-     * @throws InterruptedException
+     * @param messageHash Hash of the message
      */
     public void notifyNewMessage(int publisherId, int messageHash) throws InterruptedException {
         eventQueue.put(new MessageEvent(publisherId, messageHash));
@@ -103,7 +105,6 @@ public class Broker<T> implements Runnable {
                 break;
             }
             this.handleMessageEvent(event);
-
         }
         System.out.println("Thread interrupted: " + Thread.interrupted());
     }

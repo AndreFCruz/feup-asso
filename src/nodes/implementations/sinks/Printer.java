@@ -1,6 +1,5 @@
 package nodes.implementations.sinks;
 
-
 import nodes.Sink;
 
 public class Printer extends Sink<Object, Void> {
