@@ -14,7 +14,7 @@ public class Graph {
 
     // Edges
     // Node1(input) -> Node2(output)
-    private HashMap<String, String> edges = new HashMap<>();
+    private HashMap<String, String> edges;
 
     // Broker
     private Broker manager;
