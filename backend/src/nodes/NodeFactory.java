@@ -7,22 +7,22 @@ import nodes.implementations.sinks.Printer;
 import nodes.implementations.sources.IntegerGenerator;
 import nodes.implementations.sources.StringGenerator;
 
-public enum SourceType {
-    INTEGERGENERATOR,
-    STRINGGENERATOR,
-}
-
-public enum SinkType {
-    FILEWRITER,
-    PRINTER
-}
-
-public enum HandlerType {
-    MD5CONVERTER,
-    UPPERCASE,
-}
-
 public class NodeFactory {
+    public enum SourceType {
+        INTEGERGENERATOR,
+        STRINGGENERATOR,
+    }
+
+    public enum SinkType {
+        FILEWRITER,
+        PRINTER
+    }
+
+    public enum HandlerType {
+        MD5CONVERTER,
+        UPPERCASE,
+    }
+
     public Source createSource(SourceType nodeType) {
         switch (nodeType) {
             case INTEGERGENERATOR:
@@ -33,6 +33,7 @@ public class NodeFactory {
                 throw new IllegalStateException("Unexpected value: " + nodeType);
         }
     }
+
     public Sink createSink(SinkType nodeType) {
         switch (nodeType) {
             case FILEWRITER:
@@ -43,6 +44,7 @@ public class NodeFactory {
                 throw new IllegalStateException("Unexpected value: " + nodeType);
         }
     }
+
     public Handler createHandler(HandlerType nodeType) {
         switch (nodeType) {
             case MD5CONVERTER:
@@ -54,5 +56,4 @@ public class NodeFactory {
         }
     }
 
-    public static
 }

@@ -2,10 +2,8 @@ package manager;
 
 import nodes.*;
 
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.Set;
 
 public class Graph {
     // Nodes
@@ -32,117 +30,95 @@ public class Graph {
         this.nodeFactory = new NodeFactory();
     }
 
-    public String createSource(SourceType sourceType) {
+    public String createSource(NodeFactory.SourceType sourceType) {
         Source source = nodeFactory.createSource(sourceType);
         String sourceKey = manager.register(source);
         sources.put(source.getName(), source);
         return sourceKey;
     }
 
-    public String createSink(SinkType sinkType) {
+    public String createSink(NodeFactory.SinkType sinkType) {
         Sink sink = nodeFactory.createSink(sinkType);
         String sinkKey = manager.register(sink);
         sinks.put(sink.getName(), sink);
         return sinkKey;
     }
 
-    public String createHandler(HandlerType handlerType) {
+    public String createHandler(NodeFactory.HandlerType handlerType) {
         Handler handler = nodeFactory.createHandler(handlerType);
         String handlerKeys = manager.register(handler);
         handlers.put(handler.getName(), handler);
         return handlerKeys;
     }
 
-    public Set<String> getSourcesIds(){
+    public Set<String> getSourcesIds() {
         return sources.keySet();
     }
-    public Set<String> getSinksIds(){
+
+    public Set<String> getSinksIds() {
         return sinks.keySet();
     }
-    public Set<String> getHandlersIds(){
+
+    public Set<String> getHandlersIds() {
         return handlers.keySet();
     }
+
     public void removeSourceById(String sourceId) {
+        sources.remove(sourceId);
+        //TODO: REMOVE EDGES
+        // edges.remove(sourceId);
     }
+
     public void removeSinkById(String sinkId) {
+        sinks.remove(sinkId);
+        //TODO: Remove edges
     }
+
     public void removeHandlerById(String handlerId) {
+        handlers.remove(handlerId);
+        //TODO: REMOVE EDGES
 
     }
-    //Remove Source by name
-    //Remove Sink by name
-    //Remove Handler by name
-    //Create edge
-    public boolean createEdge(String inputId, String outputId) {
-        Node input = null;
-        Node output = null;
-        for (Node node : sources) {
-            if (node.getName().equals(inputId)) {
-                input = node;
-                break;
-            }
-        }
 
-        for (Node node: sinks) {
-            if (node.getName().equals(outputId)) {
-                output = node;
-                break;
-            }
-        }
+    public boolean createEdge(String sourceId, String sinkId) {
+        Node source = getSourceNode(sourceId);
+        Node sink = getSinkNode(sinkId);
 
-        if(input == null || output == null) {
-            for (Node node: handlers) {
-                String[] nodeKeys = node.getName().split("-");
-                if(input == null) {
-                    if (node.getName().equals(inputId)) {
-                        output = node;
-                        break;
-                    }
-                }
-                if(output == null) {
-                    if (node.getName().equals(outputId)) {
-                        output = node;
-                        break;
-                    }
-                }
-
-            }
-        }
-
-        if(input == null || output == null)
+        if (source == null || sink == null)
             return false;
 
-        manager.addSubscriber(output.getName(), input.getName());
+        manager.addSubscriber(source.getName(), sink.getName());
+        return true;
     }
 
-    // // Manage subscriptions
-        manager.addSubscriber(printerSinkKey, stringSourceKey);
-        manager.addSubscriber(printerSinkKey, integerSourceKey);
-        manager.addSubscriber(uppercaseKeys[0], stringSourceKey);
-        manager.addSubscriber(fileWriterSinkKey, uppercaseKeys[1]);
+    private Node getSourceNode(String sourceId) {
+        Node source = sources.get(sourceId);
 
-        executor.submit(stringSource);
-        executor.submit(integerSource);
+        if (source == null)
+            for (String handlerKey : handlers.keySet()) {
+                String[] handlerKeys = handlerKey.split("-");
+                if (handlerKeys[1].equals(sourceId)) {
+                    source = handlers.get(handlerKey);
+                    break;
+                }
+            }
 
-        executor.submit(uppercase);
+        return source;
+    }
 
-        executor.submit(printerSink);
-        executor.submit(fileWriterSink);
+    private Node getSinkNode(String sinkId) {
+        Node sink = sinks.get(sinkId);
 
-    ExecutorService brokerExec = Executors.newSingleThreadExecutor();
-        brokerExec.execute(manager);
+        if (sink == null)
+            for (String handlerKey : handlers.keySet()) {
+                String[] handlerKeys = handlerKey.split("-");
+                if (handlerKeys[0].equals(sinkId)) {
+                    sink = handlers.get(handlerKey);
+                    break;
+                }
+            }
 
-        new Thread(() -> {
-        try {
-            long brokerRunTime = 5000;
-            System.out.println("Trying to block Broker's execution in " + brokerRunTime + " millisecs");
-            brokerExec.awaitTermination(brokerRunTime, TimeUnit.MILLISECONDS);
-            executor.shutdownNow();
-            System.out.println("#...#");
-        } catch (InterruptedException e) {
-            System.out.println("Interrupted kill-switch Thread, lol");
-        }
-    }).start();
-}
+        return sink;
+    }
 
 }
