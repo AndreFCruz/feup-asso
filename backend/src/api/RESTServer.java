@@ -44,6 +44,7 @@ public class RESTServer {
         server.createContext("/createEdge", new Controllers.CreateEdge(infoSecCooker));
         server.createContext("/removeEdge", new Controllers.RemoveEdge(infoSecCooker));
         server.createContext("/runGraph", new Controllers.RunGraph(infoSecCooker));
+        server.createContext("/stopGraph", new Controllers.StopGraph(infoSecCooker));
 
         server.createContext("/getSources", new Controllers.GetSources(infoSecCooker));
         server.createContext("/getSinks", new Controllers.GetSinks(infoSecCooker));

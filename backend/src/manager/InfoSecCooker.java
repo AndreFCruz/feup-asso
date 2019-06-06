@@ -13,16 +13,37 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class InfoSecCooker implements Runnable {
-    private final ExecutorService executor = Executors.newCachedThreadPool();
     public RESTServer restServer;
+
     public Graph graph;
-    private ExecutorService brokerExec = Executors.newSingleThreadExecutor();
     private Broker<Object> manager;
+
+    private ExecutorService brokerExec = Executors.newSingleThreadExecutor();
+    private ExecutorService executor = Executors.newCachedThreadPool();
 
     public InfoSecCooker() throws IOException {
         this.manager = new Broker<>();
         this.graph = new Graph(manager);
         this.restServer = new RESTServer(this);
+        executeBroker();
+    }
+
+    private static void shutdownAndAwaitTermination(ExecutorService pool, long time) {
+        pool.shutdown(); // Disable new tasks from being submitted
+        try {
+            // Wait a while for existing tasks to terminate
+            if (!pool.awaitTermination(time, TimeUnit.MILLISECONDS)) {
+                pool.shutdownNow(); // Cancel currently executing tasks
+                // Wait a while for tasks to respond to being cancelled
+                if (!pool.awaitTermination(time, TimeUnit.MILLISECONDS))
+                    System.err.println("Pool did not terminate");
+            }
+        } catch (InterruptedException ie) {
+            // (Re-)Cancel if current thread also interrupted
+            pool.shutdownNow();
+            // Preserve interrupt status
+            Thread.currentThread().interrupt();
+        }
     }
 
     public void initializeGraph() {
@@ -47,6 +68,10 @@ public class InfoSecCooker implements Runnable {
     }
 
     private void execute() {
+        stop();
+        brokerExec = Executors.newSingleThreadExecutor();
+        executor = Executors.newCachedThreadPool();
+
         executeNodes();
         executeBroker();
     }
@@ -68,16 +93,13 @@ public class InfoSecCooker implements Runnable {
     @Override
     public void run() {
         execute();
-        new Thread(() -> {
-            try {
-                long brokerRunTime = 5000;
-                System.out.println("Trying to block Broker's execution in " + brokerRunTime + " millisecs");
-                brokerExec.awaitTermination(brokerRunTime, TimeUnit.MILLISECONDS);
-                executor.shutdownNow();
-                System.out.println("#...#");
-            } catch (InterruptedException e) {
-                System.out.println("Interrupted kill-switch Thread, lol");
-            }
-        }).start();
+    }
+
+    public void stop() {
+        long terminationTime = 1000;
+        System.out.println("Trying to block Broker's execution in " + terminationTime + " millisecs");
+        shutdownAndAwaitTermination(brokerExec, terminationTime);
+        shutdownAndAwaitTermination(executor, terminationTime);
+        System.out.println("#...#");
     }
 }

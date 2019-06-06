@@ -254,7 +254,21 @@ class Controllers {
 
         @Override
         public void handle(HttpExchange he) throws IOException {
-            new Thread(() -> infoSecCooker.run()).start();
+            infoSecCooker.run();
+            sendResponse(he, new HashMap<>());
+        }
+    }
+
+    public static class StopGraph implements HttpHandler {
+        private InfoSecCooker infoSecCooker;
+
+        StopGraph(InfoSecCooker infoSecCooker) {
+            this.infoSecCooker = infoSecCooker;
+        }
+
+        @Override
+        public void handle(HttpExchange he) throws IOException {
+            infoSecCooker.stop();
             sendResponse(he, new HashMap<>());
         }
     }
