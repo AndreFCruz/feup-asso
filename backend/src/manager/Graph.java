@@ -14,7 +14,7 @@ public class Graph {
 
     // Edges
     // Node1(input) -> Node2(output)
-    private HashMap<String, String> edges;
+    private HashMap<String, String> edges; // TODO: Change to String -> Array<String>
 
     // Broker
     private Broker manager;
@@ -109,6 +109,10 @@ public class Graph {
         manager.addSubscriber(sinkId, sourceId);
         edges.put(sourceId, sinkId);
         return true;
+    }
+
+    public void removeEdge(String sourceId, String sinkId) {
+        edges.remove(sourceId);
     }
 
     private Node getSourceNode(String sourceId) {

@@ -1,10 +1,12 @@
 package manager;
 
+import api.RESTServer;
 import nodes.Handler;
 import nodes.NodeFactory;
 import nodes.Sink;
 import nodes.Source;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,15 +14,15 @@ import java.util.concurrent.TimeUnit;
 
 public class Server implements Runnable {
     private final ExecutorService executor = Executors.newCachedThreadPool();
+    public RESTServer restServer;
     private ExecutorService brokerExec = Executors.newSingleThreadExecutor();
-
     private Broker<Object> manager;
-
     private Graph graph;
 
-    public Server() {
+    public Server() throws IOException {
         this.manager = new Broker<>();
         this.graph = new Graph(manager);
+        this.restServer = new RESTServer();
     }
 
     public void initializeGraph() {
