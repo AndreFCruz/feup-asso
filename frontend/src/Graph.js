@@ -137,8 +137,7 @@ export class Graph extends React.Component {
     const EdgeTypes = GraphConfig.EdgeTypes;
 
     return (
-      // <div id='graph' style={styles.graph}>
-      <div id='graph' style={{height: "100vh"}}>
+      <div id='graph'>
 
         <GraphView  ref='GraphView'
                     nodeKey={NODE_KEY}
@@ -156,6 +155,7 @@ export class Graph extends React.Component {
                     onCreateEdge={this.onCreateEdge}
                     onSwapEdge={this.onSwapEdge}
                     onDeleteEdge={this.onDeleteEdge}/>
+
       </div>
     );
   }
