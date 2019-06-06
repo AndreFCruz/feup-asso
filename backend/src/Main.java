@@ -4,14 +4,7 @@ import nodes.Handler;
 import nodes.NodeFactory;
 import nodes.Sink;
 import nodes.Source;
-import nodes.implementations.handlers.MD5Converter;
-import nodes.implementations.handlers.Uppercase;
-import nodes.implementations.sinks.FileWriter;
-import nodes.implementations.sinks.Printer;
-import nodes.implementations.sources.IntegerGenerator;
-import nodes.implementations.sources.StringGenerator;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,7 +30,7 @@ public class Main {
         String integerSourceKey = graph.createSource(NodeFactory.SourceType.INTEGERGENERATOR);
 
         // Create Handlers
-//        String[] md5ConverterKeys = graph.createHandler(NodeFactory.HandlerType.MD5CONVERTER).split("-");
+        String[] md5ConverterKeys = graph.createHandler(NodeFactory.HandlerType.MD5CONVERTER).split("-");
         String[] uppercaseKeys = graph.createHandler(NodeFactory.HandlerType.UPPERCASE).split("-");
 
         // Create Sinks

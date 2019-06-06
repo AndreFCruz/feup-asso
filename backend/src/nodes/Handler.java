@@ -36,11 +36,11 @@ public abstract class Handler<In, Out> extends Node implements Subscriber<In, Ou
 
     }
 
-    public String initializeSource(int id, BlockingQueue<Out> queue, Broker<Out> broker) {
+    private String initializeSource(int id, BlockingQueue<Out> queue, Broker<Out> broker) {
         return source.initialize(id, queue, broker);
     }
 
-    public String initializeSink(int id, BlockingQueue<In> queue) {
+    private String initializeSink(int id, BlockingQueue<In> queue) {
         return sink.initialize(id, queue);
     }
 

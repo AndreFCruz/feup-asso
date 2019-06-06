@@ -10,9 +10,9 @@ import nodes.implementations.sources.StringGenerator;
 public class NodeFactory {
     public Source createSource(SourceType nodeType) {
         switch (nodeType) {
-            case INTEGERGENERATOR:
-                return new StringGenerator();
             case STRINGGENERATOR:
+                return new StringGenerator();
+            case INTEGERGENERATOR:
                 return new IntegerGenerator();
             default:
                 throw new IllegalStateException("Unexpected value: " + nodeType);
