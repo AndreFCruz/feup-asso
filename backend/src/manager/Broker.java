@@ -26,25 +26,23 @@ public class Broker<T> implements Runnable {
 
     /**
      * Register a new Entity
+     *
+     * @return
      */
-    public int register(Source source) {
+    public String register(Source source) {
         EntityQueue entityQueue = this.registerEntity();
-        source.initialize(entityQueue.entityId, entityQueue.queue, this);
-        return entityQueue.entityId;
+        return source.initialize(entityQueue.entityId, entityQueue.queue, this);
     }
 
-    public int register(Sink sink) {
+    public String register(Sink sink) {
         EntityQueue entityQueue = this.registerEntity();
-        sink.initialize(entityQueue.entityId, entityQueue.queue);
-        return entityQueue.entityId;
+        return sink.initialize(entityQueue.entityId, entityQueue.queue);
     }
 
-    public int[] register(Handler handler) {
+    public String register(Handler handler) {
         EntityQueue entityQueuePublish = this.registerEntity();
         EntityQueue entityQueueSubscribe = this.registerEntity();
-        handler.initializeSink(entityQueueSubscribe.entityId, entityQueueSubscribe.queue);
-        handler.initializeSource(entityQueuePublish.entityId, entityQueuePublish.queue, this);
-        return new int[]{entityQueueSubscribe.entityId, entityQueuePublish.entityId};
+        return handler.initialize(entityQueuePublish.entityId, entityQueuePublish.queue, this, entityQueueSubscribe.entityId, entityQueueSubscribe.queue);
     }
 
     private EntityQueue registerEntity() {
@@ -53,10 +51,10 @@ public class Broker<T> implements Runnable {
         return new EntityQueue(entityId, queue);
     }
 
-    public void addSubscriber(int subscriberId, int publisherId) {
-        ArrayList<Integer> subscribersList = this.observers.getOrDefault(publisherId, new ArrayList<>());
-        subscribersList.add(subscriberId);
-        this.observers.put(publisherId, subscribersList);
+    public void addSubscriber(String subscriberId, String publisherId) {
+        ArrayList<Integer> subscribersList = this.observers.getOrDefault(Integer.parseInt(publisherId), new ArrayList<>());
+        subscribersList.add(Integer.parseInt(subscriberId));
+        this.observers.put(Integer.parseInt(publisherId), subscribersList);
     }
 
     /**

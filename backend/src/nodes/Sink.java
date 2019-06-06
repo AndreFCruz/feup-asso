@@ -7,16 +7,16 @@ import java.util.concurrent.BlockingQueue;
 public abstract class Sink<In, Out> extends Node implements Subscriber<In, Out>, Runnable {
 
     /**
-     * Helper class definition for Sinks with no return type.
-     * @param <T> The input data type.
+     * This node's unique ID.
      */
-    public static abstract class EndSink<T> extends Sink<T, Void> {}
-
+    private int id;
     private BlockingQueue<In> queue;
 
-    public void initialize(int id, BlockingQueue<In> queue) {
-        super.initialize(id);
+    public String initialize(int id, BlockingQueue<In> queue) {
+        String nodeName = super.initialize(Integer.toString(id));
+        this.id = id;
         this.queue = queue;
+        return nodeName;
     }
 
     /**
@@ -29,6 +29,10 @@ public abstract class Sink<In, Out> extends Node implements Subscriber<In, Out>,
         return this.queue.take();
     }
 
+    public int getId() {
+        return this.id;
+    }
+
     @Override
     public void run() {
         try {
@@ -38,5 +42,13 @@ public abstract class Sink<In, Out> extends Node implements Subscriber<In, Out>,
         } catch (InterruptedException e) {
             System.out.println("Subscriber " + this.getId() + " Thread interrupted");
         }
+    }
+
+    /**
+     * Helper class definition for Sinks with no return type.
+     *
+     * @param <T> The input data type.
+     */
+    public static abstract class EndSink<T> extends Sink<T, Void> {
     }
 }

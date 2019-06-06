@@ -23,24 +23,24 @@ public class Main {
 
         // Create Publishers and populate registry
         Source<String> stringSource = new StringGenerator();
-        int stringSourceKey = manager.register(stringSource);
+        String stringSourceKey = manager.register(stringSource);
 
         Source<Integer> integerSource = new IntegerGenerator();
-        int integerSourceKey = manager.register(integerSource);
+        String integerSourceKey = manager.register(integerSource);
 
         // Create Handlers
         Handler<Object, String> md5Converter = new MD5Converter();
-        int[] md5ConverterKeys = manager.register(md5Converter);
+        String[] md5ConverterKeys = manager.register(md5Converter).split("-");
 
         Handler<String, String> uppercase = new Uppercase();
-        int[] uppercaseKeys = manager.register(uppercase);
+        String[] uppercaseKeys = manager.register(uppercase).split("-");
 
         // Create Sinks
         Sink<Object, Void> printerSink = new Printer();
-        int printerSinkKey = manager.register(printerSink);
+        String printerSinkKey = manager.register(printerSink);
 
         Sink<Object, Void> fileWriterSink = new FileWriter();
-        int fileWriterSinkKey = manager.register(fileWriterSink);
+        String fileWriterSinkKey = manager.register(fileWriterSink);
 
 
         // // Manage subscriptions
