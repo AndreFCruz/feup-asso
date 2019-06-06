@@ -71,7 +71,7 @@ public class Graph {
 
     public void removeSinkById(String sinkId) {
         sinks.remove(sinkId);
-        for (String sourceKey : edges.keySet()) { //TODO: Correct this
+        for (String sourceKey : edges.keySet()) {
             if (edges.get(sourceKey).equals(sinkId)) {
                 edges.remove(sourceKey);
             }
@@ -80,14 +80,16 @@ public class Graph {
 
     public void removeHandlerById(String handlerId) {
         handlers.remove(handlerId);
+        String[] handlerKeys = handlerId.split("-");
         ArrayList<String> nodesToRemove = new ArrayList<>();
 
-        for (String sourceKey : edges.keySet()) { //TODO: Correct this
-            if (sourceKey.equals(handlerId)) {
+        for (String sourceKey : edges.keySet()) {
+            if (sourceKey.equals(handlerKeys[1])) {
                 nodesToRemove.add(sourceKey);
                 continue;
             }
-            if (edges.get(sourceKey).equals(handlerId)) {
+
+            if (edges.get(sourceKey).equals(handlerKeys[0])) {
                 nodesToRemove.add(sourceKey);
             }
         }
