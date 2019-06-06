@@ -11,12 +11,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class Server implements Runnable {
-    final ExecutorService executor = Executors.newCachedThreadPool();
-    ExecutorService brokerExec = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor = Executors.newCachedThreadPool();
+    private ExecutorService brokerExec = Executors.newSingleThreadExecutor();
 
-    Broker<Object> manager;
+    private Broker<Object> manager;
 
-    Graph graph;
+    private Graph graph;
 
     public Server() {
         this.manager = new Broker<>();
@@ -44,7 +44,7 @@ public class Server implements Runnable {
         graph.createEdge(uppercaseKeys[1], fileWriterSinkKey);
     }
 
-    public void execute() {
+    private void execute() {
         executeNodes();
         executeBroker();
     }
