@@ -1,29 +1,21 @@
 package manager;
 
 import nodes.*;
-import nodes.implementations.handlers.MD5Converter;
-import nodes.implementations.handlers.Uppercase;
-import nodes.implementations.sinks.FileWriter;
-import nodes.implementations.sinks.Printer;
-import nodes.implementations.sources.IntegerGenerator;
-import nodes.implementations.sources.StringGenerator;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class Graph {
     // Nodes
-    private ArrayList<Source> sources;
-    private ArrayList<Sink> sinks;
-    private ArrayList<Handler> handlers;
+    private HashMap<String, Source> sources;
+    private HashMap<String, Sink> sinks;
+    private HashMap<String, Handler> handlers;
 
     // Edges
-    // publisherKey(Source | InputHandler) -> arraySubscriberKeys (Sink | OutputHandler)
-    private Map<Integer, ArrayList<Integer>> observers = new HashMap<>();
+    // Node1(input) -> Node2(output)
+    private HashMap<String, String> edges = new HashMap<>();
 
     // Broker
     private Broker manager;
@@ -32,55 +24,96 @@ public class Graph {
     private NodeFactory nodeFactory;
 
     public Graph(Broker manager) {
-        this.sources = new ArrayList<>();
-        this.sinks = new ArrayList<>();
-        this.handlers = new ArrayList<>();
+        this.sources = new HashMap<>();
+        this.sinks = new HashMap<>();
+        this.handlers = new HashMap<>();
+        this.edges = new HashMap<>();
         this.manager = manager;
         this.nodeFactory = new NodeFactory();
     }
 
-    public int createSource(SourceType sourceType) {
+    public String createSource(SourceType sourceType) {
         Source source = nodeFactory.createSource(sourceType);
-        int sourceKey = manager.register(source);
-        sources.add(source);
+        String sourceKey = manager.register(source);
+        sources.put(source.getName(), source);
         return sourceKey;
     }
 
-    public int createSink(SinkType sinkType) {
+    public String createSink(SinkType sinkType) {
         Sink sink = nodeFactory.createSink(sinkType);
-        int sinkKey = manager.register(sink);
-        sinks.add(sink);
+        String sinkKey = manager.register(sink);
+        sinks.put(sink.getName(), sink);
         return sinkKey;
     }
 
-    public int[] createHandler(HandlerType handlerType) {
+    public String createHandler(HandlerType handlerType) {
         Handler handler = nodeFactory.createHandler(handlerType);
-        int[] handlerKeys = manager.register(handler);
-        handlers.add(handler);
+        String handlerKeys = manager.register(handler);
+        handlers.put(handler.getName(), handler);
         return handlerKeys;
     }
 
-    // Create Publishers and populate registry
-    Source<String> stringSource = new StringGenerator();
-    int stringSourceKey = manager.register(stringSource);
+    public Set<String> getSourcesIds(){
+        return sources.keySet();
+    }
+    public Set<String> getSinksIds(){
+        return sinks.keySet();
+    }
+    public Set<String> getHandlersIds(){
+        return handlers.keySet();
+    }
+    public void removeSourceById(String sourceId) {
+    }
+    public void removeSinkById(String sinkId) {
+    }
+    public void removeHandlerById(String handlerId) {
 
-    Source<Integer> integerSource = new IntegerGenerator();
-    int integerSourceKey = manager.register(integerSource);
+    }
+    //Remove Source by name
+    //Remove Sink by name
+    //Remove Handler by name
+    //Create edge
+    public boolean createEdge(String inputId, String outputId) {
+        Node input = null;
+        Node output = null;
+        for (Node node : sources) {
+            if (node.getName().equals(inputId)) {
+                input = node;
+                break;
+            }
+        }
 
-    // Create Handlers
-    Handler<Object, String> md5Converter = new MD5Converter();
-    int[] md5ConverterKeys = manager.register(md5Converter);
+        for (Node node: sinks) {
+            if (node.getName().equals(outputId)) {
+                output = node;
+                break;
+            }
+        }
 
-    Handler<String, String> uppercase = new Uppercase();
-    int[] uppercaseKeys = manager.register(uppercase);
+        if(input == null || output == null) {
+            for (Node node: handlers) {
+                String[] nodeKeys = node.getName().split("-");
+                if(input == null) {
+                    if (node.getName().equals(inputId)) {
+                        output = node;
+                        break;
+                    }
+                }
+                if(output == null) {
+                    if (node.getName().equals(outputId)) {
+                        output = node;
+                        break;
+                    }
+                }
 
-    // Create Sinks
-    Sink<Object, Void> printerSink = new Printer();
-    int printerSinkKey = manager.register(printerSink);
+            }
+        }
 
-    Sink<Object, Void> fileWriterSink = new FileWriter();
-    int fileWriterSinkKey = manager.register(fileWriterSink);
+        if(input == null || output == null)
+            return false;
 
+        manager.addSubscriber(output.getName(), input.getName());
+    }
 
     // // Manage subscriptions
         manager.addSubscriber(printerSinkKey, stringSourceKey);
