@@ -2,6 +2,7 @@ package manager;
 
 import nodes.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -65,19 +66,35 @@ public class Graph {
 
     public void removeSourceById(String sourceId) {
         sources.remove(sourceId);
-        //TODO: REMOVE EDGES
-        // edges.remove(sourceId);
+        edges.remove(sourceId);
     }
 
     public void removeSinkById(String sinkId) {
         sinks.remove(sinkId);
-        //TODO: Remove edges
+        for (String sourceKey : edges.keySet()) {
+            if (edges.get(sourceKey).equals(sinkId)) {
+                edges.remove(sourceKey);
+            }
+        }
     }
 
     public void removeHandlerById(String handlerId) {
         handlers.remove(handlerId);
-        //TODO: REMOVE EDGES
+        ArrayList<String> nodesToRemove = new ArrayList<>();
 
+        for (String sourceKey : edges.keySet()) {
+            if (sourceKey.equals(handlerId)) {
+                nodesToRemove.add(sourceKey);
+                continue;
+            }
+            if (edges.get(sourceKey).equals(handlerId)) {
+                nodesToRemove.add(sourceKey);
+            }
+        }
+
+        for (String key : nodesToRemove) {
+            edges.remove(key);
+        }
     }
 
     public boolean createEdge(String sourceId, String sinkId) {
@@ -88,6 +105,7 @@ public class Graph {
             return false;
 
         manager.addSubscriber(source.getName(), sink.getName());
+        edges.put(sourceId, sinkId);
         return true;
     }
 
@@ -120,5 +138,4 @@ public class Graph {
 
         return sink;
     }
-
 }

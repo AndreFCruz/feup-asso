@@ -8,21 +8,6 @@ import nodes.implementations.sources.IntegerGenerator;
 import nodes.implementations.sources.StringGenerator;
 
 public class NodeFactory {
-    public enum SourceType {
-        INTEGERGENERATOR,
-        STRINGGENERATOR,
-    }
-
-    public enum SinkType {
-        FILEWRITER,
-        PRINTER
-    }
-
-    public enum HandlerType {
-        MD5CONVERTER,
-        UPPERCASE,
-    }
-
     public Source createSource(SourceType nodeType) {
         switch (nodeType) {
             case INTEGERGENERATOR:
@@ -54,6 +39,21 @@ public class NodeFactory {
             default:
                 throw new IllegalStateException("Unexpected value: " + nodeType);
         }
+    }
+
+    public enum SourceType {
+        INTEGERGENERATOR,
+        STRINGGENERATOR,
+    }
+
+    public enum SinkType {
+        FILEWRITER,
+        PRINTER
+    }
+
+    public enum HandlerType {
+        MD5CONVERTER,
+        UPPERCASE,
     }
 
 }
