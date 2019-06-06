@@ -46,7 +46,7 @@ public class InfoSecCooker implements Runnable {
         graph.createEdge(uppercaseKeys[1], fileWriterSinkKey);
     }
 
-    public void execute() {
+    private void execute() {
         executeNodes();
         executeBroker();
     }

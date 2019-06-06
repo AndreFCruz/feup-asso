@@ -5,11 +5,15 @@ import manager.InfoSecCooker;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class RESTServer {
     private int PORT = 3000;
     private HttpServer server;
     private InfoSecCooker infoSecCooker;
+    private ExecutorService RESTServerExec = Executors.newSingleThreadExecutor();
+
 
     public RESTServer(InfoSecCooker infoSecCooker) throws IOException {
         this.infoSecCooker = infoSecCooker;
@@ -18,7 +22,7 @@ public class RESTServer {
     }
 
     public void start() {
-        server.setExecutor(null);
+        server.setExecutor(RESTServerExec);
         server.start();
         System.out.println("server started at " + PORT);
     }

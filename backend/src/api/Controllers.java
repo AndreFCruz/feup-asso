@@ -254,7 +254,7 @@ class Controllers {
 
         @Override
         public void handle(HttpExchange he) throws IOException {
-            infoSecCooker.execute();
+            new Thread(() -> infoSecCooker.run()).start();
             sendResponse(he, new HashMap<>());
         }
     }
