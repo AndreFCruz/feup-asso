@@ -17,6 +17,7 @@
 
 // export default Graph;
 
+import React from 'react';
 import {
   GraphView, // required
   Edge, // optional
@@ -27,6 +28,55 @@ import {
   BwdlTransformer, // optional, Example JSON transformer
   GraphUtils // optional, useful utility functions
 } from 'react-digraph';
+import './Graph.css';
+
+/// /// /// *** Graph Sample *** /// /// ///
+const sample = {
+  "nodes": [
+    {
+      "id": 1,
+      "title": "Node A",
+      "x": 258.3976135253906,
+      "y": 331.9783248901367,
+      "type": "empty"
+    },
+    {
+      "id": 2,
+      "title": "Node B",
+      "x": 593.9393920898438,
+      "y": 260.6060791015625,
+      "type": "empty"
+    },
+    {
+      "id": 3,
+      "title": "Node C",
+      "x": 237.5757598876953,
+      "y": 61.81818389892578,
+      "type": "custom"
+    },
+    {
+      "id": 4,
+      "title": "Node C",
+      "x": 600.5757598876953,
+      "y": 600.81818389892578,
+      "type": "custom"
+    }
+  ],
+  "edges": [
+    {
+      "source": 1,
+      "target": 2,
+      "type": "emptyEdge"
+    },
+    {
+      "source": 2,
+      "target": 4,
+      "type": "emptyEdge"
+    }
+  ]
+}
+/// /// /// *** Graph Sample *** /// /// ///
+
 
 const GraphConfig =  {
   NodeTypes: {
@@ -64,7 +114,7 @@ const GraphConfig =  {
 
 const NODE_KEY = "id"       // Allows D3 to correctly update DOM
 
-class Graph extends Component {
+export class Graph extends React.Component {
 
   constructor(props) {
     super(props);
@@ -87,7 +137,8 @@ class Graph extends Component {
     const EdgeTypes = GraphConfig.EdgeTypes;
 
     return (
-      <div id='graph' style={styles.graph}>
+      // <div id='graph' style={styles.graph}>
+      <div id='graph' style={{height: "100vh"}}>
 
         <GraphView  ref='GraphView'
                     nodeKey={NODE_KEY}
