@@ -17,6 +17,10 @@ public class Main {
 
     public static void main(String[] args) {
         final ExecutorService executor = Executors.newCachedThreadPool();
+        //Initialize server
+        //Initialize broker
+        // execute nodes
+        // stop nodes
 
         // Create Broker
         Broker<Object> manager = new Broker<>();
