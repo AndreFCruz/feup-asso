@@ -5,9 +5,9 @@ import java.util.Map;
 public abstract class Node {
 
     /**
-     * This node's unique ID.
+     * This node's unique name.
      */
-    private int id;
+    private String name;
 
     /**
      * This node's settings.
@@ -15,12 +15,13 @@ public abstract class Node {
      */
     private Map<String, String> settings;
 
-    public void initialize(int id) {
-        this.id = id;
+    public String initialize(String name) {
+        this.name = name;
+        return this.name;
     }
 
-    public int getId() {
-        return this.id;
+    public String getName() {
+        return this.name;
     }
 
 }
