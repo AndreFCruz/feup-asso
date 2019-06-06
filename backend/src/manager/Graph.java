@@ -8,9 +8,9 @@ import java.util.Set;
 
 public class Graph {
     // Nodes
-    private HashMap<String, Source> sources;
-    private HashMap<String, Sink> sinks;
-    private HashMap<String, Handler> handlers;
+    public HashMap<String, Source> sources;
+    public HashMap<String, Sink> sinks;
+    public HashMap<String, Handler> handlers;
 
     // Edges
     // Node1(input) -> Node2(output)
@@ -71,7 +71,7 @@ public class Graph {
 
     public void removeSinkById(String sinkId) {
         sinks.remove(sinkId);
-        for (String sourceKey : edges.keySet()) {
+        for (String sourceKey : edges.keySet()) { //TODO: Correct this
             if (edges.get(sourceKey).equals(sinkId)) {
                 edges.remove(sourceKey);
             }
@@ -82,7 +82,7 @@ public class Graph {
         handlers.remove(handlerId);
         ArrayList<String> nodesToRemove = new ArrayList<>();
 
-        for (String sourceKey : edges.keySet()) {
+        for (String sourceKey : edges.keySet()) { //TODO: Correct this
             if (sourceKey.equals(handlerId)) {
                 nodesToRemove.add(sourceKey);
                 continue;
@@ -104,7 +104,7 @@ public class Graph {
         if (source == null || sink == null)
             return false;
 
-        manager.addSubscriber(source.getName(), sink.getName());
+        manager.addSubscriber(sinkId, sourceId);
         edges.put(sourceId, sinkId);
         return true;
     }
