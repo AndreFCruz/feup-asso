@@ -15,14 +15,14 @@ import java.util.concurrent.TimeUnit;
 public class InfoSecCooker implements Runnable {
     private final ExecutorService executor = Executors.newCachedThreadPool();
     public RESTServer restServer;
+    public Graph graph;
     private ExecutorService brokerExec = Executors.newSingleThreadExecutor();
     private Broker<Object> manager;
-    private Graph graph;
 
     public InfoSecCooker() throws IOException {
         this.manager = new Broker<>();
         this.graph = new Graph(manager);
-        this.restServer = new RESTServer();
+        this.restServer = new RESTServer(this);
     }
 
     public void initializeGraph() {
@@ -46,7 +46,7 @@ public class InfoSecCooker implements Runnable {
         graph.createEdge(uppercaseKeys[1], fileWriterSinkKey);
     }
 
-    private void execute() {
+    public void execute() {
         executeNodes();
         executeBroker();
     }
