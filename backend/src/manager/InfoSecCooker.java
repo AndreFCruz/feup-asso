@@ -12,14 +12,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class Server implements Runnable {
+public class InfoSecCooker implements Runnable {
     private final ExecutorService executor = Executors.newCachedThreadPool();
     public RESTServer restServer;
     private ExecutorService brokerExec = Executors.newSingleThreadExecutor();
     private Broker<Object> manager;
     private Graph graph;
 
-    public Server() throws IOException {
+    public InfoSecCooker() throws IOException {
         this.manager = new Broker<>();
         this.graph = new Graph(manager);
         this.restServer = new RESTServer();

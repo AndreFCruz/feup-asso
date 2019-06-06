@@ -1,13 +1,13 @@
-import manager.Server;
+import manager.InfoSecCooker;
 
 import java.io.IOException;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        Server server = new Server();
-        server.initializeGraph();
-        server.run();
-        server.restServer.start();
+        InfoSecCooker infoSecCooker = new InfoSecCooker();
+        infoSecCooker.initializeGraph();
+        infoSecCooker.run();
+        infoSecCooker.restServer.start();
     }
 }
