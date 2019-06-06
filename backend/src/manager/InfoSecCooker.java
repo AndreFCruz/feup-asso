@@ -25,7 +25,6 @@ public class InfoSecCooker implements Runnable {
         this.manager = new Broker<>();
         this.graph = new Graph(manager);
         this.restServer = new RESTServer(this);
-        executeBroker();
     }
 
     private static void shutdownAndAwaitTermination(ExecutorService pool, long time) {
