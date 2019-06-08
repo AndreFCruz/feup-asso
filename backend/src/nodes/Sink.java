@@ -4,19 +4,14 @@ import pubsub.Subscriber;
 
 import java.util.concurrent.BlockingQueue;
 
-public abstract class Sink<In, Out> extends Node implements Subscriber<In, Out>, Runnable {
+public abstract class Sink<In, Out> extends Node<String> implements Subscriber<In, Out>, Runnable {
 
-    /**
-     * This node's unique ID.
-     */
-    private int id;
     private BlockingQueue<In> queue;
 
-    public String initialize(int id, BlockingQueue<In> queue) {
-        String nodeName = super.initialize(Integer.toString(id));
-        this.id = id;
+    public String initialize(String id, BlockingQueue<In> queue) {
+        super.initialize(id);
         this.queue = queue;
-        return nodeName;
+        return this.getId();
     }
 
     /**
@@ -27,10 +22,6 @@ public abstract class Sink<In, Out> extends Node implements Subscriber<In, Out>,
      */
     In pullMessage() throws InterruptedException {
         return this.queue.take();
-    }
-
-    public int getId() {
-        return this.id;
     }
 
     @Override

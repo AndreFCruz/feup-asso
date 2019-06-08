@@ -12,17 +12,18 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * @param <T> Message type
+ * Broker class for mediating message exchange between nodes.
+ * Note: this Broker uses the String type for Node's IDs.
+ * @param <MT> Message Type
  */
-public class Broker<T> implements Runnable {
+public class Broker<MT> implements Runnable {
     // Registry key(Source | Sink | inputHandler | outputHandler) -> queue
-    private Registry<Integer, BlockingQueue<T>> registry = Registry.makeIntRegistry();
+    private Registry<String, BlockingQueue<MT>> registry = Registry.makeStringRegistry();
     // publisherKey(Source | InputHandler) -> arraySubscriberKeys (Sink | OutputHandler)
-    private Map<Integer, ArrayList<Integer>> observers = new HashMap<>();
+    private Map<String, ArrayList<String>> observers = new HashMap<>();
     private BlockingQueue<MessageEvent> eventQueue = new LinkedBlockingQueue<>();
 
-    public Broker() {
-    }
+    public Broker() { }
 
     /**
      * Register a new Entity
@@ -46,15 +47,15 @@ public class Broker<T> implements Runnable {
     }
 
     private EntityQueue registerEntity() {
-        BlockingQueue<T> queue = new LinkedBlockingQueue<>(); // TODO eventually limit queue size
-        int entityId = this.registry.register(queue);
+        BlockingQueue<MT> queue = new LinkedBlockingQueue<>(); // TODO eventually limit queue size
+        String entityId = this.registry.register(queue);
         return new EntityQueue(entityId, queue);
     }
 
     public void addSubscriber(String subscriberId, String publisherId) {
-        ArrayList<Integer> subscribersList = this.observers.getOrDefault(Integer.parseInt(publisherId), new ArrayList<>());
-        subscribersList.add(Integer.parseInt(subscriberId));
-        this.observers.put(Integer.parseInt(publisherId), subscribersList);
+        ArrayList<String> subscribersList = this.observers.getOrDefault(publisherId, new ArrayList<>());
+        subscribersList.add(subscriberId);
+        this.observers.put(publisherId, subscribersList);
     }
 
     /**
@@ -64,13 +65,13 @@ public class Broker<T> implements Runnable {
      * @param publisherId Id of the publishing Publisher
      * @param messageHash Hash of the message
      */
-    public void notifyNewMessage(int publisherId, int messageHash) throws InterruptedException {
+    public void notifyNewMessage(String publisherId, int messageHash) throws InterruptedException {
         eventQueue.put(new MessageEvent(publisherId, messageHash));
     }
 
     private void handleMessageEvent(MessageEvent event) {
-        BlockingQueue<T> pubQueue = registry.get(event.publisherId);
-        T msg = pubQueue.poll();
+        BlockingQueue<MT> pubQueue = registry.get(event.publisherId);
+        MT msg = pubQueue.poll();
         if (msg == null) {
             System.err.println("Was notified of inexistent Message");
             return;
@@ -82,8 +83,8 @@ public class Broker<T> implements Runnable {
             return;
         }
 
-        ArrayList<Integer> subscribers = this.observers.get(event.publisherId);
-        for (int subId : subscribers) {
+        ArrayList<String> subscribers = this.observers.get(event.publisherId);
+        for (String subId : subscribers) {
             // Offer the published message to all subscribers
             boolean ret = this.registry.get(subId).offer(msg);
             if (!ret) {
@@ -108,26 +109,26 @@ public class Broker<T> implements Runnable {
     }
 
     class EntityQueue {
-        BlockingQueue<T> queue;
-        int entityId;
+        BlockingQueue<MT> queue;
+        String entityId;
 
-        EntityQueue(int entityId, BlockingQueue<T> queue) {
+        EntityQueue(String entityId, BlockingQueue<MT> queue) {
             this.entityId = entityId;
             this.queue = queue;
         }
     }
 
     class MessageEvent {
-        int publisherId;
+        String publisherId;
         int messageHash;
         Long timeToLive;    // In milliseconds
         long arrivalTime;   // In milliseconds
 
-        MessageEvent(int publisherId, int messageHash) {
+        MessageEvent(String publisherId, int messageHash) {
             this(publisherId, messageHash, null);
         }
 
-        MessageEvent(int publisherId, int messageHash, Long timeToLive) {
+        MessageEvent(String publisherId, int messageHash, Long timeToLive) {
             this.publisherId = publisherId;
             this.messageHash = messageHash;
             this.timeToLive = timeToLive;

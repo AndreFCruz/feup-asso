@@ -4,17 +4,18 @@ import nodes.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class Graph {
     // Nodes
-    public HashMap<String, Source> sources;
-    public HashMap<String, Sink> sinks;
-    public HashMap<String, Handler> handlers;
+    Map<String, Source> sources;     // Maps SourceID -> Source
+    Map<String, Sink> sinks;         // Maps SinkID -> Sink
+    Map<String, Handler> handlers;   // Maps HandlerID -> Handler
 
     // Edges
     // Node1(input) -> Node2(output)
-    private HashMap<String, String> edges; // TODO: Change to String -> Array<String>
+    private Map<String, String> edges; // TODO: Change to String -> Array<String>
 
     // Broker
     private Broker manager;
@@ -34,21 +35,21 @@ public class Graph {
     public String createSource(NodeFactory.SourceType sourceType) {
         Source source = nodeFactory.createSource(sourceType);
         String sourceKey = manager.register(source);
-        sources.put(source.getName(), source);
+        sources.put(source.getId().toString(), source);
         return sourceKey;
     }
 
     public String createSink(NodeFactory.SinkType sinkType) {
         Sink sink = nodeFactory.createSink(sinkType);
         String sinkKey = manager.register(sink);
-        sinks.put(sink.getName(), sink);
+        sinks.put(sink.getId().toString(), sink);
         return sinkKey;
     }
 
     public String createHandler(NodeFactory.HandlerType handlerType) {
         Handler handler = nodeFactory.createHandler(handlerType);
         String handlerKeys = manager.register(handler);
-        handlers.put(handler.getName(), handler);
+        handlers.put(handler.getId().toString(), handler);
         return handlerKeys;
     }
 

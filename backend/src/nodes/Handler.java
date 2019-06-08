@@ -6,7 +6,7 @@ import pubsub.Subscriber;
 
 import java.util.concurrent.BlockingQueue;
 
-public abstract class Handler<In, Out> extends Node implements Subscriber<In, Out>, Publisher<Out>, Runnable {
+public abstract class Handler<In, Out> extends Node<String> implements Subscriber<In, Out>, Publisher<Out>, Runnable {
 
 
     private Source<Out> source;
@@ -29,18 +29,18 @@ public abstract class Handler<In, Out> extends Node implements Subscriber<In, Ou
         };
     }
 
-    public String initialize(int sourceId, BlockingQueue<Out> sourceQueue, Broker<Out> broker, int sinkId, BlockingQueue<In> sinkQueue) {
+    public String initialize(String sourceId, BlockingQueue<Out> sourceQueue, Broker<Out> broker, String sinkId, BlockingQueue<In> sinkQueue) {
         String sourceName = initializeSource(sourceId, sourceQueue, broker);
         String sinkName = initializeSink(sinkId, sinkQueue);
-        return super.initialize(sinkName + '-' + sourceName);
+        return super.initialize(sourceName + '-' + sinkName);
 
     }
 
-    private String initializeSource(int id, BlockingQueue<Out> queue, Broker<Out> broker) {
+    private String initializeSource(String id, BlockingQueue<Out> queue, Broker<Out> broker) {
         return source.initialize(id, queue, broker);
     }
 
-    private String initializeSink(int id, BlockingQueue<In> queue) {
+    private String initializeSink(String id, BlockingQueue<In> queue) {
         return sink.initialize(id, queue);
     }
 
