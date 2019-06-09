@@ -74,6 +74,13 @@ class Controllers {
     private static void sendJSONResponse(HttpExchange he, Object responseObject) throws IOException {
         Gson gson = new Gson();
         String response = gson.toJson(responseObject);
+
+        // Allow CORS
+//        he.getRequestHeaders().add("Access-Control-Allow-Origin", "*");
+//        he.getRequestHeaders().add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+//        he.getRequestHeaders().add("Access-Control-Allow-Credentials", "true");
+//        he.getRequestHeaders().add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS,HEAD");
+
         he.sendResponseHeaders(200, response.length());
         OutputStream os = he.getResponseBody();
         os.write(response.getBytes());

@@ -4,8 +4,9 @@ import * as React from 'react';
 export const NODE_KEY = 'id'; // Key used to identify nodes
 
 export function makeGraphConfigObject() {
-  // Testing axios
-  axios.get('https://api.github.com/users/AndreFCruz')
+
+  // Fetch available node types from backend server
+  axios.get(process.env.REACT_APP_API_URL + '/node-types')
     .then(response => console.log(response));
 
   return {
@@ -83,43 +84,37 @@ const EmptyNodeShape = (
 );
 
 const CustomEmptyShape = (
-  <symbol viewBox="0 0 100 100" id="customEmpty">
+  <symbol viewBox="0 0 100 100" id={EMPTY_TYPE}>
     <circle cx="50" cy="50" r="45" />
   </symbol>
 );
 
 const SpecialShape = (
-  <symbol viewBox="-27 0 154 154" id="special" width="154" height="154">
+  <symbol viewBox="-27 0 154 154" id={SPECIAL_TYPE} width="154" height="154">
     <rect transform="translate(50) rotate(45)" width="109" height="109" />
   </symbol>
 );
 
 const PolyShape = (
-  <symbol viewBox="0 0 88 72" id="poly" width="88" height="88">
+  <symbol viewBox="0 0 88 72" id={POLY_TYPE} width="88" height="88">
     <path d="M 0 36 18 0 70 0 88 36 70 72 18 72Z"></path>
   </symbol>
 );
 
 const SkinnyShape = (
-  <symbol viewBox="0 0 154 54" width="154" height="54" id="skinny">
+  <symbol viewBox="0 0 154 54" width="154" height="54" id={SKINNY_TYPE}>
     <rect x="0" y="0" rx="2" ry="2" width="154" height="54" />
   </symbol>
 );
 
-const SpecialChildShape = (
-  <symbol viewBox="0 0 154 154" id="specialChild">
-    <rect x="2.5" y="0" width="154" height="154" fill="rgba(30, 144, 255, 0.12)" />
-  </symbol>
-);
-
 const EmptyEdgeShape = (
-  <symbol viewBox="0 0 50 50" id="emptyEdge">
+  <symbol viewBox="0 0 50 50" id={EMPTY_EDGE_TYPE}>
     <circle cx="25" cy="25" r="8" fill="currentColor" />
   </symbol>
 );
 
 const SpecialEdgeShape = (
-  <symbol viewBox="0 0 50 50" id="specialEdge">
+  <symbol viewBox="0 0 50 50" id={SPECIAL_EDGE_TYPE}>
     <rect transform="rotate(45)" x="27.5" y="-7.5" width="15" height="15" fill="currentColor" />
   </symbol>
 );
