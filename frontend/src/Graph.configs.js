@@ -54,33 +54,28 @@ function makeNodeSubtypesObject(types) {
   let retObj = {};
   for (const sourceType of types.sources) {
     retObj[sourceType] = {
-      shape: {
-        shape: SourceNodeShape,
-        shapeId: '#' + SOURCE_TYPE,
-      },
+      shape: SourceNodeShape,
+      shapeId: '#' + SOURCE_TYPE,
     };
   }
 
   for (const handlerType of types.handlers) {
     retObj[handlerType] = {
-      shape: {
-        shape: HandlerNodeShape,
-        shapeId: '#' + HANDLER_TYPE,
-      },
+      shape: HandlerNodeShape,
+      shapeId: '#' + HANDLER_TYPE,
     };
   }
 
   for (const sinkType of types.sinks) {
     retObj[sinkType] = {
-      shape: {
-        shape: SinkNodeShape,
-        shapeId: '#' + SINK_TYPE,
-      },
+      shape: SinkNodeShape,
+      shapeId: '#' + SINK_TYPE,
     };
   }
 
-  // return retObj;
-  return {};
+  console.log('NODE SUB-TYPES:');
+  console.log(retObj);
+  return retObj;
 }
 
 // These keys are arbitrary (but must match the config)
