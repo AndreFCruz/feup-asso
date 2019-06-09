@@ -12,7 +12,7 @@ import {
 } from 'react-digraph';
 import './Graph.css';
 // import { GraphConfig as DEFAULT_GRAPH_CONFIG } from "./Graph.configs";
-import { sample1 as DEFAULT_GRAPH_SAMPLE } from "./Graph.sample";
+import { sample2 as DEFAULT_GRAPH_SAMPLE } from "./Graph.sample";
 import GraphConfig, {
   edgeTypes,
   EMPTY_EDGE_TYPE,
@@ -272,18 +272,19 @@ export class Graph extends React.Component {
                     nodeKey={NODE_KEY}
                     nodes={nodes}
                     edges={edges}
-                    selected={selected}
+                    // selected={selected}
                     nodeTypes={NodeTypes}
                     nodeSubtypes={NodeSubtypes}
                     edgeTypes={EdgeTypes}
-                    onSelectNode={this.onSelectNode.bind(this)}
-                    onCreateNode={this.onCreateNode.bind(this)}
-                    onUpdateNode={this.onUpdateNode.bind(this)}
-                    onDeleteNode={this.onDeleteNode.bind(this)}
-                    onSelectEdge={this.onSelectEdge.bind(this)}
-                    onCreateEdge={this.onCreateEdge.bind(this)}
-                    onSwapEdge={this.onSwapEdge.bind(this)}
-                    onDeleteEdge={this.onDeleteEdge.bind(this)}/>
+                    // onSelectNode={this.onSelectNode.bind(this)}
+                    // onCreateNode={this.onCreateNode.bind(this)}
+                    // onUpdateNode={this.onUpdateNode.bind(this)}
+                    // onDeleteNode={this.onDeleteNode.bind(this)}
+                    // onSelectEdge={this.onSelectEdge.bind(this)}
+                    // onCreateEdge={this.onCreateEdge.bind(this)}
+                    // onSwapEdge={this.onSwapEdge.bind(this)}
+                    // onDeleteEdge={this.onDeleteEdge.bind(this)}
+                    />
 
       </div>
     );

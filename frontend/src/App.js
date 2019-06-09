@@ -5,13 +5,11 @@ import { Graph } from "./Graph.js";
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        {/* <img src={logo} className="App-logo" alt="logo" /> */}
+      {/* <header className="App-header">
         <p>
           ASSO DAG EDITOR
         </p>
-      </header>
-      
+      </header> */}
       <Graph id="graph-render"/>
     </div>
   );
