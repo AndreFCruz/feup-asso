@@ -81,18 +81,13 @@ export class Graph extends React.Component {
   onCreateNode(x, y) {
     const graph = this.state.graph;
 
-    // This is just an example - any sort of logic
-    // could be used here to determine node type
-    // There is also support for subtypes. (see 'sample' above)
-    // The subtype geometry will underlay the 'type' geometry for a node
-    const type = Math.random() < 0.25 ? SPECIAL_TYPE : EMPTY_TYPE;
-
+    let id = this.state.totalNodes + 1;
     const viewNode = {
-      id: Date.now(),
-      title: '',
-      type,
-      x,
-      y
+      id,
+      title: 'Node (' +id + ')',
+      type: EMPTY_TYPE,
+      x: 10,
+      y: 0
     };
 
     graph.nodes = [...graph.nodes, viewNode];
@@ -100,38 +95,47 @@ export class Graph extends React.Component {
   }
 
   // Deletes a node from the graph
-  onDeleteNode(viewNode, nodeId, nodeArr) {
+  onDeleteNode(viewNode, nodeId, nodeAdr) {
     const graph = this.state.graph;
     // Delete any connected edges
-    const newEdges = graph.edges.filter((edge, i) => {
-      return edge.source !== viewNode[NODE_KEY] && edge.target !== viewNode[NODE_KEY];
+
+    const newEdges = graph.edges.filter(edge => {
+      return edge.source !== nodeId && edge.target !== nodeId;
     });
-    graph.nodes = nodeArr;
+
+    graph.nodes = nodeAdr;
     graph.edges = newEdges;
 
     this.setState({ graph, selected: null });
   }
 
   // Creates a new node between two edges
-  onCreateEdge(sourceViewNode, targetViewNode) {
+  onCreateEdge() {
+
+    let sourceSelect = document.getElementById('source');
+    let sinkSelect = document.getElementById('sink');
+
+    let sourceNode = sourceSelect.options[sourceSelect.selectedIndex].value;
+    let sinkNode = sinkSelect.options[sinkSelect.selectedIndex].value;
+
     const graph = this.state.graph;
-    // This is just an example - any sort of logic
-    // could be used here to determine edge type
-    const type = sourceViewNode.type === SPECIAL_TYPE ? SPECIAL_EDGE_TYPE : EMPTY_EDGE_TYPE;
-
     const viewEdge = {
-      source: sourceViewNode[NODE_KEY],
-      target: targetViewNode[NODE_KEY],
-      type
+      source: sourceNode,
+      target: sinkNode,
+      type : EMPTY_EDGE_TYPE
     };
-
+    
     // Only add the edge when the source node is not the same as the target
-    if (viewEdge.source !== viewEdge.target) {
+    if (sourceNode !== sinkNode) {
       graph.edges = [...graph.edges, viewEdge];
+      
       this.setState({
         graph,
         selected: viewEdge
       });
+    }
+    else{
+      console.log('Can only add an edge between 2 different nodes');
     }
   }
 
@@ -251,19 +255,19 @@ export class Graph extends React.Component {
       <div id='graph'>
 
         <div className="graph-header">
-          <button onClick={this.addStartNode.bind(this)}>Add Node</button>
-          <button onClick={this.deleteStartNode.bind(this)}>Delete Node</button>
-          <input
-            className="total-nodes"
-            type="number"
-            onBlur={this.handleChange.bind(this)}
-            placeholder={this.state.totalNodes.toString()}
-          />
-          <div className="pan-list">
-          <span>Pan To:</span>
-            <select onChange={this.onSelectPanNode.bind(this)}>
+          <div>
+            <span id="number-nodes">Number of Nodes: {this.state.totalNodes.toString()}</span>
+          </div>
+          <button onClick={this.onCreateNode.bind(this)}>Add Node</button>
+          <div className="create-edge">
+            <span>Add Edge: </span>
+            <select id="source" onChange={this.onSelectPanNode.bind(this)}>
               {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
             </select>
+            <select id="sink" onChange={this.onSelectPanNode.bind(this)}>
+              {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
+            </select>
+            <button onClick={this.onCreateEdge.bind(this)}>Create</button>
           </div>
         </div>
 
@@ -271,18 +275,17 @@ export class Graph extends React.Component {
                     nodeKey={NODE_KEY}
                     nodes={nodes}
                     edges={edges}
-                    // selected={selected}
+                    selected={selected}
                     nodeTypes={NodeTypes}
                     nodeSubtypes={NodeSubtypes}
                     edgeTypes={EdgeTypes}
-                    // onSelectNode={this.onSelectNode.bind(this)}
+                    onSelectNode={this.onSelectNode.bind(this)}
                     // onCreateNode={this.onCreateNode.bind(this)}
-                    // onUpdateNode={this.onUpdateNode.bind(this)}
-                    // onDeleteNode={this.onDeleteNode.bind(this)}
-                    // onSelectEdge={this.onSelectEdge.bind(this)}
-                    // onCreateEdge={this.onCreateEdge.bind(this)}
+                    onUpdateNode={this.onUpdateNode.bind(this)}
+                    onDeleteNode={this.onDeleteNode.bind(this)}
+                    onSelectEdge={this.onSelectEdge.bind(this)}
                     // onSwapEdge={this.onSwapEdge.bind(this)}
-                    // onDeleteEdge={this.onDeleteEdge.bind(this)}
+                    onDeleteEdge={this.onDeleteEdge.bind(this)}
                     />
 
       </div>
