@@ -29,6 +29,8 @@ export class Graph extends React.Component {
       totalNodes: sample.nodes.length,
       graphConfig: config,
     }
+
+    this.GraphView = React.createRef();
   }
 
   componentDidMount() {
@@ -110,11 +112,6 @@ export class Graph extends React.Component {
     let sinkNode = sinkSelect.options[sinkSelect.selectedIndex].value;
     const type = this.state.graphConfig.EdgeTypes.standardEdge;
 
-    if (sourceNode == sinkNode) {
-      console.warn(`Trying to create an edge from node ${sourceNode} to itself`);
-      return;
-    }
-
     const graph = this.state.graph;
     const viewEdge = {
       source: sourceNode,
@@ -130,9 +127,8 @@ export class Graph extends React.Component {
         graph,
         selected: viewEdge
       });
-    }
-    else{
-      console.log('Can only add an edge between 2 different nodes');
+    } else {
+      console.warn(`Trying to create an edge from node ${sourceNode} to itself`);
     }
   }
 
@@ -261,17 +257,23 @@ export class Graph extends React.Component {
           <button onClick={this.onCreateNode.bind(this)}>Add Node</button>
           <div className="create-edge">
             <span>Add Edge: </span>
-            <select id="source" onChange={this.onSelectPanNode.bind(this)}>
+            <select id="source">
               {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
             </select>
-            <select id="sink" onChange={this.onSelectPanNode.bind(this)}>
+            <select id="sink">
               {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
             </select>
             <button onClick={this.onCreateEdge.bind(this)}>Create</button>
           </div>
+          <div>
+            <span>Pan to Node: </span>
+            <select id="panToSelection" onChange={this.onSelectPanNode.bind(this)}>
+              {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
+            </select>
+          </div>
         </div>
 
-        <GraphView  ref='GraphView'
+        <GraphView  ref={(el) => (this.GraphView = el)}
                     nodeKey={NODE_KEY}
                     nodes={nodes}
                     edges={edges}
