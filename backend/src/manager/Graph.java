@@ -35,21 +35,21 @@ public class Graph {
     public String createSource(NodeFactory.SourceType sourceType) {
         Source source = nodeFactory.createSource(sourceType);
         String sourceKey = manager.register(source);
-        sources.put(source.getId().toString(), source);
+        sources.put((String) source.getId(), source);
         return sourceKey;
     }
 
     public String createSink(NodeFactory.SinkType sinkType) {
         Sink sink = nodeFactory.createSink(sinkType);
         String sinkKey = manager.register(sink);
-        sinks.put(sink.getId().toString(), sink);
+        sinks.put((String) sink.getId(), sink);
         return sinkKey;
     }
 
     public String createHandler(NodeFactory.HandlerType handlerType) {
         Handler handler = nodeFactory.createHandler(handlerType);
         String handlerKeys = manager.register(handler);
-        handlers.put(handler.getId().toString(), handler);
+        handlers.put((String) handler.getId(), handler);
         return handlerKeys;
     }
 
@@ -80,17 +80,16 @@ public class Graph {
     }
 
     public void removeHandlerById(String handlerId) {
-        handlers.remove(handlerId);
-        String[] handlerKeys = handlerId.split("-");
+        Handler handlerRemoved = handlers.remove(handlerId);
         ArrayList<String> nodesToRemove = new ArrayList<>();
 
         for (String sourceKey : edges.keySet()) {
-            if (sourceKey.equals(handlerKeys[1])) {
+            if (sourceKey.equals(handlerRemoved.getSourceId())) {
                 nodesToRemove.add(sourceKey);
                 continue;
             }
 
-            if (edges.get(sourceKey).equals(handlerKeys[0])) {
+            if (edges.get(sourceKey).equals(handlerRemoved.getSinkId())) {
                 nodesToRemove.add(sourceKey);
             }
         }
@@ -121,10 +120,9 @@ public class Graph {
 
         if (source == null)
             for (String handlerKey : handlers.keySet()) {
-                String[] handlerKeys = handlerKey.split("-");
-                if (handlerKeys[1].equals(sourceId)) {
-                    source = handlers.get(handlerKey);
-                    break;
+                Handler handler = handlers.get(handlerKey);
+                if (handler.getSourceId().equals(sourceId)) {
+                    return handler;
                 }
             }
 
@@ -136,10 +134,9 @@ public class Graph {
 
         if (sink == null)
             for (String handlerKey : handlers.keySet()) {
-                String[] handlerKeys = handlerKey.split("-");
-                if (handlerKeys[0].equals(sinkId)) {
-                    sink = handlers.get(handlerKey);
-                    break;
+                Handler handler = handlers.get(handlerKey);
+                if (handler.getSinkId().equals(sinkId)) {
+                    return handler;
                 }
             }
 

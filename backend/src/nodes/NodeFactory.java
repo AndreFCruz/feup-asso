@@ -7,7 +7,7 @@ import nodes.implementations.sinks.Printer;
 import nodes.implementations.sources.IntegerGenerator;
 import nodes.implementations.sources.StringGenerator;
 
-public class NodeFactory {
+public class NodeFactory { //TODO: Convert to MAP (String -> Type) and MAP (String -> Constructor)
     public static SourceType convertSourceNameToSourceType(String sourceName) {
         switch (sourceName) {
             case "integer_generator":

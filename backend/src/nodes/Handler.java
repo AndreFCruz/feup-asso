@@ -29,11 +29,10 @@ public abstract class Handler<In, Out> extends Node<String> implements Subscribe
         };
     }
 
-    public String initialize(String sourceId, BlockingQueue<Out> sourceQueue, Broker<Out> broker, String sinkId, BlockingQueue<In> sinkQueue) {
+    public String initialize(String sinkId, BlockingQueue<In> sinkQueue, String sourceId, BlockingQueue<Out> sourceQueue, Broker<Out> broker) {
         String sourceName = initializeSource(sourceId, sourceQueue, broker);
         String sinkName = initializeSink(sinkId, sinkQueue);
-        return super.initialize(sourceName + '-' + sinkName);
-
+        return super.initialize(sinkName + '-' + sourceName);
     }
 
     private String initializeSource(String id, BlockingQueue<Out> queue, Broker<Out> broker) {

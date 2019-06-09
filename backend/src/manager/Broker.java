@@ -14,6 +14,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Broker class for mediating message exchange between nodes.
  * Note: this Broker uses the String type for Node's IDs.
+ *
  * @param <MT> Message Type
  */
 public class Broker<MT> implements Runnable {
@@ -23,7 +24,8 @@ public class Broker<MT> implements Runnable {
     private Map<String, ArrayList<String>> observers = new HashMap<>();
     private BlockingQueue<MessageEvent> eventQueue = new LinkedBlockingQueue<>();
 
-    public Broker() { }
+    public Broker() {
+    }
 
     /**
      * Register a new Entity
@@ -43,7 +45,7 @@ public class Broker<MT> implements Runnable {
     public String register(Handler handler) {
         EntityQueue entityQueuePublish = this.registerEntity();
         EntityQueue entityQueueSubscribe = this.registerEntity();
-        return handler.initialize(entityQueuePublish.entityId, entityQueuePublish.queue, this, entityQueueSubscribe.entityId, entityQueueSubscribe.queue);
+        return handler.initialize(entityQueueSubscribe.entityId, entityQueueSubscribe.queue, entityQueuePublish.entityId, entityQueuePublish.queue, this);
     }
 
     private EntityQueue registerEntity() {
@@ -83,7 +85,7 @@ public class Broker<MT> implements Runnable {
             return;
         }
 
-        ArrayList<String> subscribers = this.observers.get(event.publisherId);
+        ArrayList<String> subscribers = this.observers.getOrDefault(event.publisherId, new ArrayList<>());
         for (String subId : subscribers) {
             // Offer the published message to all subscribers
             boolean ret = this.registry.get(subId).offer(msg);

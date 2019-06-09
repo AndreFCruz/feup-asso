@@ -101,7 +101,7 @@ class Controllers {
 
         @Override
         public void handle(HttpExchange he) throws IOException {
-            if (! he.getRequestMethod().equalsIgnoreCase("GET"))
+            if (!he.getRequestMethod().equalsIgnoreCase("GET"))
                 return;
 
             // TODO Actually fetch the available node types
