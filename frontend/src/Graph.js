@@ -241,6 +241,23 @@ export class Graph extends React.Component {
     }
   }
 
+  getNodeTypes() {
+    let graphConfig = this.state.graphConfig;
+    let nodeTypes = new Map();
+    for (let prop in graphConfig.NodeTypes) {
+      let parentTypeId = graphConfig.NodeTypes[prop].shapeId;
+      let parentType = parentTypeId.split('#')[1];
+      nodeTypes[parentType] = [];
+    }
+
+    for (let subType in graphConfig.NodeSubtypes) {
+      let parentType = graphConfig.NodeSubtypes[subType].nodeType;
+      nodeTypes[parentType].push(subType);
+    }
+
+    return nodeTypes;
+  }
+
   render() {
     const nodes = this.state.graph.nodes;
     const edges = this.state.graph.edges;
@@ -249,6 +266,9 @@ export class Graph extends React.Component {
     const NodeTypes = this.state.graphConfig.NodeTypes;
     const NodeSubtypes = this.state.graphConfig.NodeSubtypes;
     const EdgeTypes = this.state.graphConfig.EdgeTypes;
+
+    // TODO use this in options for button select
+    let nodeTypes = this.getNodeTypes();
 
     return (
       <div id='graph'>
