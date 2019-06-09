@@ -1,5 +1,6 @@
 import axios from "axios";
-import * as React from 'react';
+// import * as React from 'react';
+import React from 'react';
 
 export const NODE_KEY = 'id'; // Key used to identify nodes
 
@@ -78,7 +79,8 @@ function makeNodeSubtypesObject(types) {
     };
   }
 
-  return retObj;
+  // return retObj;
+  return {};
 }
 
 // These keys are arbitrary (but must match the config)

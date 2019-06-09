@@ -282,11 +282,11 @@ export class Graph extends React.Component {
               nodeSubtypes={NodeSubtypes}
               edgeTypes={EdgeTypes}
               onSelectNode={this.onSelectNode.bind(this)}
-              // onCreateNode={this.onCreateNode.bind(this)}
+              onCreateNode={this.onCreateNode.bind(this)}
               onUpdateNode={this.onUpdateNode.bind(this)}
               onDeleteNode={this.onDeleteNode.bind(this)}
               onSelectEdge={this.onSelectEdge.bind(this)}
-              // onSwapEdge={this.onSwapEdge.bind(this)}
+              onSwapEdge={this.onSwapEdge.bind(this)}
               onDeleteEdge={this.onDeleteEdge.bind(this)}
               />
 
