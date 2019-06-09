@@ -2,7 +2,6 @@ import {
   SPECIAL_EDGE_TYPE,
   EMPTY_EDGE_TYPE,
   SPECIAL_TYPE,
-  SPECIAL_CHILD_SUBTYPE,
   EMPTY_TYPE,
   POLY_TYPE,
   SKINNY_TYPE
@@ -80,7 +79,6 @@ export const sample = {
     },
     {
       id: 'a2',
-      subtype: SPECIAL_CHILD_SUBTYPE,
       title: 'Node B (2)',
       type: EMPTY_TYPE,
       x: 593.9393920898438,

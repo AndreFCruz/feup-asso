@@ -1,5 +1,6 @@
 package api;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -70,6 +71,47 @@ class Controllers {
         os.close();
     }
 
+    private static void sendJSONResponse(HttpExchange he, Object responseObject) throws IOException {
+        Gson gson = new Gson();
+        String response = gson.toJson(responseObject);
+
+        // Allow CORS
+//        he.getRequestHeaders().add("Access-Control-Allow-Origin", "*");
+//        he.getRequestHeaders().add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+//        he.getRequestHeaders().add("Access-Control-Allow-Credentials", "true");
+//        he.getRequestHeaders().add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS,HEAD");
+
+        he.sendResponseHeaders(200, response.length());
+        OutputStream os = he.getResponseBody();
+        os.write(response.getBytes());
+        os.close();
+    }
+
+    public static class GetNodeTypes implements HttpHandler {
+        private InfoSecCooker infoSecCooker;
+
+        GetNodeTypes(InfoSecCooker infoSecCooker) {
+            this.infoSecCooker = infoSecCooker;
+        }
+
+        @Override
+        public void handle(HttpExchange he) throws IOException {
+            if (! he.getRequestMethod().equalsIgnoreCase("GET"))
+                return;
+
+            // TODO Actually fetch the available node types
+            Collection<String> sourceTypes = Arrays.asList("FILE_READER", "REST_HANDLER");
+            Collection<String> handlerTypes = Arrays.asList("MD5_CONVERTER", "UPPER_CASE_CONVERTER");
+            Collection<String> sinkTypes = Arrays.asList("FILE_WRITER", "PRINTER");
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("sources", sourceTypes);
+            response.put("handlers", handlerTypes);
+            response.put("sinks", sinkTypes);
+            sendJSONResponse(he, response);
+        }
+    }
+
     public static class RootHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange he) throws IOException {
@@ -100,6 +142,8 @@ class Controllers {
 
         @Override
         public void handle(HttpExchange he) throws IOException {
+            System.out.println("Request type: '" + he.getRequestMethod() + "'");
+
             Map<String, Object> parameters = new HashMap<>();
             URI requestedUri = he.getRequestURI();
             String query = requestedUri.getRawQuery();
@@ -114,6 +158,7 @@ class Controllers {
         @Override
         public void handle(HttpExchange he) throws IOException {
             Map<String, Object> parameters = parseBody(he);
+
 
             sendResponse(he, parameters);
         }

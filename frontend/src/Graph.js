@@ -1,5 +1,4 @@
 import React from 'react';
-import axios from "axios";
 import {
   GraphView, // required
   // Edge, // optional
@@ -12,17 +11,9 @@ import {
 } from 'react-digraph';
 import './Graph.css';
 import { sample as GRAPH_SAMPLE } from "./Graph.sample";
-import GraphConfig, {
-  edgeTypes,
-  EMPTY_EDGE_TYPE,
-  EMPTY_TYPE,
+import {
+  makeGraphConfigObject,
   NODE_KEY,
-  nodeTypes,
-  // POLY_TYPE,
-  // SPECIAL_CHILD_SUBTYPE,
-  SPECIAL_EDGE_TYPE,
-  SPECIAL_TYPE,
-  // SKINNY_TYPE
 } from './Graph.configs';
 
 export class Graph extends React.Component {
@@ -31,7 +22,7 @@ export class Graph extends React.Component {
     super(props);
 
     let sample = GRAPH_SAMPLE;
-    let config = GraphConfig;
+    let config = makeGraphConfigObject();
 
     this.state = {
       graph: sample,
@@ -46,10 +37,6 @@ export class Graph extends React.Component {
     // - fetch types of nodes for Sources/Handlers/Sinks
     // - construct a GraphConfig object
     // - update state with this.setState({...});
-
-    // Testing axios
-    axios.get('https://api.github.com/users/AndreFCruz')
-      .then(response => console.log(response));
   }
 
   /*
@@ -82,10 +69,12 @@ export class Graph extends React.Component {
     const graph = this.state.graph;
 
     let id = this.state.totalNodes + 1;
+    const type = this.state.graphConfig.NodeTypes.emptyNode;
+
     const viewNode = {
       id,
       title: 'Node (' +id + ')',
-      type: EMPTY_TYPE,
+      type,
       x: 10,
       y: 0
     };
@@ -117,12 +106,13 @@ export class Graph extends React.Component {
 
     let sourceNode = sourceSelect.options[sourceSelect.selectedIndex].value;
     let sinkNode = sinkSelect.options[sinkSelect.selectedIndex].value;
+    const type = this.state.graphConfig.EdgeTypes.standardEdge;
 
     const graph = this.state.graph;
     const viewEdge = {
       source: sourceNode,
       target: sinkNode,
-      type : EMPTY_EDGE_TYPE
+      type
     };
     
     // Only add the edge when the source node is not the same as the target
@@ -189,13 +179,13 @@ export class Graph extends React.Component {
     return this.state.graph.nodes[i];
   }
 
-  makeItLarge() {
-    const graph = this.state.graph;
-    const generatedSample = generateSample(this.state.totalNodes);
-    graph.nodes = generatedSample.nodes;
-    graph.edges = generatedSample.edges;
-    this.setState(this.state);
-  }
+  // makeItLarge() {
+  //   const graph = this.state.graph;
+  //   const generatedSample = generateSample(this.state.totalNodes);
+  //   graph.nodes = generatedSample.nodes;
+  //   graph.edges = generatedSample.edges;
+  //   this.setState(this.state);
+  // }
 
   addStartNode() {
     const graph = this.state.graph;
@@ -205,7 +195,7 @@ export class Graph extends React.Component {
       {
         id: Date.now(),
         title: 'Node A',
-        type: SPECIAL_TYPE,
+        type: this.state.graphConfig.NodeTypes.special,
         x: 0,
         y: 0
       },
@@ -228,11 +218,14 @@ export class Graph extends React.Component {
   }
 
   handleChange(event) {
+    console.log('Handling Change onBlur');
+    console.log(event);
+
     this.setState(
       {
         totalNodes: parseInt(event.target.value || '0', 10)
       },
-      this.makeItLarge.bind(this)
+      // this.makeItLarge.bind(this)
     );
   }
 
@@ -294,41 +287,41 @@ export class Graph extends React.Component {
 
 }
 
-function generateSample(totalNodes) {
-  const generatedSample = {
-    edges: [],
-    nodes: []
-  };
-  let y = 0;
-  let x = 0;
+// function generateSample(totalNodes) {
+//   const generatedSample = {
+//     edges: [],
+//     nodes: []
+//   };
+//   let y = 0;
+//   let x = 0;
 
-  const numNodes = totalNodes ? totalNodes : 0;
-  // generate large array of nodes
-  // These loops are fast enough. 1000 nodes = .45ms + .34ms
-  // 2000 nodes = .86ms + .68ms
-  // implying a linear relationship with number of nodes.
-  for (let i = 1; i <= numNodes; i++) {
-    if (i % 20 === 0) {
-      y++;
-      x = 0;
-    } else {
-      x++;
-    }
-    generatedSample.nodes.push({
-      id: `a${i}`,
-      title: `Node ${i}`,
-      type: nodeTypes[Math.floor(nodeTypes.length * Math.random())],
-      x: 0 + 200 * x,
-      y: 0 + 200 * y
-    });
-  }
-  // link each node to another node
-  for (let i = 1; i < numNodes; i++) {
-    generatedSample.edges.push({
-      source: `a${i}`,
-      target: `a${i + 1}`,
-      type: edgeTypes[Math.floor(edgeTypes.length * Math.random())]
-    });
-  }
-  return generatedSample;
-}
+//   const numNodes = totalNodes ? totalNodes : 0;
+//   // generate large array of nodes
+//   // These loops are fast enough. 1000 nodes = .45ms + .34ms
+//   // 2000 nodes = .86ms + .68ms
+//   // implying a linear relationship with number of nodes.
+//   for (let i = 1; i <= numNodes; i++) {
+//     if (i % 20 === 0) {
+//       y++;
+//       x = 0;
+//     } else {
+//       x++;
+//     }
+//     generatedSample.nodes.push({
+//       id: `a${i}`,
+//       title: `Node ${i}`,
+//       type: nodeTypes[Math.floor(nodeTypes.length * Math.random())],
+//       x: 0 + 200 * x,
+//       y: 0 + 200 * y
+//     });
+//   }
+//   // link each node to another node
+//   for (let i = 1; i < numNodes; i++) {
+//     generatedSample.edges.push({
+//       source: `a${i}`,
+//       target: `a${i + 1}`,
+//       type: edgeTypes[Math.floor(edgeTypes.length * Math.random())]
+//     });
+//   }
+//   return generatedSample;
+// }
