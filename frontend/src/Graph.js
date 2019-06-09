@@ -31,6 +31,8 @@ export class Graph extends React.Component {
       selected: {},
       totalNodes: sample.nodes.length,
       graphConfig: config,
+      selectedOption: {},
+      selectedOption2: {}
     }
 
     this.GraphView = React.createRef();
@@ -73,11 +75,14 @@ export class Graph extends React.Component {
     const graph = this.state.graph;
 
     let id = this.state.totalNodes + 1;
-    const type = SOURCE_TYPE;
+    const type = this.state.selectedOption;
+
+    let select = document.getElementById('secondOption');
+    let title = select.options[select.selectedIndex].value;
 
     const viewNode = {
       id: 'a' + id,
-      title: 'Node (' +id + ')',
+      title,
       type,
       x: 10,
       y: 0
@@ -258,6 +263,13 @@ export class Graph extends React.Component {
     return nodeTypes;
   }
 
+
+  handleChange1(){
+    let select = document.getElementById('firstOption');
+    let selectedOption = select.options[select.selectedIndex].value;
+    this.setState({selectedOption});
+  };
+
   render() {
     const nodes = this.state.graph.nodes;
     const edges = this.state.graph.edges;
@@ -270,6 +282,20 @@ export class Graph extends React.Component {
     // TODO use this in options for button select
     let nodeTypes = this.getNodeTypes();
 
+    function sequenceToOptions(seq) {
+      return seq.map(el => Object.assign({}, { value: el, label: el }));
+    }
+
+    let firstOptions = Object.keys(nodeTypes);
+    firstOptions = sequenceToOptions(firstOptions);
+    if (Object.keys(this.state.selectedOption).length === 0) {
+      this.state.selectedOption = firstOptions[0].value;
+    }
+    
+    let secondOptions = nodeTypes[this.state.selectedOption];
+    secondOptions = sequenceToOptions(secondOptions);
+
+
     return (
       <div id='graph'>
 
@@ -280,13 +306,15 @@ export class Graph extends React.Component {
           </div>
           <div className="create-node">
             <span>Add Node: </span>
-            <select id="shape">
-              {nodeTypes.map(node => <option  value={node}>{node}</option>)}
-            </select>
-            <select id="type">
-              {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
-            </select>
             
+            <select id='firstOption' onChange={this.handleChange1.bind(this)}>
+              {firstOptions.map(node => <option value={node.value}>{node.value}</option>)}
+            </select>
+
+            <select id='secondOption'>
+              {secondOptions.map(node => <option value={node.value}>{node.value}</option>)}
+            </select>
+
             <button onClick={this.onCreateNode.bind(this)}>Create</button>
           </div>
           <div className="create-edge">
