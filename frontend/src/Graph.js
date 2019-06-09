@@ -11,8 +11,7 @@ import {
   // GraphUtils // optional, useful utility functions
 } from 'react-digraph';
 import './Graph.css';
-// import { GraphConfig as DEFAULT_GRAPH_CONFIG } from "./Graph.configs";
-import { sample2 as DEFAULT_GRAPH_SAMPLE } from "./Graph.sample";
+import { sample as GRAPH_SAMPLE } from "./Graph.sample";
 import GraphConfig, {
   edgeTypes,
   EMPTY_EDGE_TYPE,
@@ -24,14 +23,14 @@ import GraphConfig, {
   SPECIAL_EDGE_TYPE,
   SPECIAL_TYPE,
   // SKINNY_TYPE
-} from './graph-config'; // Configures node/edge types
+} from './Graph.configs';
 
 export class Graph extends React.Component {
 
   constructor(props) {
     super(props);
 
-    let sample = DEFAULT_GRAPH_SAMPLE;
+    let sample = GRAPH_SAMPLE;
     let config = GraphConfig;
 
     this.state = {
