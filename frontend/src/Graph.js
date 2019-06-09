@@ -73,7 +73,7 @@ export class Graph extends React.Component {
     const type = this.state.graphConfig.NodeTypes.emptyNode;
 
     const viewNode = {
-      id,
+      id: 'a' + id,
       title: 'Node (' +id + ')',
       type,
       x: 10,
@@ -110,7 +110,7 @@ export class Graph extends React.Component {
 
     let sourceNode = sourceSelect.options[sourceSelect.selectedIndex].value;
     let sinkNode = sinkSelect.options[sinkSelect.selectedIndex].value;
-    const type = this.state.graphConfig.EdgeTypes.standardEdge;
+    const type = this.state.graphConfig.EdgeTypes.standardEdge.shapeId;
 
     const graph = this.state.graph;
     const viewEdge = {
@@ -254,7 +254,14 @@ export class Graph extends React.Component {
           <div>
             <span id="number-nodes">Number of Nodes: {this.state.totalNodes.toString()}</span>
           </div>
-          <button onClick={this.onCreateNode.bind(this)}>Add Node</button>
+          <div className="create-node">
+            <span>Add Node: </span>
+            <select id="type">
+              {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
+            </select>
+            
+            <button onClick={this.onCreateNode.bind(this)}>Create</button>
+          </div>
           <div className="create-edge">
             <span>Add Edge: </span>
             <select id="source">
