@@ -128,14 +128,28 @@ export class Graph extends React.Component {
       type
     };
     
+    let sourceViewNode = this.getViewNode(sourceNode);
+    let sinkViewNode =  this.getViewNode(sinkNode);
+
     // Only add the edge when the source node is not the same as the target
-    if (sourceNode !== sinkNode) {
-      graph.edges = [...graph.edges, viewEdge];
-      
-      this.setState({
-        graph,
-        selected: viewEdge
-      });
+    if (sourceNode !== sinkNode) 
+    {
+      if(sourceViewNode.type === SINK_TYPE)
+      {
+        console.warn(`Trying to create an output edge from the sink node ${sourceNode}`);
+      }
+      else if(sinkViewNode.type === SOURCE_TYPE)
+      {
+        console.warn(`Trying to create an input edge to the source node ${sinkNode}`);
+      }
+      else{
+        graph.edges = [...graph.edges, viewEdge];
+        
+        this.setState({
+          graph,
+          selected: viewEdge
+        });
+      }
     } else {
       console.warn(`Trying to create an edge from node ${sourceNode} to itself`);
     }
