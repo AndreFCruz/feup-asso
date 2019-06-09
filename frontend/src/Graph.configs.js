@@ -1,26 +1,66 @@
-// @flow
-/*
-  Copyright(c) 2018 Uber Technologies, Inc.
-
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-          http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
-*/
-
-/*
-  Example config for GraphView component
-*/
+import axios from "axios";
 import * as React from 'react';
 
 export const NODE_KEY = 'id'; // Key used to identify nodes
+
+export function makeGraphConfigObject() {
+  // Testing axios
+  axios.get('https://api.github.com/users/AndreFCruz')
+    .then(response => console.log(response));
+
+  return {
+    EdgeTypes: makeEdgeTypesObject(),
+    NodeTypes: makeNodeTypesObject(),
+    NodeSubtypes: makeNodeSubtypesObject()
+  };
+}
+
+function makeNodeTypesObject() {
+  return {
+    emptyNode: {
+      shape: EmptyNodeShape,
+      shapeId: '#emptyNode',
+      typeText: 'None'
+    },
+    empty: {
+      shape: CustomEmptyShape,
+      shapeId: '#empty',
+      typeText: 'None'
+    },
+    special: {
+      shape: SpecialShape,
+      shapeId: '#special',
+      typeText: 'Special'
+    },
+    skinny: {
+      shape: SkinnyShape,
+      shapeId: '#skinny',
+      typeText: 'Skinny'
+    },
+    poly: {
+      shape: PolyShape,
+      shapeId: "#poly",
+      typeText: 'Poly'
+    }
+  };
+}
+
+function makeEdgeTypesObject() {
+  return {
+    standardEdge: {
+      shape: EmptyEdgeShape,
+      shapeId: '#emptyEdge'
+    },
+    specialEdge: {
+      shape: SpecialEdgeShape,
+      shapeId: '#specialEdge'
+    }
+  };
+}
+
+function makeNodeSubtypesObject() {
+  return {};
+}
 
 // These keys are arbitrary (but must match the config)
 // However, GraphView renders text differently for empty types
@@ -29,7 +69,6 @@ export const EMPTY_TYPE = 'customEmpty'; // Empty node type
 export const POLY_TYPE = 'poly';
 export const SPECIAL_TYPE = 'special';
 export const SKINNY_TYPE = 'skinny';
-export const SPECIAL_CHILD_SUBTYPE = 'specialChild';
 export const EMPTY_EDGE_TYPE = 'emptyEdge';
 export const SPECIAL_EDGE_TYPE = 'specialEdge';
 
@@ -85,9 +124,9 @@ const SpecialEdgeShape = (
   </symbol>
 );
 
-export default {
+export const SAMPLE_GRAPH_CONFIG = {
   EdgeTypes: {
-    emptyEdge: {
+    standardEdge: {
       shape: EmptyEdgeShape,
       shapeId: '#emptyEdge'
     },
@@ -96,11 +135,11 @@ export default {
       shapeId: '#specialEdge'
     }
   },
-  NodeSubtypes: {
-    specialChild: {
-      shape: SpecialChildShape,
-      shapeId: '#specialChild'
-    }
+  NodeSubtypes: { // Ignoring node subtypes...
+    // specialChild: {
+    //   shape: SpecialChildShape,
+    //   shapeId: '#specialChild'
+    // }
   },
   NodeTypes: {
     emptyNode: {
