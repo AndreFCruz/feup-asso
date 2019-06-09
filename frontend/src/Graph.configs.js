@@ -56,6 +56,7 @@ function makeNodeSubtypesObject(types) {
     retObj[sourceType] = {
       shape: SourceNodeShape,
       shapeId: '#' + SOURCE_TYPE,
+      nodeType: SOURCE_TYPE,
     };
   }
 
@@ -63,6 +64,7 @@ function makeNodeSubtypesObject(types) {
     retObj[handlerType] = {
       shape: HandlerNodeShape,
       shapeId: '#' + HANDLER_TYPE,
+      nodeType: HANDLER_TYPE,
     };
   }
 
@@ -70,6 +72,7 @@ function makeNodeSubtypesObject(types) {
     retObj[sinkType] = {
       shape: SinkNodeShape,
       shapeId: '#' + SINK_TYPE,
+      nodeType: SINK_TYPE,
     };
   }
 
