@@ -101,7 +101,7 @@ export class Graph extends React.Component {
   }
 
   // Creates a new node between two edges
-  onCreateEdge() {
+  onCreateEdge(event) {
 
     let sourceSelect = document.getElementById('source');
     let sinkSelect = document.getElementById('sink');
@@ -109,6 +109,11 @@ export class Graph extends React.Component {
     let sourceNode = sourceSelect.options[sourceSelect.selectedIndex].value;
     let sinkNode = sinkSelect.options[sinkSelect.selectedIndex].value;
     const type = this.state.graphConfig.EdgeTypes.standardEdge;
+
+    if (sourceNode == sinkNode) {
+      console.warn(`Trying to create an edge from node ${sourceNode} to itself`);
+      return;
+    }
 
     const graph = this.state.graph;
     const viewEdge = {
