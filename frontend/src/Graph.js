@@ -106,6 +106,7 @@ export class Graph extends React.Component {
 
     graph.nodes = nodeAdr;
     graph.edges = newEdges;
+    this.state.totalNodes--;
 
     this.setState({ graph, selected: null });
   }
