@@ -7,7 +7,9 @@ export function makeGraphConfigObject() {
 
   // Fetch available node types from backend server
   axios.get(process.env.REACT_APP_API_URL + '/node-types')
-    .then(response => console.log(response));
+    .then(response => {
+      console.log(response.data);
+    });
 
   return {
     EdgeTypes: makeEdgeTypesObject(),

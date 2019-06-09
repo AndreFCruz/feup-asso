@@ -23,7 +23,6 @@ export class Graph extends React.Component {
 
     let sample = GRAPH_SAMPLE;
     let config = makeGraphConfigObject();
-
     this.state = {
       graph: sample,
       selected: {},
