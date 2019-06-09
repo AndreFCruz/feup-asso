@@ -2,10 +2,7 @@ import React from 'react';
 import {
   GraphView, // required
   // Edge, // optional
-  // type IEdge, // optional
   // Node, // optional
-  // type INode, // optional
-  // type LayoutEngineType, // required to change the layoutEngineType, otherwise optional
   // BwdlTransformer, // optional, Example JSON transformer
   // GraphUtils // optional, useful utility functions
 } from 'react-digraph';
@@ -14,7 +11,13 @@ import { sample as GRAPH_SAMPLE } from "./Graph.sample";
 import {
   makeGraphConfigObject,
   NODE_KEY,
+  SOURCE_TYPE,
+  HANDLER_TYPE,
+  SINK_TYPE,
+  STANDARD_EDGE_TYPE,
+  nodeTypes
 } from './Graph.configs';
+// import { Col, Row, Container } from "react-bootstrap";
 
 export class Graph extends React.Component {
 
@@ -70,7 +73,7 @@ export class Graph extends React.Component {
     const graph = this.state.graph;
 
     let id = this.state.totalNodes + 1;
-    const type = this.state.graphConfig.NodeTypes.emptyNode;
+    const type = SOURCE_TYPE;
 
     const viewNode = {
       id: 'a' + id,
@@ -110,7 +113,7 @@ export class Graph extends React.Component {
 
     let sourceNode = sourceSelect.options[sourceSelect.selectedIndex].value;
     let sinkNode = sinkSelect.options[sinkSelect.selectedIndex].value;
-    const type = this.state.graphConfig.EdgeTypes.standardEdge.shapeId;
+    const type = STANDARD_EDGE_TYPE;
 
     const graph = this.state.graph;
     const viewEdge = {
@@ -190,35 +193,35 @@ export class Graph extends React.Component {
   //   this.setState(this.state);
   // }
 
-  addStartNode() {
-    const graph = this.state.graph;
-    // using a new array like this creates a new memory reference
-    // this will force a re-render
-    graph.nodes = [
-      {
-        id: Date.now(),
-        title: 'Node A',
-        type: this.state.graphConfig.NodeTypes.special,
-        x: 0,
-        y: 0
-      },
-      ...this.state.graph.nodes
-    ];
-    this.setState({
-      graph
-    });
-  }
+  // addStartNode() {
+  //   const graph = this.state.graph;
+  //   // using a new array like this creates a new memory reference
+  //   // this will force a re-render
+  //   graph.nodes = [
+  //     {
+  //       id: Date.now(),
+  //       title: 'Node A',
+  //       type: this.state.graphConfig.NodeTypes.special,
+  //       x: 0,
+  //       y: 0
+  //     },
+  //     ...this.state.graph.nodes
+  //   ];
+  //   this.setState({
+  //     graph
+  //   });
+  // }
 
-  deleteStartNode() {
-    const graph = this.state.graph;
-    graph.nodes.splice(0, 1);
-    // using a new array like this creates a new memory reference
-    // this will force a re-render
-    graph.nodes = [...this.state.graph.nodes];
-    this.setState({
-      graph
-    });
-  }
+  // deleteStartNode() {
+  //   const graph = this.state.graph;
+  //   graph.nodes.splice(0, 1);
+  //   // using a new array like this creates a new memory reference
+  //   // this will force a re-render
+  //   graph.nodes = [...this.state.graph.nodes];
+  //   this.setState({
+  //     graph
+  //   });
+  // }
 
   handleChange(event) {
     console.log('Handling Change onBlur');
@@ -250,12 +253,16 @@ export class Graph extends React.Component {
     return (
       <div id='graph'>
 
+        {/* TODO Eventually move this header to a side panel to the right of the GraphView */}
         <div className="graph-header">
           <div>
             <span id="number-nodes">Number of Nodes: {this.state.totalNodes.toString()}</span>
           </div>
           <div className="create-node">
             <span>Add Node: </span>
+            <select id="shape">
+              {nodeTypes.map(node => <option  value={node}>{node}</option>)}
+            </select>
             <select id="type">
               {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
             </select>
@@ -280,22 +287,23 @@ export class Graph extends React.Component {
           </div>
         </div>
 
-        <GraphView  ref={(el) => (this.GraphView = el)}
-                    nodeKey={NODE_KEY}
-                    nodes={nodes}
-                    edges={edges}
-                    selected={selected}
-                    nodeTypes={NodeTypes}
-                    nodeSubtypes={NodeSubtypes}
-                    edgeTypes={EdgeTypes}
-                    onSelectNode={this.onSelectNode.bind(this)}
-                    // onCreateNode={this.onCreateNode.bind(this)}
-                    onUpdateNode={this.onUpdateNode.bind(this)}
-                    onDeleteNode={this.onDeleteNode.bind(this)}
-                    onSelectEdge={this.onSelectEdge.bind(this)}
-                    // onSwapEdge={this.onSwapEdge.bind(this)}
-                    onDeleteEdge={this.onDeleteEdge.bind(this)}
-                    />
+        <GraphView
+              ref={(el) => (this.GraphView = el)}
+              nodeKey={NODE_KEY}
+              nodes={nodes}
+              edges={edges}
+              selected={selected}
+              nodeTypes={NodeTypes}
+              nodeSubtypes={NodeSubtypes}
+              edgeTypes={EdgeTypes}
+              onSelectNode={this.onSelectNode.bind(this)}
+              onCreateNode={this.onCreateNode.bind(this)}
+              onUpdateNode={this.onUpdateNode.bind(this)}
+              onDeleteNode={this.onDeleteNode.bind(this)}
+              onSelectEdge={this.onSelectEdge.bind(this)}
+              onSwapEdge={this.onSwapEdge.bind(this)}
+              onDeleteEdge={this.onDeleteEdge.bind(this)}
+              />
 
       </div>
     );

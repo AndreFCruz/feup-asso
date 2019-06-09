@@ -1,168 +1,118 @@
 import axios from "axios";
-import * as React from 'react';
+// import * as React from 'react';
+import React from 'react';
 
 export const NODE_KEY = 'id'; // Key used to identify nodes
 
 export function makeGraphConfigObject() {
 
   // Fetch available node types from backend server
-  // axios.get(process.env.REACT_APP_API_URL + '/node-types')
-  //   .then(response => {
-  //     console.log(response.data);
-  //   });
+  axios.get(process.env.REACT_APP_API_URL + '/node-types')
+    .then(response => console.log(response))
+    .catch(error => console.warn('Error on axios.get: ' + JSON.stringify(error)));
+
+  // NOTE Sample response from backend server
+  let nodeTypesResponse = {"sources":["FILE_READER","REST_HANDLER"],"sinks":["FILE_WRITER","PRINTER"],"handlers":["MD5_CONVERTER","UPPER_CASE_CONVERTER"]};
 
   return {
     EdgeTypes: makeEdgeTypesObject(),
     NodeTypes: makeNodeTypesObject(),
-    NodeSubtypes: makeNodeSubtypesObject()
+    NodeSubtypes: makeNodeSubtypesObject(nodeTypesResponse)
   };
 }
 
 function makeNodeTypesObject() {
   return {
-    emptyNode: {
-      shape: EmptyNodeShape,
-      shapeId: '#emptyNode',
-      typeText: 'None'
+    sourceNode: {
+      shape: SourceNodeShape,
+      shapeId: '#' + SOURCE_TYPE,
+      typeText: 'Source'
     },
-    empty: {
-      shape: CustomEmptyShape,
-      shapeId: '#empty',
-      typeText: 'None'
+    handlerNode: {
+      shape: HandlerNodeShape,
+      shapeId: '#' + HANDLER_TYPE,
+      typeText: 'Handler'
     },
-    special: {
-      shape: SpecialShape,
-      shapeId: '#special',
-      typeText: 'Special'
+    sinkNode: {
+      shape: SinkNodeShape,
+      shapeId: '#' + SINK_TYPE,
+      typeText: 'Sink'
     },
-    skinny: {
-      shape: SkinnyShape,
-      shapeId: '#skinny',
-      typeText: 'Skinny'
-    },
-    poly: {
-      shape: PolyShape,
-      shapeId: "#poly",
-      typeText: 'Poly'
-    }
   };
 }
 
 function makeEdgeTypesObject() {
   return {
     standardEdge: {
-      shape: EmptyEdgeShape,
-      shapeId: '#emptyEdge'
+      shape: StandardEdgeShape,
+      shapeId: '#' + STANDARD_EDGE_TYPE,
     },
-    specialEdge: {
-      shape: SpecialEdgeShape,
-      shapeId: '#specialEdge'
-    }
   };
 }
 
-function makeNodeSubtypesObject() {
-  return {};
+function makeNodeSubtypesObject(types) {
+  let retObj = {};
+  for (const sourceType of types.sources) {
+    retObj[sourceType] = {
+      shape: SourceNodeShape,
+      shapeId: '#' + SOURCE_TYPE,
+    };
+  }
+
+  for (const handlerType of types.handlers) {
+    retObj[handlerType] = {
+      shape: HandlerNodeShape,
+      shapeId: '#' + HANDLER_TYPE,
+    };
+  }
+
+  for (const sinkType of types.sinks) {
+    retObj[sinkType] = {
+      shape: SinkNodeShape,
+      shapeId: '#' + SINK_TYPE,
+    };
+  }
+
+  console.log('NODE SUB-TYPES:');
+  console.log(retObj);
+  return retObj;
 }
 
 // These keys are arbitrary (but must match the config)
 // However, GraphView renders text differently for empty types
 // so this has to be passed in if that behavior is desired.
-export const EMPTY_TYPE = 'customEmpty'; // Empty node type
-export const POLY_TYPE = 'poly';
-export const SPECIAL_TYPE = 'special';
-export const SKINNY_TYPE = 'skinny';
-export const EMPTY_EDGE_TYPE = 'emptyEdge';
-export const SPECIAL_EDGE_TYPE = 'specialEdge';
 
-export const nodeTypes = [EMPTY_TYPE, POLY_TYPE, SPECIAL_TYPE, SKINNY_TYPE];
-export const edgeTypes = [EMPTY_EDGE_TYPE, SPECIAL_EDGE_TYPE];
+// Node Types
+export const SOURCE_TYPE = 'sourceNode';
+export const HANDLER_TYPE = 'handlerNode';
+export const SINK_TYPE = 'sinkNode';
+export const nodeTypes = [SOURCE_TYPE, HANDLER_TYPE, SINK_TYPE];
+
+// Edge Types
+export const STANDARD_EDGE_TYPE = 'standardEdge';
+export const edgeTypes = [STANDARD_EDGE_TYPE];
 
 
-const EmptyNodeShape = (
-  <symbol viewBox="0 0 154 154" width="154" height="154" id="emptyNode">
-    <circle cx="77" cy="77" r="76" />
+const SourceNodeShape = (
+  <symbol viewBox="0 0 160 160" id={SOURCE_TYPE}>
+    <circle cx="80" cy="80" r="70" />
   </symbol>
 );
 
-const CustomEmptyShape = (
-  <symbol viewBox="0 0 100 100" id={EMPTY_TYPE}>
-    <circle cx="50" cy="50" r="45" />
+const HandlerNodeShape = (
+  <symbol viewBox="0 0 80 80" id={HANDLER_TYPE}>
+    <circle cx="40" cy="40" r="35" />
   </symbol>
 );
 
-const SpecialShape = (
-  <symbol viewBox="-27 0 154 154" id={SPECIAL_TYPE} width="154" height="154">
-    <rect transform="translate(50) rotate(45)" width="109" height="109" />
+const SinkNodeShape = (
+  <symbol viewBox="0 0 120 120" id={SINK_TYPE}>
+    <circle cx="60" cy="60" r="55" />
   </symbol>
 );
 
-const PolyShape = (
-  <symbol viewBox="0 0 88 72" id={POLY_TYPE} width="88" height="88">
-    <path d="M 0 36 18 0 70 0 88 36 70 72 18 72Z"></path>
-  </symbol>
-);
-
-const SkinnyShape = (
-  <symbol viewBox="0 0 154 54" width="154" height="54" id={SKINNY_TYPE}>
-    <rect x="0" y="0" rx="2" ry="2" width="154" height="54" />
-  </symbol>
-);
-
-const EmptyEdgeShape = (
-  <symbol viewBox="0 0 50 50" id={EMPTY_EDGE_TYPE}>
+const StandardEdgeShape = (
+  <symbol viewBox="0 0 50 50" id={STANDARD_EDGE_TYPE}>
     <circle cx="25" cy="25" r="8" fill="currentColor" />
   </symbol>
 );
-
-const SpecialEdgeShape = (
-  <symbol viewBox="0 0 50 50" id={SPECIAL_EDGE_TYPE}>
-    <rect transform="rotate(45)" x="27.5" y="-7.5" width="15" height="15" fill="currentColor" />
-  </symbol>
-);
-
-export const SAMPLE_GRAPH_CONFIG = {
-  EdgeTypes: {
-    standardEdge: {
-      shape: EmptyEdgeShape,
-      shapeId: '#emptyEdge'
-    },
-    specialEdge: {
-      shape: SpecialEdgeShape,
-      shapeId: '#specialEdge'
-    }
-  },
-  NodeSubtypes: { // Ignoring node subtypes...
-    // specialChild: {
-    //   shape: SpecialChildShape,
-    //   shapeId: '#specialChild'
-    // }
-  },
-  NodeTypes: {
-    emptyNode: {
-      shape: EmptyNodeShape,
-      shapeId: '#emptyNode',
-      typeText: 'None'
-    },
-    empty: {
-      shape: CustomEmptyShape,
-      shapeId: '#empty',
-      typeText: 'None'
-    },
-    special: {
-      shape: SpecialShape,
-      shapeId: '#special',
-      typeText: 'Special'
-    },
-    skinny: {
-      shape: SkinnyShape,
-      shapeId: '#skinny',
-      typeText: 'Skinny'
-    },
-    poly: {
-      shape: PolyShape,
-      shapeId: "#poly",
-      typeText: 'Poly'
-    }
-  }
-};
