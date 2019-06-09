@@ -44,6 +44,14 @@ public abstract class Handler<In, Out> extends Node<String> implements Subscribe
         return sink.initialize(id, queue);
     }
 
+    public String getSourceId() {
+        return this.source.getId();
+    }
+
+    public String getSinkId() {
+        return this.sink.getId();
+    }
+
     @Override
     public Out produceMessage() throws InterruptedException {
         In message = sink.pullMessage();
