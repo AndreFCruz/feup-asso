@@ -64,7 +64,7 @@ export class Graph extends React.Component {
   }
 
   // Updates the graph with a new node
-  onCreateNode(x, y) {
+  onCreateNode(event) {
     const graph = this.state.graph;
 
     let id = this.state.totalNodes + 1;
@@ -79,7 +79,10 @@ export class Graph extends React.Component {
     };
 
     graph.nodes = [...graph.nodes, viewNode];
-    this.setState({ graph });
+    this.setState({
+      graph: graph,
+      totalNodes: this.state.totalNodes + 1,
+    });
   }
 
   // Deletes a node from the graph
