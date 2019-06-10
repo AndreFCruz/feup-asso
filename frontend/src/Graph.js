@@ -265,6 +265,10 @@ export class Graph extends React.Component {
     }
   }
 
+  onRunGraph(){
+    console.log(JSON.stringify(this.state.graph));
+  }
+
   getNodeTypes() {
     let graphConfig = this.state.graphConfig;
     let nodeTypes = new Map();
@@ -355,6 +359,9 @@ export class Graph extends React.Component {
             <select id="panToSelection" onChange={this.onSelectPanNode.bind(this)}>
               {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
             </select>
+          </div>
+          <div className="send-backend-run">
+            <button onClick={this.onRunGraph.bind(this)}>Run</button>
           </div>
         </div>
 
