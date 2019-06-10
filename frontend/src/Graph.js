@@ -18,6 +18,7 @@ import {
   nodeTypes
 } from './Graph.configs';
 // import { Col, Row, Container } from "react-bootstrap";
+import toposort from 'toposort';
 
 export class Graph extends React.Component {
 
@@ -135,27 +136,23 @@ export class Graph extends React.Component {
     let sourceViewNode = this.getViewNode(sourceNode);
     let sinkViewNode =  this.getViewNode(sinkNode);
 
-    // Only add the edge when the source node is not the same as the target
-    if (sourceNode !== sinkNode) 
-    {
-      if(sourceViewNode.type === SINK_TYPE)
-      {
-        console.warn(`Trying to create an output edge from the sink node ${sourceNode}`);
-      }
-      else if(sinkViewNode.type === SOURCE_TYPE)
-      {
-        console.warn(`Trying to create an input edge to the source node ${sinkNode}`);
-      }
-      else{
-        graph.edges = [...graph.edges, viewEdge];
-        
-        this.setState({
-          graph,
-          selected: viewEdge
-        });
-      }
-    } else {
+    // Check if Edge is valid
+    // TODO check if edge is repeated
+    if (sourceNode === sinkNode) {
       console.warn(`Trying to create an edge from node ${sourceNode} to itself`);
+    } else if (sourceViewNode.type === SINK_TYPE) {
+      console.warn(`Trying to create an output edge from the sink node ${sourceNode}`);
+    } else if (sinkViewNode.type === SOURCE_TYPE) {
+      console.warn(`Trying to create an input edge to the source node ${sinkNode}`);
+    } else if (! isGraphAcyclic(this.state.graph)) {
+      console.warn('Edge creation would create a cycle in the graph');
+    } else { // Else, create the edge (it's valid)
+      graph.edges = [...graph.edges, viewEdge];
+      
+      this.setState({
+        graph,
+        selected: viewEdge
+      });
     }
   }
 
@@ -290,6 +287,10 @@ export class Graph extends React.Component {
   };
 
   render() {
+    function sequenceToOptions(seq) {
+      return seq.map(el => Object.assign({}, { value: el, label: el }));
+    }
+
     const nodes = this.state.graph.nodes;
     const edges = this.state.graph.edges;
     const selected = this.state.selected;
@@ -298,22 +299,17 @@ export class Graph extends React.Component {
     const NodeSubtypes = this.state.graphConfig.NodeSubtypes;
     const EdgeTypes = this.state.graphConfig.EdgeTypes;
 
-    // TODO use this in options for button select
+
     let nodeTypes = this.getNodeTypes();
-
-    function sequenceToOptions(seq) {
-      return seq.map(el => Object.assign({}, { value: el, label: el }));
-    }
-
     let firstOptions = Object.keys(nodeTypes);
     firstOptions = sequenceToOptions(firstOptions);
-    if (Object.keys(this.state.selectedOption).length === 0) {
-      this.setState({
-        selectedOption: firstOptions[0].value
-      });
+
+    let selectedOption1 = this.state.selectedOption;
+    if (Object.keys(selectedOption1).length === 0) {
+      selectedOption1 = firstOptions[0].value;
     }
     
-    let secondOptions = nodeTypes[this.state.selectedOption];
+    let secondOptions = nodeTypes[selectedOption1];
     secondOptions = sequenceToOptions(secondOptions);
 
 
@@ -378,6 +374,18 @@ export class Graph extends React.Component {
     );
   }
 
+}
+
+function isGraphAcyclic(graph) {
+  let directedEdges = graph.edges.map(el => [el.source, el.target]);
+
+  try { // Try to obtain topological sort
+    toposort(directedEdges);
+  } catch (err) {
+    return false;
+  }
+
+  return true;
 }
 
 // function generateSample(totalNodes) {
