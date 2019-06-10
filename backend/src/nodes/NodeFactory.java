@@ -9,6 +9,7 @@ import nodes.implementations.sources.StringGenerator;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public class NodeFactory {
@@ -47,6 +48,18 @@ public class NodeFactory {
 
     public static SinkType convertSinkNameToSinkType(String sinkName) {
         return sinkNameToSinkType.get(sinkName);
+    }
+
+    public static Set<String> getSourceNames() {
+        return sourceNameToSourceType.keySet();
+    }
+
+    public static Set<String> getHandlerNames() {
+        return handlerNameToHandlerType.keySet();
+    }
+
+    public static Set<String> getSinkNames() {
+        return sinkNameToSinkType.keySet();
     }
 
     public Source createSource(SourceType nodeType) {

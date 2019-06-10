@@ -5,6 +5,7 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import manager.InfoSecCooker;
+import nodes.NodeFactory;
 
 import java.io.*;
 import java.net.URI;
@@ -93,26 +94,15 @@ class Controllers {
     }
 
     public static class GetNodeTypes implements HttpHandler {
-        private InfoSecCooker infoSecCooker;
-
-        GetNodeTypes(InfoSecCooker infoSecCooker) {
-            this.infoSecCooker = infoSecCooker;
-        }
-
         @Override
         public void handle(HttpExchange he) throws IOException {
             if (!he.getRequestMethod().equalsIgnoreCase("GET"))
                 return;
 
-            // TODO Actually fetch the available node types
-            Collection<String> sourceTypes = Arrays.asList("FILE_READER", "REST_HANDLER");
-            Collection<String> handlerTypes = Arrays.asList("MD5_CONVERTER", "UPPER_CASE_CONVERTER");
-            Collection<String> sinkTypes = Arrays.asList("FILE_WRITER", "PRINTER");
-
             Map<String, Object> response = new HashMap<>();
-            response.put("sources", sourceTypes);
-            response.put("handlers", handlerTypes);
-            response.put("sinks", sinkTypes);
+            response.put("sources", NodeFactory.getSourceNames());
+            response.put("handlers", NodeFactory.getHandlerNames());
+            response.put("sinks", NodeFactory.getSinkNames());
             sendJSONResponse(he, response);
         }
     }

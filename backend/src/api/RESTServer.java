@@ -51,6 +51,6 @@ public class RESTServer {
         server.createContext("/getHandlers", new Controllers.GetHandlers(infoSecCooker));
 
         // Following methods return the available types
-        server.createContext("/node-types", new Controllers.GetNodeTypes(infoSecCooker));
+        server.createContext("/node-types", new Controllers.GetNodeTypes());
     }
 }
