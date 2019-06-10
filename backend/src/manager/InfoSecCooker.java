@@ -47,16 +47,16 @@ public class InfoSecCooker implements Runnable {
 
     public void initializeGraph() {
         // Create Publishers and populate registry
-        String stringSourceKey = graph.createSource(NodeFactory.SourceType.STRINGGENERATOR);
-        String integerSourceKey = graph.createSource(NodeFactory.SourceType.INTEGERGENERATOR);
+        String stringSourceKey = graph.createSource(NodeFactory.SourceType.STRING_GENERATOR);
+        String integerSourceKey = graph.createSource(NodeFactory.SourceType.INTEGER_GENERATOR);
 
         // Create Handlers
-        String[] md5ConverterKeys = graph.createHandler(NodeFactory.HandlerType.MD5CONVERTER).split("-");
-        String[] uppercaseKeys = graph.createHandler(NodeFactory.HandlerType.UPPERCASE).split("-");
+        String[] md5ConverterKeys = graph.createHandler(NodeFactory.HandlerType.MD5_CONVERTER).split("-");
+        String[] uppercaseKeys = graph.createHandler(NodeFactory.HandlerType.UPPER_CASE_CONVERTER).split("-");
 
         // Create Sinks
         String printerSinkKey = graph.createSink(NodeFactory.SinkType.PRINTER);
-        String fileWriterSinkKey = graph.createSink(NodeFactory.SinkType.FILEWRITER);
+        String fileWriterSinkKey = graph.createSink(NodeFactory.SinkType.FILE_WRITER);
 
 
         // Manage subscriptions
