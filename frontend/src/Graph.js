@@ -106,9 +106,13 @@ export class Graph extends React.Component {
 
     graph.nodes = nodeAdr;
     graph.edges = newEdges;
-    this.state.totalNodes--;
+    let totalNodes = this.state.totalNodes - 1;
 
-    this.setState({ graph, selected: null });
+    this.setState({
+      graph,
+      selected: null,
+      totalNodes: totalNodes,
+    });
   }
 
   // Creates a new node between two edges
@@ -304,7 +308,9 @@ export class Graph extends React.Component {
     let firstOptions = Object.keys(nodeTypes);
     firstOptions = sequenceToOptions(firstOptions);
     if (Object.keys(this.state.selectedOption).length === 0) {
-      this.state.selectedOption = firstOptions[0].value;
+      this.setState({
+        selectedOption: firstOptions[0].value
+      });
     }
     
     let secondOptions = nodeTypes[this.state.selectedOption];
