@@ -30,19 +30,19 @@ public class Broker<MT> implements Runnable {
     /**
      * Register a new Entity
      *
-     * @return
+     * @return string key
      */
-    public String register(Source source) {
+    String register(Source source) {
         EntityQueue entityQueue = this.registerEntity();
         return source.initialize(entityQueue.entityId, entityQueue.queue, this);
     }
 
-    public String register(Sink sink) {
+    String register(Sink sink) {
         EntityQueue entityQueue = this.registerEntity();
         return sink.initialize(entityQueue.entityId, entityQueue.queue);
     }
 
-    public String register(Handler handler) {
+    String register(Handler handler) {
         EntityQueue entityQueuePublish = this.registerEntity();
         EntityQueue entityQueueSubscribe = this.registerEntity();
         return handler.initialize(entityQueueSubscribe.entityId, entityQueueSubscribe.queue, entityQueuePublish.entityId, entityQueuePublish.queue, this);
@@ -54,7 +54,7 @@ public class Broker<MT> implements Runnable {
         return new EntityQueue(entityId, queue);
     }
 
-    public void addSubscriber(String subscriberId, String publisherId) {
+    void addSubscriber(String subscriberId, String publisherId) {
         ArrayList<String> subscribersList = this.observers.getOrDefault(publisherId, new ArrayList<>());
         subscribersList.add(subscriberId);
         this.observers.put(publisherId, subscribersList);
@@ -102,7 +102,7 @@ public class Broker<MT> implements Runnable {
             MessageEvent event;
             try {
                 event = eventQueue.take(); // .take() blocks awaiting for new Events
-            } catch (InterruptedException e1) {
+            } catch (InterruptedException e) {
                 break;
             }
             this.handleMessageEvent(event);

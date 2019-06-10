@@ -1,7 +1,6 @@
 package api;
 
 import com.google.gson.Gson;
-import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import manager.InfoSecCooker;
@@ -12,7 +11,6 @@ import nodes.Sink;
 import org.json.JSONObject;
 
 import java.io.*;
-import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -21,7 +19,6 @@ import static nodes.NodeFactory.*;
 
 class Controllers {
     private static void parseQuery(String query, Map<String, Object> parameters) throws UnsupportedEncodingException {
-
         if (query != null) {
             String[] pairs = query.split("[&]");
             for (String pair : pairs) {
@@ -78,12 +75,12 @@ class Controllers {
     }
 
     private static void sendResponse(HttpExchange he, Map<String, Object> parameters) throws IOException {
-        String response = "";
+        StringBuilder response = new StringBuilder();
         for (String key : parameters.keySet())
-            response += key + " = " + parameters.get(key) + "\n";
+            response.append(key).append(" = ").append(parameters.get(key)).append("\n");
         he.sendResponseHeaders(200, response.length());
         OutputStream os = he.getResponseBody();
-        os.write(response.getBytes());
+        os.write(response.toString().getBytes());
         os.close();
     }
 
@@ -130,47 +127,6 @@ class Controllers {
             OutputStream os = he.getResponseBody();
             os.write(response.getBytes());
             os.close();
-        }
-    }
-
-    public static class EchoHeaderHandler implements HttpHandler {
-        @Override
-        public void handle(HttpExchange he) throws IOException {
-            Headers headers = he.getRequestHeaders();
-            Set<Map.Entry<String, List<String>>> entries = headers.entrySet();
-            StringBuilder response = new StringBuilder();
-            for (Map.Entry<String, List<String>> entry : entries)
-                response.append(entry.toString()).append("\n");
-            he.sendResponseHeaders(200, response.length());
-            OutputStream os = he.getResponseBody();
-            os.write(response.toString().getBytes());
-            os.close();
-        }
-    }
-
-    public static class EchoGetHandler implements HttpHandler {
-
-        @Override
-        public void handle(HttpExchange he) throws IOException {
-            System.out.println("Request type: '" + he.getRequestMethod() + "'");
-
-            Map<String, Object> parameters = new HashMap<>();
-            URI requestedUri = he.getRequestURI();
-            String query = requestedUri.getRawQuery();
-            parseQuery(query, parameters);
-
-            sendResponse(he, parameters);
-        }
-    }
-
-    public static class EchoPostHandler implements HttpHandler {
-
-        @Override
-        public void handle(HttpExchange he) throws IOException {
-            Map<String, Object> parameters = parseBody(he);
-
-
-            sendResponse(he, parameters);
         }
     }
 
@@ -377,6 +333,37 @@ class Controllers {
         }
     }
 
+    public static class GetEdges implements HttpHandler {
+        private InfoSecCooker infoSecCooker;
+
+        GetEdges(InfoSecCooker infoSecCooker) {
+            this.infoSecCooker = infoSecCooker;
+        }
+
+        @Override
+        public void handle(HttpExchange he) throws IOException {
+            Map<String, Object> response = new HashMap<>();
+            response.put("edges", infoSecCooker.graph.getEdges());
+            sendResponse(he, response);
+        }
+    }
+
+    public static class CheckEdge implements HttpHandler {
+        private InfoSecCooker infoSecCooker;
+
+        CheckEdge(InfoSecCooker infoSecCooker) {
+            this.infoSecCooker = infoSecCooker;
+        }
+
+        @Override
+        public void handle(HttpExchange he) throws IOException {
+            JSONObject body = parseBodyToJSONObj(he);
+            boolean success = infoSecCooker.graph.checkValidEdge(body.get("source"), body.get("sink"));
+            sendJSONResponse(he, success);
+        }
+    }
+
+
     public static class SendGraph implements HttpHandler {
         private InfoSecCooker infoSecCooker;
 
@@ -387,7 +374,6 @@ class Controllers {
         @Override
         public void handle(HttpExchange he) throws IOException {
             boolean success = infoSecCooker.loadGraph(parseBodyToJSONObj(he));
-
             sendJSONResponse(he, success);
         }
     }
