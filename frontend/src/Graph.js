@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from "axios";
 import {
   GraphView, // required
   // Edge, // optional
@@ -263,7 +264,23 @@ export class Graph extends React.Component {
   }
 
   onRunGraph(){
-    console.log(JSON.stringify(this.state.graph));
+
+    axios.post(process.env.REACT_APP_API_URL + '/sendGraph', JSON.stringify(this.state.graph))
+    .then(response => {
+      if(response === true){
+        this.sendRunRequest();
+      } 
+      else{
+        console.warn('There was an error parsing the graph.');
+      }
+    })
+    .catch(error => console.warn('Error on axios.get: ' + JSON.stringify(error)));
+  }
+
+  sendRunRequest(){
+    axios.post(process.env.REACT_APP_API_URL + '/runGraph', JSON.stringify(this.state.graph))
+    .then(response => console.log(response))
+    .catch(error => console.warn('Error on axios.get: ' + JSON.stringify(error)));
   }
 
   getNodeTypes() {
