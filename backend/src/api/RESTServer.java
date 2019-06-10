@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class RESTServer {
-    private int PORT = 3000;
+    private int PORT = 3001;
     private HttpServer server;
     private InfoSecCooker infoSecCooker;
     private ExecutorService RESTServerExec = Executors.newSingleThreadExecutor();

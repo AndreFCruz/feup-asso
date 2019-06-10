@@ -143,7 +143,7 @@ class Controllers {
             Node source = infoSecCooker.graph.createSource(convertSourceNameToSourceType(parameters.get("name").toString()));
             Map<String, Object> response = new HashMap<>();
             response.put("sourceKey", source.getId());
-            sendResponse(he, response);
+            sendJSONResponse(he, response);
         }
     }
 
@@ -160,7 +160,7 @@ class Controllers {
             Sink sink = infoSecCooker.graph.createSink(convertSinkNameToSinkType(parameters.get("name").toString()));
             Map<String, Object> response = new HashMap<>();
             response.put("sinkKey", sink.getId());
-            sendResponse(he, response);
+            sendJSONResponse(he, response);
         }
     }
 
@@ -177,7 +177,7 @@ class Controllers {
             Handler handler = infoSecCooker.graph.createHandler(convertHandlerNameToHandlerType(parameters.get("name").toString()));
             Map<String, Object> response = new HashMap<>();
             response.put("handlerKey", handler.getId());
-            sendResponse(he, response);
+            sendJSONResponse(he, response);
         }
     }
 
@@ -192,7 +192,7 @@ class Controllers {
         public void handle(HttpExchange he) throws IOException {
             Map<String, Object> parameters = parseBody(he);
             infoSecCooker.graph.removeSourceById(parameters.get("name").toString());
-            sendResponse(he, new HashMap<>());
+            sendJSONResponse(he, new HashMap<>());
         }
     }
 
@@ -207,7 +207,7 @@ class Controllers {
         public void handle(HttpExchange he) throws IOException {
             Map<String, Object> parameters = parseBody(he);
             infoSecCooker.graph.removeSinkById(parameters.get("name").toString());
-            sendResponse(he, new HashMap<>());
+            sendJSONResponse(he, new HashMap<>());
         }
     }
 
@@ -222,7 +222,7 @@ class Controllers {
         public void handle(HttpExchange he) throws IOException {
             Map<String, Object> parameters = parseBody(he);
             infoSecCooker.graph.removeHandlerById(parameters.get("name").toString());
-            sendResponse(he, new HashMap<>());
+            sendJSONResponse(he, new HashMap<>());
         }
     }
 
@@ -237,7 +237,7 @@ class Controllers {
         public void handle(HttpExchange he) throws IOException {
             Map<String, Object> parameters = parseBody(he);
             infoSecCooker.graph.createEdge(parameters.get("sourceId").toString(), parameters.get("sinkId").toString());
-            sendResponse(he, new HashMap<>());
+            sendJSONResponse(he, new HashMap<>());
         }
     }
 
@@ -252,7 +252,7 @@ class Controllers {
         public void handle(HttpExchange he) throws IOException {
             Map<String, Object> parameters = parseBody(he);
             infoSecCooker.graph.removeEdge(parameters.get("sourceId").toString(), parameters.get("sinkId").toString());
-            sendResponse(he, new HashMap<>());
+            sendJSONResponse(he, new HashMap<>());
         }
     }
 
@@ -266,7 +266,7 @@ class Controllers {
         @Override
         public void handle(HttpExchange he) throws IOException {
             infoSecCooker.run();
-            sendResponse(he, new HashMap<>());
+            sendJSONResponse(he, new HashMap<>());
         }
     }
 
@@ -280,7 +280,7 @@ class Controllers {
         @Override
         public void handle(HttpExchange he) throws IOException {
             infoSecCooker.stop();
-            sendResponse(he, new HashMap<>());
+            sendJSONResponse(he, new HashMap<>());
         }
     }
 
@@ -296,7 +296,7 @@ class Controllers {
             Set<String> sourcesSet = infoSecCooker.graph.getSourcesIds();
             Map<String, Object> response = new HashMap<>();
             response.put("sources", sourcesSet);
-            sendResponse(he, response);
+            sendJSONResponse(he, response);
         }
     }
 
@@ -312,7 +312,7 @@ class Controllers {
             Set<String> sinksSet = infoSecCooker.graph.getSinksIds();
             Map<String, Object> response = new HashMap<>();
             response.put("sinks", sinksSet);
-            sendResponse(he, response);
+            sendJSONResponse(he, response);
         }
     }
 
@@ -329,7 +329,7 @@ class Controllers {
             Set<String> handlersSet = infoSecCooker.graph.getHandlersIds();
             Map<String, Object> response = new HashMap<>();
             response.put("handlers", handlersSet);
-            sendResponse(he, response);
+            sendJSONResponse(he, response);
         }
     }
 
@@ -344,7 +344,7 @@ class Controllers {
         public void handle(HttpExchange he) throws IOException {
             Map<String, Object> response = new HashMap<>();
             response.put("edges", infoSecCooker.graph.getEdges());
-            sendResponse(he, response);
+            sendJSONResponse(he, response);
         }
     }
 

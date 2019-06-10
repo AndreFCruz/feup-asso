@@ -9,15 +9,15 @@ import {
 export const sample = {
   nodes: [
     {
-      id: 'source.REST_SERVER',
-      title: 'REST_SERVER',
+      id: 'source.INTEGER_GENERATOR',
+      title: 'INTEGER_GENERATOR',
       type: SOURCE_TYPE,
       x: 100,
       y: 0,
     },
     {
-      id: 'source.FILE_READER',
-      title: 'FILE_READER',
+      id: 'source.STRING_GENERATOR',
+      title: 'STRING_GENERATOR',
       type: SOURCE_TYPE,
       x: 100,
       y: 200,
@@ -30,8 +30,8 @@ export const sample = {
       y: 0,
     },
     {
-      id: 'handler.TO_UPPER_CASE',
-      title: 'TO_UPPER_CASE',
+      id: 'handler.UPPER_CASE_CONVERTER',
+      title: 'UPPER_CASE_CONVERTER',
       type: HANDLER_TYPE,
       x: 300,
       y: 200,
@@ -53,27 +53,27 @@ export const sample = {
   ],
   edges: [
     {
-      source: 'source.REST_SERVER',
+      source: 'source.INTEGER_GENERATOR',
       target: 'handler.MD5_CONVERTER',
       type: STANDARD_EDGE_TYPE,
     },
     {
-      source: 'source.FILE_READER',
+      source: 'source.STRING_GENERATOR',
       target: 'handler.MD5_CONVERTER',
       type: STANDARD_EDGE_TYPE,
     },
     {
       source: 'handler.MD5_CONVERTER',
-      target: 'handler.TO_UPPER_CASE',
+      target: 'handler.FILE_WRITER',
       type: STANDARD_EDGE_TYPE,
     },
     {
-      source: 'handler.TO_UPPER_CASE',
-      target: 'sink.FILE_WRITER',
+      source: 'handler.STRING_GENERATOR',
+      target: 'sink.UPPER_CASE_CONVERTER',
       type: STANDARD_EDGE_TYPE,
     },
     {
-      source: 'handler.TO_UPPER_CASE',
+      source: 'handler.UPPER_CASE_CONVERTER',
       target: 'sink.PRINTER',
       type: STANDARD_EDGE_TYPE,
     },

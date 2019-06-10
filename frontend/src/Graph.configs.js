@@ -12,7 +12,7 @@ export function makeGraphConfigObject() {
     .catch(error => console.warn('Error on axios.get: ' + JSON.stringify(error)));
 
   // NOTE Sample response from backend server
-  let nodeTypesResponse = {"sources":["FILE_READER","REST_HANDLER"],"sinks":["FILE_WRITER","PRINTER"],"handlers":["MD5_CONVERTER","UPPER_CASE_CONVERTER"]};
+  let nodeTypesResponse = {"sources":["INTEGER_GENERATOR","STRING_GENERATOR"],"sinks":["FILE_WRITER","PRINTER"],"handlers":["MD5_CONVERTER","UPPER_CASE_CONVERTER"]};
 
   return {
     EdgeTypes: makeEdgeTypesObject(),
