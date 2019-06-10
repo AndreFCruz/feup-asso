@@ -9,22 +9,9 @@ import nodes.implementations.sources.StringGenerator;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Supplier;
 
 public class NodeFactory {
-    private static Map<String, SourceType> sourceNameToSourceType = new HashMap<>() {{
-        put("INTEGER_GENERATOR", SourceType.INTEGER_GENERATOR);
-        put("STRING_GENERATOR", SourceType.STRING_GENERATOR);
-    }};
-    private static Map<String, HandlerType> handlerNameToHandlerType = new HashMap<>() {{
-        put("MD5_CONVERTER", HandlerType.MD5_CONVERTER);
-        put("UPPER_CASE_CONVERTER", HandlerType.UPPER_CASE_CONVERTER);
-    }};
-    private static Map<String, SinkType> sinkNameToSinkType = new HashMap<>() {{
-        put("FILE_WRITER", SinkType.FILE_WRITER);
-        put("PRINTER", SinkType.PRINTER);
-    }};
     private static Map<SourceType, Supplier<Source>> sourceTypeToSourceNode = new HashMap<>() {{
         put(SourceType.INTEGER_GENERATOR, IntegerGenerator::new);
         put(SourceType.STRING_GENERATOR, StringGenerator::new);
@@ -39,27 +26,27 @@ public class NodeFactory {
     }};
 
     public static SourceType convertSourceNameToSourceType(String sourceName) {
-        return sourceNameToSourceType.get(sourceName);
+        return SourceType.valueOf(sourceName);
     }
 
     public static HandlerType convertHandlerNameToHandlerType(String handlerName) {
-        return handlerNameToHandlerType.get(handlerName);
+        return HandlerType.valueOf(handlerName);
     }
 
     public static SinkType convertSinkNameToSinkType(String sinkName) {
-        return sinkNameToSinkType.get(sinkName);
+        return SinkType.valueOf(sinkName);
     }
 
-    public static Set<String> getSourceNames() {
-        return sourceNameToSourceType.keySet();
+    public static SourceType[] getSourceNames() {
+        return SourceType.values();
     }
 
-    public static Set<String> getHandlerNames() {
-        return handlerNameToHandlerType.keySet();
+    public static HandlerType[] getHandlerNames() {
+        return HandlerType.values();
     }
 
-    public static Set<String> getSinkNames() {
-        return sinkNameToSinkType.keySet();
+    public static SinkType[] getSinkNames() {
+        return SinkType.values();
     }
 
     public Source createSource(SourceType nodeType) {

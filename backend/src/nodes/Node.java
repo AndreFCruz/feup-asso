@@ -15,7 +15,7 @@ public abstract class Node<Id> {
      */
     private Map<String, String> settings;
 
-    public Id initialize(Id id) {
+    Id initialize(Id id) {
         this.id = id;
         return id;
     }

@@ -60,14 +60,9 @@ public abstract class Handler<In, Out> extends Node<String> implements Subscribe
     }
 
     @Override
-    public Out produceMessage() { //TODO: Refactor this
-        try {
-            In message = sink.pullMessage();
-            return this.handleMessage(message);
-        } catch (Exception e) {
-            System.out.println(e);
-            return (Out) "";
-        }
+    public Out produceMessage() throws InterruptedException {
+        In message = sink.pullMessage();
+        return this.handleMessage(message);
     }
 
     // This method can cease to exist, and instead launch threads for this handler's sink/source references;
