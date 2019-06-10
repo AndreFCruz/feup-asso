@@ -51,6 +51,14 @@ public abstract class Handler<In, Out> extends Node<String> implements Subscribe
         return this.sink.getId();
     }
 
+    public Node getSource() {
+        return this.source;
+    }
+
+    public Node getSink() {
+        return this.sink;
+    }
+
     @Override
     public Out produceMessage() { //TODO: Refactor this
         try {

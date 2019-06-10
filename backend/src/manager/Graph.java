@@ -32,25 +32,25 @@ public class Graph {
         this.nodeFactory = new NodeFactory();
     }
 
-    public String createSource(NodeFactory.SourceType sourceType) {
+    public Source createSource(NodeFactory.SourceType sourceType) {
         Source source = nodeFactory.createSource(sourceType);
-        String sourceKey = manager.register(source);
+        manager.register(source);
         sources.put((String) source.getId(), source);
-        return sourceKey;
+        return source;
     }
 
-    public String createSink(NodeFactory.SinkType sinkType) {
+    public Sink createSink(NodeFactory.SinkType sinkType) {
         Sink sink = nodeFactory.createSink(sinkType);
-        String sinkKey = manager.register(sink);
+        manager.register(sink);
         sinks.put((String) sink.getId(), sink);
-        return sinkKey;
+        return sink;
     }
 
-    public String createHandler(NodeFactory.HandlerType handlerType) {
+    public Handler createHandler(NodeFactory.HandlerType handlerType) {
         Handler handler = nodeFactory.createHandler(handlerType);
-        String handlerKeys = manager.register(handler);
+        manager.register(handler);
         handlers.put((String) handler.getId(), handler);
-        return handlerKeys;
+        return handler;
     }
 
     public Set<String> getSourcesIds() {
@@ -122,10 +122,9 @@ public class Graph {
             for (String handlerKey : handlers.keySet()) {
                 Handler handler = handlers.get(handlerKey);
                 if (handler.getSourceId().equals(sourceId)) {
-                    return handler;
+                    return handler.getSource();
                 }
             }
-
         return source;
     }
 
@@ -136,7 +135,7 @@ public class Graph {
             for (String handlerKey : handlers.keySet()) {
                 Handler handler = handlers.get(handlerKey);
                 if (handler.getSinkId().equals(sinkId)) {
-                    return handler;
+                    return handler.getSink();
                 }
             }
 

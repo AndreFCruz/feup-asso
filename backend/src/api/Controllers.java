@@ -5,7 +5,10 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import manager.InfoSecCooker;
+import nodes.Handler;
+import nodes.Node;
 import nodes.NodeFactory;
+import nodes.Sink;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -181,9 +184,9 @@ class Controllers {
         @Override
         public void handle(HttpExchange he) throws IOException {
             Map<String, Object> parameters = parseBody(he);
-            String sourceKey = infoSecCooker.graph.createSource(convertSourceNameToSourceType(parameters.get("name").toString()));
+            Node source = infoSecCooker.graph.createSource(convertSourceNameToSourceType(parameters.get("name").toString()));
             Map<String, Object> response = new HashMap<>();
-            response.put("sourceKey", sourceKey);
+            response.put("sourceKey", source.getId());
             sendResponse(he, response);
         }
     }
@@ -198,9 +201,9 @@ class Controllers {
         @Override
         public void handle(HttpExchange he) throws IOException {
             Map<String, Object> parameters = parseBody(he);
-            String sinkKey = infoSecCooker.graph.createSink(convertSinkNameToSinkType(parameters.get("name").toString()));
+            Sink sink = infoSecCooker.graph.createSink(convertSinkNameToSinkType(parameters.get("name").toString()));
             Map<String, Object> response = new HashMap<>();
-            response.put("sinkKey", sinkKey);
+            response.put("sinkKey", sink.getId());
             sendResponse(he, response);
         }
     }
@@ -215,9 +218,9 @@ class Controllers {
         @Override
         public void handle(HttpExchange he) throws IOException {
             Map<String, Object> parameters = parseBody(he);
-            String handlerKey = infoSecCooker.graph.createHandler(convertHandlerNameToHandlerType(parameters.get("name").toString()));
+            Handler handler = infoSecCooker.graph.createHandler(convertHandlerNameToHandlerType(parameters.get("name").toString()));
             Map<String, Object> response = new HashMap<>();
-            response.put("handlerKey", handlerKey);
+            response.put("handlerKey", handler.getId());
             sendResponse(he, response);
         }
     }

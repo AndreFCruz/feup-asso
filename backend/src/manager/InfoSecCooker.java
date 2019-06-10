@@ -1,18 +1,18 @@
 package manager;
 
 import api.RESTServer;
-import nodes.Handler;
-import nodes.NodeFactory;
-import nodes.Sink;
-import nodes.Source;
+import nodes.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 public class InfoSecCooker implements Runnable {
     public RESTServer restServer;
@@ -47,34 +47,84 @@ public class InfoSecCooker implements Runnable {
         }
     }
 
-    public boolean loadGraph(JSONObject graph) {
-        JSONArray nodes = graph.getJSONArray("nodes");
-        JSONArray edges = graph.getJSONArray("edges");
-        for(int i=0; i< nodes.length(); i++){
-            System.out.println(nodes.getJSONObject(i).get("title"));
+    public boolean loadGraph(JSONObject graphObj) {
+        Map<String, Function<Object, Node>> typeNodeToCreateNode = new HashMap<>() {{
+            put("sourceNode", (sourceType) -> graph.createSource((NodeFactory.SourceType) sourceType));
+            put("handlerNode", (handlerType) -> graph.createHandler((NodeFactory.HandlerType) handlerType));
+            put("sinkNode", (sinkType) -> graph.createSink((NodeFactory.SinkType) sinkType));
+        }};
+
+        Map<String, Node> frontendIdToRealId = new HashMap<>();
+        JSONArray nodes = graphObj.getJSONArray("nodes");
+        JSONArray edges = graphObj.getJSONArray("edges");
+
+        for (int i = 0; i < nodes.length(); i++) {
+            JSONObject nodeObj = nodes.getJSONObject(i);
+            String nodeId = nodeObj.get("id").toString();
+            String nodeType = nodeObj.get("type").toString();
+            String nodeSubType = nodeObj.get("title").toString();
+            Node node;
+            switch (nodeType) {
+                case "sourceNode":
+                    NodeFactory.SourceType sourceType = NodeFactory.convertSourceNameToSourceType(nodeSubType);
+                    node = graph.createSource(sourceType);
+                    break;
+                case "handlerNode":
+                    NodeFactory.HandlerType handlerType = NodeFactory.convertHandlerNameToHandlerType(nodeSubType);
+                    node = graph.createHandler(handlerType);
+                    break;
+                case "sinkNode":
+                    NodeFactory.SinkType sinkType = NodeFactory.convertSinkNameToSinkType(nodeSubType);
+                    node = graph.createSink(sinkType);
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + nodeType);
+            }
+            frontendIdToRealId.put(nodeId, node);
         }
+
+        for (int i = 0; i < edges.length(); i++) {
+            JSONObject edge = edges.getJSONObject(i);
+            String sourceId = edge.get("source").toString();
+            String targetId = edge.get("target").toString();
+            Node source = frontendIdToRealId.get(sourceId);
+            Node target = frontendIdToRealId.get(targetId);
+            if (source instanceof Handler)
+                sourceId = ((Handler) source).getSourceId();
+            else
+                sourceId = (String) source.getId();
+
+            if (target instanceof Handler)
+                targetId = ((Handler) target).getSinkId();
+            else
+                targetId = (String) target.getId();
+
+            graph.createEdge(sourceId, targetId);
+        }
+
+
         return true;
     }
 
     public void initializeGraph() {
         // Create Publishers and populate registry
-        String stringSourceKey = graph.createSource(NodeFactory.SourceType.STRING_GENERATOR);
-        String integerSourceKey = graph.createSource(NodeFactory.SourceType.INTEGER_GENERATOR);
+        Source stringSource = graph.createSource(NodeFactory.SourceType.STRING_GENERATOR);
+        Source integerSource = graph.createSource(NodeFactory.SourceType.INTEGER_GENERATOR);
 
         // Create Handlers
-        String[] md5ConverterKeys = graph.createHandler(NodeFactory.HandlerType.MD5_CONVERTER).split("-");
-        String[] uppercaseKeys = graph.createHandler(NodeFactory.HandlerType.UPPER_CASE_CONVERTER).split("-");
+        Handler md5Converter = graph.createHandler(NodeFactory.HandlerType.MD5_CONVERTER);
+        Handler uppercase = graph.createHandler(NodeFactory.HandlerType.UPPER_CASE_CONVERTER);
 
         // Create Sinks
-        String printerSinkKey = graph.createSink(NodeFactory.SinkType.PRINTER);
-        String fileWriterSinkKey = graph.createSink(NodeFactory.SinkType.FILE_WRITER);
+        Sink printerSink = graph.createSink(NodeFactory.SinkType.PRINTER);
+        Sink fileWriterSink = graph.createSink(NodeFactory.SinkType.FILE_WRITER);
 
 
         // Manage subscriptions
-        graph.createEdge(stringSourceKey, printerSinkKey);
-        graph.createEdge(integerSourceKey, printerSinkKey);
-        graph.createEdge(stringSourceKey, uppercaseKeys[0]);
-        graph.createEdge(uppercaseKeys[1], fileWriterSinkKey);
+        graph.createEdge((String) stringSource.getId(), (String) printerSink.getId());
+        graph.createEdge((String) integerSource.getId(), (String) printerSink.getId());
+        graph.createEdge((String) stringSource.getId(), uppercase.getSinkId());
+        graph.createEdge(uppercase.getSourceId(), (String) fileWriterSink.getId());
     }
 
     private void execute() {
