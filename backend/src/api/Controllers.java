@@ -6,6 +6,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import manager.InfoSecCooker;
 import nodes.NodeFactory;
+import org.json.JSONObject;
 
 import java.io.*;
 import java.net.URI;
@@ -60,6 +61,17 @@ class Controllers {
         String query = br.readLine();
         parseQuery(query, parameters);
         return parameters;
+    }
+
+    private static JSONObject parseBodyToJSONObj(HttpExchange he) throws IOException {
+        InputStreamReader isr = new InputStreamReader(he.getRequestBody(), StandardCharsets.UTF_8);
+        BufferedReader br = new BufferedReader(isr);
+        String line;
+        StringBuilder response = new StringBuilder();
+        while ((line = br.readLine()) != null)
+            response.append(line);
+
+        return new JSONObject(response.toString());
     }
 
     private static void sendResponse(HttpExchange he, Map<String, Object> parameters) throws IOException {
@@ -359,6 +371,21 @@ class Controllers {
             Map<String, Object> response = new HashMap<>();
             response.put("handlers", handlersSet);
             sendResponse(he, response);
+        }
+    }
+
+    public static class SendGraph implements HttpHandler {
+        private InfoSecCooker infoSecCooker;
+
+        SendGraph(InfoSecCooker infoSecCooker) {
+            this.infoSecCooker = infoSecCooker;
+        }
+
+        @Override
+        public void handle(HttpExchange he) throws IOException {
+            boolean success = infoSecCooker.loadGraph(parseBodyToJSONObj(he));
+
+            sendJSONResponse(he, success);
         }
     }
 }

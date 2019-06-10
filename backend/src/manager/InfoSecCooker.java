@@ -5,6 +5,8 @@ import nodes.Handler;
 import nodes.NodeFactory;
 import nodes.Sink;
 import nodes.Source;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -43,6 +45,15 @@ public class InfoSecCooker implements Runnable {
             // Preserve interrupt status
             Thread.currentThread().interrupt();
         }
+    }
+
+    public boolean loadGraph(JSONObject graph) {
+        JSONArray nodes = graph.getJSONArray("nodes");
+        JSONArray edges = graph.getJSONArray("edges");
+        for(int i=0; i< nodes.length(); i++){
+            System.out.println(nodes.getJSONObject(i).get("title"));
+        }
+        return true;
     }
 
     public void initializeGraph() {

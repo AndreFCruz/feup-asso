@@ -52,5 +52,7 @@ public class RESTServer {
 
         // Following methods return the available types
         server.createContext("/node-types", new Controllers.GetNodeTypes());
+
+        server.createContext("/sendGraph", new Controllers.SendGraph(infoSecCooker));
     }
 }
