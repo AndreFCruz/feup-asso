@@ -4,6 +4,7 @@ import api.RESTServer;
 import nodes.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import utils.Utils;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -11,8 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 public class InfoSecCooker implements Runnable {
     public RESTServer restServer;
@@ -29,40 +28,32 @@ public class InfoSecCooker implements Runnable {
         this.restServer = new RESTServer(this);
     }
 
-    private static void shutdownAndAwaitTermination(ExecutorService pool, long time) {
-        pool.shutdown(); // Disable new tasks from being submitted
-        try {
-            // Wait a while for existing tasks to terminate
-            if (!pool.awaitTermination(time, TimeUnit.MILLISECONDS)) {
-                pool.shutdownNow(); // Cancel currently executing tasks
-                // Wait a while for tasks to respond to being cancelled
-                if (!pool.awaitTermination(time, TimeUnit.MILLISECONDS))
-                    System.err.println("Pool did not terminate");
-            }
-        } catch (InterruptedException ie) {
-            // (Re-)Cancel if current thread also interrupted
-            pool.shutdownNow();
-            // Preserve interrupt status
-            Thread.currentThread().interrupt();
-        }
-    }
-
     public boolean loadGraph(JSONObject graphObj) {
-        Map<String, Function<Object, Node>> typeNodeToCreateNode = new HashMap<>() {{
-            put("sourceNode", (sourceType) -> graph.createSource((NodeFactory.SourceType) sourceType));
-            put("handlerNode", (handlerType) -> graph.createHandler((NodeFactory.HandlerType) handlerType));
-            put("sinkNode", (sinkType) -> graph.createSink((NodeFactory.SinkType) sinkType));
-        }};
-
-        Map<String, Node> frontendIdToRealId = new HashMap<>();
+        resetGraph();
         JSONArray nodes = graphObj.getJSONArray("nodes");
         JSONArray edges = graphObj.getJSONArray("edges");
+
+        Map<String, Node> nodesNameToNodeObject = loadNodes(nodes);
+
+        loadEdges(edges, nodesNameToNodeObject);
+
+        return true;
+    }
+
+    private void resetGraph() {
+        this.manager = new Broker<>();
+        this.graph = new Graph(manager);
+    }
+
+    private Map<String, Node> loadNodes(JSONArray nodes) {
+        Map<String, Node> nodesNameToNodeObject = new HashMap<>();
 
         for (int i = 0; i < nodes.length(); i++) {
             JSONObject nodeObj = nodes.getJSONObject(i);
             String nodeId = nodeObj.get("id").toString();
             String nodeType = nodeObj.get("type").toString();
             String nodeSubType = nodeObj.get("title").toString();
+
             Node node;
             switch (nodeType) {
                 case "sourceNode":
@@ -80,15 +71,22 @@ public class InfoSecCooker implements Runnable {
                 default:
                     throw new IllegalStateException("Unexpected value: " + nodeType);
             }
-            frontendIdToRealId.put(nodeId, node);
+
+            nodesNameToNodeObject.put(nodeId, node);
         }
 
+        return nodesNameToNodeObject;
+    }
+
+    private void loadEdges(JSONArray edges, Map<String, Node> nodesNameToNodeObject) {
         for (int i = 0; i < edges.length(); i++) {
             JSONObject edge = edges.getJSONObject(i);
             String sourceId = edge.get("source").toString();
             String targetId = edge.get("target").toString();
-            Node source = frontendIdToRealId.get(sourceId);
-            Node target = frontendIdToRealId.get(targetId);
+
+            Node source = nodesNameToNodeObject.get(sourceId);
+            Node target = nodesNameToNodeObject.get(targetId);
+
             if (source instanceof Handler)
                 sourceId = ((Handler) source).getSourceId();
             else
@@ -101,9 +99,6 @@ public class InfoSecCooker implements Runnable {
 
             graph.createEdge(sourceId, targetId);
         }
-
-
-        return true;
     }
 
     public void initializeGraph() {
@@ -158,8 +153,8 @@ public class InfoSecCooker implements Runnable {
     public void stop() {
         long terminationTime = 1000;
         System.out.println("Trying to block Broker's execution in " + terminationTime + " millisecs");
-        shutdownAndAwaitTermination(brokerExec, terminationTime);
-        shutdownAndAwaitTermination(executor, terminationTime);
+        Utils.shutdownAndAwaitTermination(brokerExec, terminationTime);
+        Utils.shutdownAndAwaitTermination(executor, terminationTime);
         System.out.println("#...#");
     }
 }
