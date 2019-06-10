@@ -24,14 +24,11 @@ public class RESTServer {
     public void start() {
         server.setExecutor(RESTServerExec);
         server.start();
-        System.out.println("server started at " + PORT);
+        System.out.println("Server started at " + PORT);
     }
 
     private void initializeRoutes() {
         server.createContext("/", new Controllers.RootHandler());
-        server.createContext("/echoHeader", new Controllers.EchoHeaderHandler());
-        server.createContext("/echoGet", new Controllers.EchoGetHandler());
-        server.createContext("/echoPost", new Controllers.EchoPostHandler());
 
         server.createContext("/createSource", new Controllers.CreateSource(infoSecCooker));
         server.createContext("/createSink", new Controllers.CreateSink(infoSecCooker));
@@ -49,10 +46,12 @@ public class RESTServer {
         server.createContext("/getSources", new Controllers.GetSources(infoSecCooker));
         server.createContext("/getSinks", new Controllers.GetSinks(infoSecCooker));
         server.createContext("/getHandlers", new Controllers.GetHandlers(infoSecCooker));
+        server.createContext("/getEdges", new Controllers.GetEdges(infoSecCooker));
 
         // Following methods return the available types
         server.createContext("/node-types", new Controllers.GetNodeTypes());
 
         server.createContext("/sendGraph", new Controllers.SendGraph(infoSecCooker));
+        server.createContext("/checkEdge", new Controllers.CheckEdge(infoSecCooker));
     }
 }

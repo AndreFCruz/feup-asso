@@ -14,8 +14,8 @@ public class Graph {
     Map<String, Handler> handlers;   // Maps HandlerID -> Handler
 
     // Edges
-    // Node1(input) -> Node2(output)
-    private Map<String, String> edges; // TODO: Change to String -> Array<String>
+    // Node1(input) -> Array<Node(output)>
+    private Map<String, ArrayList<String>> edges;
 
     // Broker
     private Broker manager;
@@ -34,22 +34,22 @@ public class Graph {
 
     public Source createSource(NodeFactory.SourceType sourceType) {
         Source source = nodeFactory.createSource(sourceType);
-        manager.register(source);
-        sources.put((String) source.getId(), source);
+        String sourceKey = manager.register(source);
+        sources.put(sourceKey, source);
         return source;
     }
 
     public Sink createSink(NodeFactory.SinkType sinkType) {
         Sink sink = nodeFactory.createSink(sinkType);
-        manager.register(sink);
-        sinks.put((String) sink.getId(), sink);
+        String sinkKey = manager.register(sink);
+        sinks.put(sinkKey, sink);
         return sink;
     }
 
     public Handler createHandler(NodeFactory.HandlerType handlerType) {
         Handler handler = nodeFactory.createHandler(handlerType);
-        manager.register(handler);
-        handlers.put((String) handler.getId(), handler);
+        String handlerKey = manager.register(handler);
+        handlers.put(handlerKey, handler);
         return handler;
     }
 
@@ -65,6 +65,10 @@ public class Graph {
         return handlers.keySet();
     }
 
+    public Map<String, ArrayList<String>> getEdges() {
+        return edges;
+    }
+
     public void removeSourceById(String sourceId) {
         sources.remove(sourceId);
         edges.remove(sourceId);
@@ -73,33 +77,20 @@ public class Graph {
     public void removeSinkById(String sinkId) {
         sinks.remove(sinkId);
         for (String sourceKey : edges.keySet()) {
-            if (edges.get(sourceKey).equals(sinkId)) {
-                edges.remove(sourceKey);
-            }
+            edges.get(sourceKey).remove(sinkId);
         }
     }
 
     public void removeHandlerById(String handlerId) {
         Handler handlerRemoved = handlers.remove(handlerId);
-        ArrayList<String> nodesToRemove = new ArrayList<>();
 
+        edges.remove(handlerRemoved.getSourceId());
         for (String sourceKey : edges.keySet()) {
-            if (sourceKey.equals(handlerRemoved.getSourceId())) {
-                nodesToRemove.add(sourceKey);
-                continue;
-            }
-
-            if (edges.get(sourceKey).equals(handlerRemoved.getSinkId())) {
-                nodesToRemove.add(sourceKey);
-            }
-        }
-
-        for (String key : nodesToRemove) {
-            edges.remove(key);
+            edges.get(sourceKey).remove(handlerRemoved.getSinkId());
         }
     }
 
-    public boolean createEdge(String sourceId, String sinkId) {
+    public boolean createEdge(String sourceId, String sinkId) { //TODO: Check types
         Node source = getSourceNode(sourceId);
         Node sink = getSinkNode(sinkId);
 
@@ -107,12 +98,15 @@ public class Graph {
             return false;
 
         manager.addSubscriber(sinkId, sourceId);
-        edges.put(sourceId, sinkId);
+
+        ArrayList<String> sinks = edges.getOrDefault(sourceId, new ArrayList<>());
+        sinks.add(sinkId);
+        edges.put(sourceId, sinks);
         return true;
     }
 
     public void removeEdge(String sourceId, String sinkId) {
-        edges.remove(sourceId);
+        edges.get(sourceId).remove(sinkId);
     }
 
     private Node getSourceNode(String sourceId) {
@@ -140,5 +134,11 @@ public class Graph {
             }
 
         return sink;
+    }
+
+    public boolean checkValidEdge(Object source, Object sink) {
+        System.out.println(source.toString());
+        System.out.println(sink.toString());
+        return true;
     }
 }
