@@ -30,8 +30,15 @@ public class InfoSecCooker implements Runnable {
 
     public boolean loadGraph(JSONObject graphObj) {
         resetGraph();
+
+        if (graphObj.isEmpty())
+            return false;
+
         JSONArray nodes = graphObj.getJSONArray("nodes");
         JSONArray edges = graphObj.getJSONArray("edges");
+
+        if (nodes == null || edges == null)
+            return false;
 
         Map<String, Node> nodesNameToNodeObject = loadNodes(nodes);
 

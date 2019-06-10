@@ -64,12 +64,12 @@ export const sample = {
     },
     {
       source: 'handler.MD5_CONVERTER',
-      target: 'handler.FILE_WRITER',
+      target: 'sink.FILE_WRITER',
       type: STANDARD_EDGE_TYPE,
     },
     {
-      source: 'handler.STRING_GENERATOR',
-      target: 'sink.UPPER_CASE_CONVERTER',
+      source: 'source.STRING_GENERATOR',
+      target: 'handler.UPPER_CASE_CONVERTER',
       type: STANDARD_EDGE_TYPE,
     },
     {
