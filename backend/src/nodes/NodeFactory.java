@@ -7,86 +7,87 @@ import nodes.implementations.sinks.Printer;
 import nodes.implementations.sources.IntegerGenerator;
 import nodes.implementations.sources.StringGenerator;
 
-public class NodeFactory { //TODO: Convert to MAP (String -> Type) and MAP (String -> Constructor)
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Supplier;
+
+public class NodeFactory {
+    private static Map<String, SourceType> sourceNameToSourceType = new HashMap<>() {{
+        put("INTEGER_GENERATOR", SourceType.INTEGER_GENERATOR);
+        put("STRING_GENERATOR", SourceType.STRING_GENERATOR);
+    }};
+    private static Map<String, HandlerType> handlerNameToHandlerType = new HashMap<>() {{
+        put("MD5_CONVERTER", HandlerType.MD5_CONVERTER);
+        put("UPPER_CASE_CONVERTER", HandlerType.UPPER_CASE_CONVERTER);
+    }};
+    private static Map<String, SinkType> sinkNameToSinkType = new HashMap<>() {{
+        put("FILE_WRITER", SinkType.FILE_WRITER);
+        put("PRINTER", SinkType.PRINTER);
+    }};
+    private static Map<SourceType, Supplier<Source>> sourceTypeToSourceNode = new HashMap<>() {{
+        put(SourceType.INTEGER_GENERATOR, IntegerGenerator::new);
+        put(SourceType.STRING_GENERATOR, StringGenerator::new);
+    }};
+    private static Map<HandlerType, Supplier<Handler>> handlerTypeToHandlerNode = new HashMap<>() {{
+        put(HandlerType.MD5_CONVERTER, MD5Converter::new);
+        put(HandlerType.UPPER_CASE_CONVERTER, Uppercase::new);
+    }};
+    private static Map<SinkType, Supplier<Sink>> sinkTypeToSinkNode = new HashMap<>() {{
+        put(SinkType.FILE_WRITER, FileWriter::new);
+        put(SinkType.PRINTER, Printer::new);
+    }};
+
     public static SourceType convertSourceNameToSourceType(String sourceName) {
-        switch (sourceName) {
-            case "integer_generator":
-                return SourceType.INTEGERGENERATOR;
-            case "string_generator":
-                return SourceType.STRINGGENERATOR;
-            default:
-                throw new IllegalStateException("Unexpected value: " + sourceName);
-        }
+        return sourceNameToSourceType.get(sourceName);
     }
 
     public static HandlerType convertHandlerNameToHandlerType(String handlerName) {
-        switch (handlerName) {
-            case "md5_converter":
-                return HandlerType.MD5CONVERTER;
-            case "upper_case":
-                return HandlerType.UPPERCASE;
-            default:
-                throw new IllegalStateException("Unexpected value: " + handlerName);
-        }
+        return handlerNameToHandlerType.get(handlerName);
     }
 
     public static SinkType convertSinkNameToSinkType(String sinkName) {
-        switch (sinkName) {
-            case "file_writer":
-                return SinkType.FILEWRITER;
-            case "printer":
-                return SinkType.PRINTER;
-            default:
-                throw new IllegalStateException("Unexpected value: " + sinkName);
-        }
+        return sinkNameToSinkType.get(sinkName);
+    }
+
+    public static Set<String> getSourceNames() {
+        return sourceNameToSourceType.keySet();
+    }
+
+    public static Set<String> getHandlerNames() {
+        return handlerNameToHandlerType.keySet();
+    }
+
+    public static Set<String> getSinkNames() {
+        return sinkNameToSinkType.keySet();
     }
 
     public Source createSource(SourceType nodeType) {
-        switch (nodeType) {
-            case STRINGGENERATOR:
-                return new StringGenerator();
-            case INTEGERGENERATOR:
-                return new IntegerGenerator();
-            default:
-                throw new IllegalStateException("Unexpected value: " + nodeType);
-        }
-    }
-
-    public Sink createSink(SinkType nodeType) {
-        switch (nodeType) {
-            case FILEWRITER:
-                return new FileWriter();
-            case PRINTER:
-                return new Printer();
-            default:
-                throw new IllegalStateException("Unexpected value: " + nodeType);
-        }
+        return sourceTypeToSourceNode.get(nodeType).get();
     }
 
     public Handler createHandler(HandlerType nodeType) {
-        switch (nodeType) {
-            case MD5CONVERTER:
-                return new MD5Converter();
-            case UPPERCASE:
-                return new Uppercase();
-            default:
-                throw new IllegalStateException("Unexpected value: " + nodeType);
-        }
+        return handlerTypeToHandlerNode.get(nodeType).get();
     }
 
+    public Sink createSink(SinkType nodeType) {
+        return sinkTypeToSinkNode.get(nodeType).get();
+    }
+
+
     public enum SourceType {
-        INTEGERGENERATOR,
-        STRINGGENERATOR,
+        INTEGER_GENERATOR,
+        STRING_GENERATOR,
     }
 
     public enum SinkType {
-        FILEWRITER,
+        FILE_WRITER,
         PRINTER
     }
 
     public enum HandlerType {
-        MD5CONVERTER,
-        UPPERCASE,
+        MD5_CONVERTER,
+        UPPER_CASE_CONVERTER,
     }
 
 }
