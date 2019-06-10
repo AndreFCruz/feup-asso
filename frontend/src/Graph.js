@@ -264,81 +264,8 @@ export class Graph extends React.Component {
   }
 
   onRunGraph(){
-    const graph = {
-      "nodes": [
-          {
-              "id": "source.INTEGER_GENERATOR",
-              "title": "INTEGER_GENERATOR",
-              "type": "sourceNode",
-              "x": 100,
-              "y": 0
-          },
-          {
-              "id": "source.STRING_GENERATOR",
-              "title": "STRING_GENERATOR",
-              "type": "sourceNode",
-              "x": 100,
-              "y": 200
-          },
-          {
-              "id": "handler.MD5_CONVERTER",
-              "title": "MD5_CONVERTER",
-              "type": "handlerNode",
-              "x": 300,
-              "y": 0
-          },
-          {
-              "id": "handler.UPPER_CASE_CONVERTER",
-              "title": "UPPER_CASE_CONVERTER",
-              "type": "handlerNode",
-              "x": 300,
-              "y": 200
-          },
-          {
-              "id": "sink.FILE_WRITER",
-              "title": "FILE_WRITER",
-              "type": "sinkNode",
-              "x": 500,
-              "y": 0
-          },
-          {
-              "id": "sink.PRINTER",
-              "title": "PRINTER",
-              "type": "sinkNode",
-              "x": 500,
-              "y": 200
-          }
-      ],
-      "edges": [
-          {
-              "source": "source.INTEGER_GENERATOR",
-              "target": "handler.MD5_CONVERTER",
-              "type": "standardEdge"
-          },
-          {
-              "source": "source.STRING_GENERATOR",
-              "target": "handler.MD5_CONVERTER",
-              "type": "standardEdge"
-          },
-          {
-              "source": "handler.MD5_CONVERTER",
-              "target": "sink.FILE_WRITER",
-              "type": "standardEdge"
-          },
-          {
-              "source": "source.STRING_GENERATOR",
-              "target": "handler.UPPER_CASE_CONVERTER",
-              "type": "standardEdge"
-          },
-          {
-              "source": "handler.UPPER_CASE_CONVERTER",
-              "target": "sink.PRINTER",
-              "type": "standardEdge"
-          }
-      ]
-  };
 
-    axios.post(process.env.REACT_APP_API_URL + '/sendGraph', JSON.stringify(graph))
+    axios.post(process.env.REACT_APP_API_URL + '/sendGraph', JSON.stringify(this.state.graph))
     .then(response => {
       console.log(response);
       if(response.data === true){
@@ -352,7 +279,7 @@ export class Graph extends React.Component {
   }
 
   sendRunRequest(){
-    axios.get(process.env.REACT_APP_API_URL + '/runGraph', JSON.stringify(this.state.graph))
+    axios.get(process.env.REACT_APP_API_URL + '/runGraph', JSON.stringify({}))
     .then(response => console.log(response))
     .catch(error => console.warn('Error on axios.get: ' + JSON.stringify(error)));
   }
@@ -406,6 +333,9 @@ export class Graph extends React.Component {
     
     let secondOptions = nodeTypes[selectedOption1];
     secondOptions = sequenceToOptions(secondOptions);
+
+
+    console.log(this.state.graph);
 
 
     return (
