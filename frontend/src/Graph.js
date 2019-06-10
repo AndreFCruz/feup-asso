@@ -290,6 +290,10 @@ export class Graph extends React.Component {
   };
 
   render() {
+    function sequenceToOptions(seq) {
+      return seq.map(el => Object.assign({}, { value: el, label: el }));
+    }
+
     const nodes = this.state.graph.nodes;
     const edges = this.state.graph.edges;
     const selected = this.state.selected;
@@ -298,22 +302,20 @@ export class Graph extends React.Component {
     const NodeSubtypes = this.state.graphConfig.NodeSubtypes;
     const EdgeTypes = this.state.graphConfig.EdgeTypes;
 
-    // TODO use this in options for button select
+
     let nodeTypes = this.getNodeTypes();
-
-    function sequenceToOptions(seq) {
-      return seq.map(el => Object.assign({}, { value: el, label: el }));
-    }
-
     let firstOptions = Object.keys(nodeTypes);
     firstOptions = sequenceToOptions(firstOptions);
-    if (Object.keys(this.state.selectedOption).length === 0) {
+
+    let selectedOption1 = this.state.selectedOption;
+    if (Object.keys(selectedOption1).length === 0) {
       this.setState({
         selectedOption: firstOptions[0].value
       });
+      selectedOption1 = firstOptions[0].value;
     }
     
-    let secondOptions = nodeTypes[this.state.selectedOption];
+    let secondOptions = nodeTypes[selectedOption1];
     secondOptions = sequenceToOptions(secondOptions);
 
 
