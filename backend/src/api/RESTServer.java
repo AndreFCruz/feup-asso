@@ -34,12 +34,7 @@ public class RESTServer {
         server.createContext("/createSink", new Controllers.CreateSink(infoSecCooker));
         server.createContext("/createHandler", new Controllers.CreateHandler(infoSecCooker));
 
-        server.createContext("/removeSource", new Controllers.RemoveSource(infoSecCooker));
-        server.createContext("/removeSink", new Controllers.RemoveSink(infoSecCooker));
-        server.createContext("/removeHandler", new Controllers.RemoveHandler(infoSecCooker));
-
         server.createContext("/createEdge", new Controllers.CreateEdge(infoSecCooker));
-        server.createContext("/removeEdge", new Controllers.RemoveEdge(infoSecCooker));
         server.createContext("/runGraph", new Controllers.RunGraph(infoSecCooker));
         server.createContext("/stopGraph", new Controllers.StopGraph(infoSecCooker));
 

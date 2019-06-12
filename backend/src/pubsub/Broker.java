@@ -1,4 +1,4 @@
-package manager;
+package pubsub;
 
 import nodes.Handler;
 import nodes.Sink;
@@ -32,17 +32,17 @@ public class Broker<MT> implements Runnable {
      *
      * @return string key
      */
-    String register(Source source) {
+    public String register(Source source) {
         EntityQueue entityQueue = this.registerEntity();
         return source.initialize(entityQueue.entityId, entityQueue.queue, this);
     }
 
-    String register(Sink sink) {
+    public String register(Sink sink) {
         EntityQueue entityQueue = this.registerEntity();
         return sink.initialize(entityQueue.entityId, entityQueue.queue);
     }
 
-    String register(Handler handler) {
+    public String register(Handler handler) {
         EntityQueue entityQueuePublish = this.registerEntity();
         EntityQueue entityQueueSubscribe = this.registerEntity();
         return handler.initialize(entityQueueSubscribe.entityId, entityQueueSubscribe.queue, entityQueuePublish.entityId, entityQueuePublish.queue, this);
@@ -54,7 +54,7 @@ public class Broker<MT> implements Runnable {
         return new EntityQueue(entityId, queue);
     }
 
-    void addSubscriber(String subscriberId, String publisherId) {
+    public void addSubscriber(String subscriberId, String publisherId) {
         ArrayList<String> subscribersList = this.observers.getOrDefault(publisherId, new ArrayList<>());
         subscribersList.add(subscriberId);
         this.observers.put(publisherId, subscribersList);

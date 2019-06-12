@@ -1,34 +1,32 @@
-package manager;
+package graph;
 
 import nodes.*;
+import pubsub.Broker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class Graph {
+public class GraphTopology {
     // Nodes
     Map<String, Source> sources;     // Maps SourceID -> Source
     Map<String, Sink> sinks;         // Maps SinkID -> Sink
     Map<String, Handler> handlers;   // Maps HandlerID -> Handler
-
+    // Broker
+    Broker<Object> manager;
     // Edges
     // Node1(input) -> Array<Node(output)>
     private Map<String, ArrayList<String>> edges;
-
-    // Broker
-    private Broker manager;
-
     //NodeFactory
     private NodeFactory nodeFactory;
 
-    public Graph(Broker manager) {
+    public GraphTopology() {
         this.sources = new HashMap<>();
         this.sinks = new HashMap<>();
         this.handlers = new HashMap<>();
         this.edges = new HashMap<>();
-        this.manager = manager;
+        this.manager = new Broker<>();
         this.nodeFactory = new NodeFactory();
     }
 
@@ -69,27 +67,6 @@ public class Graph {
         return edges;
     }
 
-    public void removeSourceById(String sourceId) {
-        sources.remove(sourceId);
-        edges.remove(sourceId);
-    }
-
-    public void removeSinkById(String sinkId) {
-        sinks.remove(sinkId);
-        for (String sourceKey : edges.keySet()) {
-            edges.get(sourceKey).remove(sinkId);
-        }
-    }
-
-    public void removeHandlerById(String handlerId) {
-        Handler handlerRemoved = handlers.remove(handlerId);
-
-        edges.remove(handlerRemoved.getSourceId());
-        for (String sourceKey : edges.keySet()) {
-            edges.get(sourceKey).remove(handlerRemoved.getSinkId());
-        }
-    }
-
     public boolean createEdge(String sourceId, String sinkId) { //TODO: Check types
         Node source = getSourceNode(sourceId);
         Node sink = getSinkNode(sinkId);
@@ -103,10 +80,6 @@ public class Graph {
         sinks.add(sinkId);
         edges.put(sourceId, sinks);
         return true;
-    }
-
-    public void removeEdge(String sourceId, String sinkId) {
-        edges.get(sourceId).remove(sinkId);
     }
 
     private Node getSourceNode(String sourceId) {

@@ -1,6 +1,6 @@
 package nodes;
 
-import manager.Broker;
+import pubsub.Broker;
 import pubsub.Publisher;
 import pubsub.Subscriber;
 
