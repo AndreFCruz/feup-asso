@@ -3,6 +3,8 @@ package graph;
 import nodes.*;
 import pubsub.Broker;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -92,7 +94,7 @@ public class GraphTopology {
             for (String handlerKey : handlers.keySet()) {
                 Handler handler = handlers.get(handlerKey);
                 if (handler.getSourceId().equals(sourceId)) {
-                    return handler.getSource();
+                    return handler;
                 }
             }
         return source;
@@ -105,16 +107,37 @@ public class GraphTopology {
             for (String handlerKey : handlers.keySet()) {
                 Handler handler = handlers.get(handlerKey);
                 if (handler.getSinkId().equals(sinkId)) {
-                    return handler.getSink();
+                    return handler;
                 }
             }
 
         return sink;
     }
 
-    public boolean checkValidEdge(Object source, Object sink) {
-        System.out.println(source.toString());
-        System.out.println(sink.toString());
-        return true;
+    public boolean checkValidEdge(Object output, Object input) {
+        Node outputNode = getSourceNode(output.toString());
+        Node inputNode = getSinkNode(input.toString());
+
+        int outputIndex = (outputNode instanceof Handler) ? 1 : 0;
+
+        Class outputTypeClass = getGenericTypeNode(outputNode, outputIndex);
+        Class inputTypeClass = getGenericTypeNode(inputNode, 0);
+
+        return inputTypeClass.isAssignableFrom(outputTypeClass);
+    }
+
+    private Class getGenericTypeNode(Node node, int index) {
+        Type mySuperclass = node.getClass().getGenericSuperclass();
+        Type[] tType = ((ParameterizedType) mySuperclass).getActualTypeArguments();
+        String typeName = tType[index].getTypeName();
+
+        Class clazz = null;
+        try {
+            clazz = Class.forName(typeName);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return clazz;
     }
 }

@@ -288,7 +288,7 @@ class Controllers {
         @Override
         public void handle(HttpExchange he) throws IOException {
             JSONObject body = parseBodyToJSONObj(he);
-            boolean success = infoSecCooker.graph.getGraphTopology().checkValidEdge(body.get("source"), body.get("sink"));
+            boolean success = infoSecCooker.graph.getGraphTopology().checkValidEdge(body.get("output"), body.get("input"));
             sendJSONResponse(he, success);
         }
     }
