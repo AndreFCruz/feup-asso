@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GraphLoader {
-    public static GraphTopology initializeGraph() {
+    public static GraphTopology loadGraph() {
         GraphTopology graphTopology = new GraphTopology();
 
         // Create Publishers and populate registry

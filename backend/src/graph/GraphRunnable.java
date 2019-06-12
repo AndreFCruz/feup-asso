@@ -14,9 +14,11 @@ public class GraphRunnable {
     private ExecutorService executor = Executors.newCachedThreadPool();
 
     private GraphTopology graphTopology;
+    private boolean isRunning;
 
     public GraphRunnable(GraphTopology graphTopology) {
         this.graphTopology = graphTopology;
+        this.isRunning = false;
     }
 
     public void start() {
@@ -26,6 +28,7 @@ public class GraphRunnable {
 
         executeNodes();
         executeBroker();
+        isRunning = true;
     }
 
     private void executeNodes() {
@@ -39,18 +42,21 @@ public class GraphRunnable {
     }
 
     private void executeBroker() {
-        brokerExec.execute(graphTopology.manager);
+        brokerExec.execute(graphTopology.broker);
     }
 
     public void stop() {
+        if (!isRunning)
+            return;
+
         long terminationTime = 1000;
-        System.out.println("Trying to block Broker's execution in " + terminationTime + " millisecs");
         Utils.shutdownAndAwaitTermination(brokerExec, terminationTime);
         Utils.shutdownAndAwaitTermination(executor, terminationTime);
         System.out.println("#...#");
+        isRunning = false;
     }
 
-        public GraphTopology getGraphTopology() {
+    public GraphTopology getGraphTopology() {
         return graphTopology;
     }
 

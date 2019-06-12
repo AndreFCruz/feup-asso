@@ -13,40 +13,43 @@ public class GraphTopology {
     Map<String, Source> sources;     // Maps SourceID -> Source
     Map<String, Sink> sinks;         // Maps SinkID -> Sink
     Map<String, Handler> handlers;   // Maps HandlerID -> Handler
+
     // Broker
-    Broker<Object> manager;
+    Broker<Object> broker;
+
     // Edges
-    // Node1(input) -> Array<Node(output)>
+    // Node1(output) -> Array<Node(input)>
     private Map<String, ArrayList<String>> edges;
+
     //NodeFactory
     private NodeFactory nodeFactory;
 
-    public GraphTopology() {
+    GraphTopology() {
         this.sources = new HashMap<>();
         this.sinks = new HashMap<>();
         this.handlers = new HashMap<>();
         this.edges = new HashMap<>();
-        this.manager = new Broker<>();
+        this.broker = new Broker<>();
         this.nodeFactory = new NodeFactory();
     }
 
     public Source createSource(NodeFactory.SourceType sourceType) {
         Source source = nodeFactory.createSource(sourceType);
-        String sourceKey = manager.register(source);
+        String sourceKey = broker.register(source);
         sources.put(sourceKey, source);
         return source;
     }
 
     public Sink createSink(NodeFactory.SinkType sinkType) {
         Sink sink = nodeFactory.createSink(sinkType);
-        String sinkKey = manager.register(sink);
+        String sinkKey = broker.register(sink);
         sinks.put(sinkKey, sink);
         return sink;
     }
 
     public Handler createHandler(NodeFactory.HandlerType handlerType) {
         Handler handler = nodeFactory.createHandler(handlerType);
-        String handlerKey = manager.register(handler);
+        String handlerKey = broker.register(handler);
         handlers.put(handlerKey, handler);
         return handler;
     }
@@ -74,7 +77,7 @@ public class GraphTopology {
         if (source == null || sink == null)
             return false;
 
-        manager.addSubscriber(sinkId, sourceId);
+        broker.addSubscriber(sinkId, sourceId);
 
         ArrayList<String> sinks = edges.getOrDefault(sourceId, new ArrayList<>());
         sinks.add(sinkId);

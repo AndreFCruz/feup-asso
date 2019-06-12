@@ -3,6 +3,8 @@ package pubsub;
 import nodes.Handler;
 import nodes.Sink;
 import nodes.Source;
+import pubsub.helpers.EntityQueue;
+import pubsub.helpers.MessageEvent;
 import utils.Registry;
 
 import java.util.ArrayList;
@@ -33,19 +35,17 @@ public class Broker<MT> implements Runnable {
      * @return string key
      */
     public String register(Source source) {
-        EntityQueue entityQueue = this.registerEntity();
-        return source.initialize(entityQueue.entityId, entityQueue.queue, this);
+        return source.initialize(this.registerEntity(), this);
     }
 
     public String register(Sink sink) {
-        EntityQueue entityQueue = this.registerEntity();
-        return sink.initialize(entityQueue.entityId, entityQueue.queue);
+        return sink.initialize(this.registerEntity());
     }
 
     public String register(Handler handler) {
         EntityQueue entityQueuePublish = this.registerEntity();
         EntityQueue entityQueueSubscribe = this.registerEntity();
-        return handler.initialize(entityQueueSubscribe.entityId, entityQueueSubscribe.queue, entityQueuePublish.entityId, entityQueuePublish.queue, this);
+        return handler.initialize(entityQueueSubscribe, entityQueuePublish, this);
     }
 
     private EntityQueue registerEntity() {
@@ -108,39 +108,5 @@ public class Broker<MT> implements Runnable {
             this.handleMessageEvent(event);
         }
         System.out.println("Thread interrupted: " + Thread.interrupted());
-    }
-
-    class EntityQueue {
-        BlockingQueue<MT> queue;
-        String entityId;
-
-        EntityQueue(String entityId, BlockingQueue<MT> queue) {
-            this.entityId = entityId;
-            this.queue = queue;
-        }
-    }
-
-    class MessageEvent {
-        String publisherId;
-        int messageHash;
-        Long timeToLive;    // In milliseconds
-        long arrivalTime;   // In milliseconds
-
-        MessageEvent(String publisherId, int messageHash) {
-            this(publisherId, messageHash, null);
-        }
-
-        MessageEvent(String publisherId, int messageHash, Long timeToLive) {
-            this.publisherId = publisherId;
-            this.messageHash = messageHash;
-            this.timeToLive = timeToLive;
-            this.arrivalTime = System.currentTimeMillis();
-        }
-
-        boolean isAlive() {
-            return this.timeToLive == null ||
-                    this.arrivalTime + this.timeToLive > System.currentTimeMillis();
-
-        }
     }
 }
