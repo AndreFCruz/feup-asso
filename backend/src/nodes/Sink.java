@@ -1,6 +1,7 @@
 package nodes;
 
 import pubsub.Subscriber;
+import pubsub.helpers.EntityQueue;
 
 import java.util.concurrent.BlockingQueue;
 
@@ -8,9 +9,9 @@ public abstract class Sink<In, Out> extends Node<String> implements Subscriber<I
 
     private BlockingQueue<In> queue;
 
-    public String initialize(String id, BlockingQueue<In> queue) {
-        super.initialize(id);
-        this.queue = queue;
+    public String initialize(EntityQueue<In> entityQueue) {
+        super.initialize(entityQueue.entityId);
+        this.queue = entityQueue.queue;
         return this.getId();
     }
 

@@ -74,16 +74,6 @@ class Controllers {
         return new JSONObject(response.toString());
     }
 
-    private static void sendResponse(HttpExchange he, Map<String, Object> parameters) throws IOException {
-        StringBuilder response = new StringBuilder();
-        for (String key : parameters.keySet())
-            response.append(key).append(" = ").append(parameters.get(key)).append("\n");
-        he.sendResponseHeaders(200, response.length());
-        OutputStream os = he.getResponseBody();
-        os.write(response.toString().getBytes());
-        os.close();
-    }
-
     private static void sendJSONResponse(HttpExchange he, Object responseObject) throws IOException {
         Gson gson = new Gson();
         String response = gson.toJson(responseObject);
@@ -140,7 +130,7 @@ class Controllers {
         @Override
         public void handle(HttpExchange he) throws IOException {
             Map<String, Object> parameters = parseBody(he);
-            Node source = infoSecCooker.graph.createSource(convertSourceNameToSourceType(parameters.get("name").toString()));
+            Node source = infoSecCooker.graph.getGraphTopology().createSource(convertSourceNameToSourceType(parameters.get("name").toString()));
             Map<String, Object> response = new HashMap<>();
             response.put("sourceKey", source.getId());
             sendJSONResponse(he, response);
@@ -157,7 +147,7 @@ class Controllers {
         @Override
         public void handle(HttpExchange he) throws IOException {
             Map<String, Object> parameters = parseBody(he);
-            Sink sink = infoSecCooker.graph.createSink(convertSinkNameToSinkType(parameters.get("name").toString()));
+            Sink sink = infoSecCooker.graph.getGraphTopology().createSink(convertSinkNameToSinkType(parameters.get("name").toString()));
             Map<String, Object> response = new HashMap<>();
             response.put("sinkKey", sink.getId());
             sendJSONResponse(he, response);
@@ -174,55 +164,10 @@ class Controllers {
         @Override
         public void handle(HttpExchange he) throws IOException {
             Map<String, Object> parameters = parseBody(he);
-            Handler handler = infoSecCooker.graph.createHandler(convertHandlerNameToHandlerType(parameters.get("name").toString()));
+            Handler handler = infoSecCooker.graph.getGraphTopology().createHandler(convertHandlerNameToHandlerType(parameters.get("name").toString()));
             Map<String, Object> response = new HashMap<>();
             response.put("handlerKey", handler.getId());
             sendJSONResponse(he, response);
-        }
-    }
-
-    public static class RemoveSource implements HttpHandler {
-        private InfoSecCooker infoSecCooker;
-
-        RemoveSource(InfoSecCooker infoSecCooker) {
-            this.infoSecCooker = infoSecCooker;
-        }
-
-        @Override
-        public void handle(HttpExchange he) throws IOException {
-            Map<String, Object> parameters = parseBody(he);
-            infoSecCooker.graph.removeSourceById(parameters.get("name").toString());
-            sendJSONResponse(he, new HashMap<>());
-        }
-    }
-
-    public static class RemoveSink implements HttpHandler {
-        private InfoSecCooker infoSecCooker;
-
-        RemoveSink(InfoSecCooker infoSecCooker) {
-            this.infoSecCooker = infoSecCooker;
-        }
-
-        @Override
-        public void handle(HttpExchange he) throws IOException {
-            Map<String, Object> parameters = parseBody(he);
-            infoSecCooker.graph.removeSinkById(parameters.get("name").toString());
-            sendJSONResponse(he, new HashMap<>());
-        }
-    }
-
-    public static class RemoveHandler implements HttpHandler {
-        private InfoSecCooker infoSecCooker;
-
-        RemoveHandler(InfoSecCooker infoSecCooker) {
-            this.infoSecCooker = infoSecCooker;
-        }
-
-        @Override
-        public void handle(HttpExchange he) throws IOException {
-            Map<String, Object> parameters = parseBody(he);
-            infoSecCooker.graph.removeHandlerById(parameters.get("name").toString());
-            sendJSONResponse(he, new HashMap<>());
         }
     }
 
@@ -236,22 +181,7 @@ class Controllers {
         @Override
         public void handle(HttpExchange he) throws IOException {
             Map<String, Object> parameters = parseBody(he);
-            infoSecCooker.graph.createEdge(parameters.get("sourceId").toString(), parameters.get("sinkId").toString());
-            sendJSONResponse(he, new HashMap<>());
-        }
-    }
-
-    public static class RemoveEdge implements HttpHandler {
-        private InfoSecCooker infoSecCooker;
-
-        RemoveEdge(InfoSecCooker infoSecCooker) {
-            this.infoSecCooker = infoSecCooker;
-        }
-
-        @Override
-        public void handle(HttpExchange he) throws IOException {
-            Map<String, Object> parameters = parseBody(he);
-            infoSecCooker.graph.removeEdge(parameters.get("sourceId").toString(), parameters.get("sinkId").toString());
+            infoSecCooker.graph.getGraphTopology().createEdge(parameters.get("sourceId").toString(), parameters.get("sinkId").toString());
             sendJSONResponse(he, new HashMap<>());
         }
     }
@@ -265,7 +195,7 @@ class Controllers {
 
         @Override
         public void handle(HttpExchange he) throws IOException {
-            infoSecCooker.run();
+            infoSecCooker.startGraph();
             sendJSONResponse(he, new HashMap<>());
         }
     }
@@ -279,7 +209,7 @@ class Controllers {
 
         @Override
         public void handle(HttpExchange he) throws IOException {
-            infoSecCooker.stop();
+            infoSecCooker.stopGraph();
             sendJSONResponse(he, new HashMap<>());
         }
     }
@@ -293,7 +223,7 @@ class Controllers {
 
         @Override
         public void handle(HttpExchange he) throws IOException {
-            Set<String> sourcesSet = infoSecCooker.graph.getSourcesIds();
+            Set<String> sourcesSet = infoSecCooker.graph.getGraphTopology().getSourcesIds();
             Map<String, Object> response = new HashMap<>();
             response.put("sources", sourcesSet);
             sendJSONResponse(he, response);
@@ -309,7 +239,7 @@ class Controllers {
 
         @Override
         public void handle(HttpExchange he) throws IOException {
-            Set<String> sinksSet = infoSecCooker.graph.getSinksIds();
+            Set<String> sinksSet = infoSecCooker.graph.getGraphTopology().getSinksIds();
             Map<String, Object> response = new HashMap<>();
             response.put("sinks", sinksSet);
             sendJSONResponse(he, response);
@@ -326,7 +256,7 @@ class Controllers {
 
         @Override
         public void handle(HttpExchange he) throws IOException {
-            Set<String> handlersSet = infoSecCooker.graph.getHandlersIds();
+            Set<String> handlersSet = infoSecCooker.graph.getGraphTopology().getHandlersIds();
             Map<String, Object> response = new HashMap<>();
             response.put("handlers", handlersSet);
             sendJSONResponse(he, response);
@@ -343,7 +273,7 @@ class Controllers {
         @Override
         public void handle(HttpExchange he) throws IOException {
             Map<String, Object> response = new HashMap<>();
-            response.put("edges", infoSecCooker.graph.getEdges());
+            response.put("edges", infoSecCooker.graph.getGraphTopology().getEdges());
             sendJSONResponse(he, response);
         }
     }
@@ -358,7 +288,7 @@ class Controllers {
         @Override
         public void handle(HttpExchange he) throws IOException {
             JSONObject body = parseBodyToJSONObj(he);
-            boolean success = infoSecCooker.graph.checkValidEdge(body.get("source"), body.get("sink"));
+            boolean success = infoSecCooker.graph.getGraphTopology().checkValidEdge(body.get("source"), body.get("sink"));
             sendJSONResponse(he, success);
         }
     }

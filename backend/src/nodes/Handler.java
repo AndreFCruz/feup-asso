@@ -1,10 +1,9 @@
 package nodes;
 
-import manager.Broker;
+import pubsub.Broker;
 import pubsub.Publisher;
 import pubsub.Subscriber;
-
-import java.util.concurrent.BlockingQueue;
+import pubsub.helpers.EntityQueue;
 
 public abstract class Handler<In, Out> extends Node<String> implements Subscriber<In, Out>, Publisher<Out>, Runnable {
 
@@ -29,18 +28,10 @@ public abstract class Handler<In, Out> extends Node<String> implements Subscribe
         };
     }
 
-    public String initialize(String sinkId, BlockingQueue<In> sinkQueue, String sourceId, BlockingQueue<Out> sourceQueue, Broker<Out> broker) {
-        String sourceName = initializeSource(sourceId, sourceQueue, broker);
-        String sinkName = initializeSink(sinkId, sinkQueue);
+    public String initialize(EntityQueue<In> entityQueueSubscribe, EntityQueue<Out> entityQueuePublish, Broker<Out> broker) {
+        String sinkName = sink.initialize(entityQueueSubscribe);
+        String sourceName = source.initialize(entityQueuePublish, broker);
         return super.initialize(sinkName + '-' + sourceName);
-    }
-
-    private String initializeSource(String id, BlockingQueue<Out> queue, Broker<Out> broker) {
-        return source.initialize(id, queue, broker);
-    }
-
-    private String initializeSink(String id, BlockingQueue<In> queue) {
-        return sink.initialize(id, queue);
     }
 
     public String getSourceId() {
