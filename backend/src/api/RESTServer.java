@@ -30,11 +30,6 @@ public class RESTServer {
     private void initializeRoutes() {
         server.createContext("/", new Controllers.RootHandler());
 
-        server.createContext("/createSource", new Controllers.CreateSource(infoSecCooker));
-        server.createContext("/createSink", new Controllers.CreateSink(infoSecCooker));
-        server.createContext("/createHandler", new Controllers.CreateHandler(infoSecCooker));
-        server.createContext("/createEdge", new Controllers.CreateEdge(infoSecCooker));
-
         server.createContext("/getSources", new Controllers.GetSources(infoSecCooker));
         server.createContext("/getSinks", new Controllers.GetSinks(infoSecCooker));
         server.createContext("/getHandlers", new Controllers.GetHandlers(infoSecCooker));
@@ -42,7 +37,7 @@ public class RESTServer {
 
         // Following methods return the available types
         server.createContext("/node-types", new Controllers.GetNodeTypes());
-        server.createContext("/checkEdge", new Controllers.CheckEdge(infoSecCooker));
+        server.createContext("/checkEdge", new Controllers.CheckEdge());
 
         server.createContext("/sendGraph", new Controllers.SendGraph(infoSecCooker));
         server.createContext("/runGraph", new Controllers.RunGraph(infoSecCooker));

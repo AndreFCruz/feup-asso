@@ -26,7 +26,7 @@ public class GraphTopology {
     //NodeFactory
     private NodeFactory nodeFactory;
 
-    GraphTopology() {
+    public GraphTopology() {
         this.sources = new HashMap<>();
         this.sinks = new HashMap<>();
         this.handlers = new HashMap<>();
@@ -35,21 +35,21 @@ public class GraphTopology {
         this.nodeFactory = new NodeFactory();
     }
 
-    public Source createSource(NodeFactory.SourceType sourceType) {
+    Source createSource(NodeFactory.SourceType sourceType) {
         Source source = nodeFactory.createSource(sourceType);
         String sourceKey = broker.register(source);
         sources.put(sourceKey, source);
         return source;
     }
 
-    public Sink createSink(NodeFactory.SinkType sinkType) {
+    Sink createSink(NodeFactory.SinkType sinkType) {
         Sink sink = nodeFactory.createSink(sinkType);
         String sinkKey = broker.register(sink);
         sinks.put(sinkKey, sink);
         return sink;
     }
 
-    public Handler createHandler(NodeFactory.HandlerType handlerType) {
+    Handler createHandler(NodeFactory.HandlerType handlerType) {
         Handler handler = nodeFactory.createHandler(handlerType);
         String handlerKey = broker.register(handler);
         handlers.put(handlerKey, handler);
@@ -72,51 +72,32 @@ public class GraphTopology {
         return edges;
     }
 
-    public boolean createEdge(String sourceId, String sinkId) { //TODO: Check types
-        Node source = getSourceNode(sourceId);
-        Node sink = getSinkNode(sinkId);
-
-        if (source == null || sink == null)
+    boolean createEdge(Node outputNode, Node inputNode) {
+        if (!checkValidEdge(outputNode, inputNode))
             return false;
 
-        broker.addSubscriber(sinkId, sourceId);
+        String outputId = getSourceNodeId(outputNode);
+        String inputId = getSinkNodeId(inputNode);
 
-        ArrayList<String> sinks = edges.getOrDefault(sourceId, new ArrayList<>());
-        sinks.add(sinkId);
-        edges.put(sourceId, sinks);
+        broker.addSubscriber(inputId, outputId);
+
+        ArrayList<String> sinks = edges.getOrDefault(outputId, new ArrayList<>());
+        sinks.add(inputId);
+        edges.put(outputId, sinks);
         return true;
     }
 
-    private Node getSourceNode(String sourceId) {
-        Node source = sources.get(sourceId);
-
-        if (source == null)
-            for (String handlerKey : handlers.keySet()) {
-                Handler handler = handlers.get(handlerKey);
-                if (handler.getSourceId().equals(sourceId)) {
-                    return handler;
-                }
-            }
-        return source;
+    private String getSourceNodeId(Node sourceNode) {
+        return (sourceNode instanceof Handler) ? ((Handler) sourceNode).getSourceId() : (String) sourceNode.getId();
     }
 
-    private Node getSinkNode(String sinkId) {
-        Node sink = sinks.get(sinkId);
-
-        if (sink == null)
-            for (String handlerKey : handlers.keySet()) {
-                Handler handler = handlers.get(handlerKey);
-                if (handler.getSinkId().equals(sinkId)) {
-                    return handler;
-                }
-            }
-
-        return sink;
+    private String getSinkNodeId(Node sinkNode) {
+        return (sinkNode instanceof Handler) ? ((Handler) sinkNode).getSinkId() : (String) sinkNode.getId();
     }
 
-    public boolean checkValidEdge(Object output, Object input) {
-        Node outputNode = getSourceNode(output.toString());
-        Node inputNode = getSinkNode(input.toString());
+    public boolean checkValidEdge(Node outputNode, Node inputNode) {
+        if (outputNode == null || inputNode == null)
+            return false;
 
         int outputIndex = (outputNode instanceof Handler) ? 1 : 0;
 

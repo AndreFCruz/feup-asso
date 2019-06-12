@@ -25,10 +25,10 @@ public class GraphLoader {
 
 
         // Manage subscriptions
-        graphTopology.createEdge((String) stringSource.getId(), (String) printerSink.getId());
-        graphTopology.createEdge((String) integerSource.getId(), (String) printerSink.getId());
-        graphTopology.createEdge((String) stringSource.getId(), uppercase.getSinkId());
-        graphTopology.createEdge(uppercase.getSourceId(), (String) fileWriterSink.getId());
+        graphTopology.createEdge(stringSource, printerSink);
+        graphTopology.createEdge(integerSource, printerSink);
+        graphTopology.createEdge(stringSource, uppercase);
+        graphTopology.createEdge(uppercase, fileWriterSink);
 
         return graphTopology;
     }
@@ -46,7 +46,8 @@ public class GraphLoader {
         GraphTopology graphTopology = new GraphTopology();
         Map<String, Node> nodesNameToNodeObject = loadNodes(graphTopology, nodes);
 
-        loadEdges(graphTopology, edges, nodesNameToNodeObject);
+        if (!loadEdges(graphTopology, edges, nodesNameToNodeObject))
+            return null;
 
         return graphTopology;
     }
@@ -57,26 +58,8 @@ public class GraphLoader {
         for (int i = 0; i < nodes.length(); i++) {
             JSONObject nodeObj = nodes.getJSONObject(i);
             String nodeId = nodeObj.get("id").toString();
-            String nodeType = nodeObj.get("type").toString();
-            String nodeSubType = nodeObj.get("title").toString();
 
-            Node node;
-            switch (nodeType) {
-                case "sourceNode":
-                    NodeFactory.SourceType sourceType = NodeFactory.convertSourceNameToSourceType(nodeSubType);
-                    node = graphTopology.createSource(sourceType);
-                    break;
-                case "handlerNode":
-                    NodeFactory.HandlerType handlerType = NodeFactory.convertHandlerNameToHandlerType(nodeSubType);
-                    node = graphTopology.createHandler(handlerType);
-                    break;
-                case "sinkNode":
-                    NodeFactory.SinkType sinkType = NodeFactory.convertSinkNameToSinkType(nodeSubType);
-                    node = graphTopology.createSink(sinkType);
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected value: " + nodeType);
-            }
+            Node node = createNode(graphTopology, nodeObj);
 
             nodesNameToNodeObject.put(nodeId, node);
         }
@@ -84,7 +67,32 @@ public class GraphLoader {
         return nodesNameToNodeObject;
     }
 
-    private static void loadEdges(GraphTopology graphTopology, JSONArray edges, Map<String, Node> nodesNameToNodeObject) {
+    public static Node createNode(GraphTopology graphTopology, JSONObject nodeObj) {
+        String nodeType = nodeObj.get("type").toString();
+        String nodeSubType = nodeObj.get("title").toString();
+
+        Node node;
+        switch (nodeType) {
+            case "sourceNode":
+                NodeFactory.SourceType sourceType = NodeFactory.convertSourceNameToSourceType(nodeSubType);
+                node = graphTopology.createSource(sourceType);
+                break;
+            case "handlerNode":
+                NodeFactory.HandlerType handlerType = NodeFactory.convertHandlerNameToHandlerType(nodeSubType);
+                node = graphTopology.createHandler(handlerType);
+                break;
+            case "sinkNode":
+                NodeFactory.SinkType sinkType = NodeFactory.convertSinkNameToSinkType(nodeSubType);
+                node = graphTopology.createSink(sinkType);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + nodeType);
+        }
+
+        return node;
+    }
+
+    private static boolean loadEdges(GraphTopology graphTopology, JSONArray edges, Map<String, Node> nodesNameToNodeObject) {
         for (int i = 0; i < edges.length(); i++) {
             JSONObject edge = edges.getJSONObject(i);
             String sourceId = edge.get("source").toString();
@@ -93,17 +101,10 @@ public class GraphLoader {
             Node source = nodesNameToNodeObject.get(sourceId);
             Node target = nodesNameToNodeObject.get(targetId);
 
-            if (source instanceof Handler)
-                sourceId = ((Handler) source).getSourceId();
-            else
-                sourceId = (String) source.getId();
-
-            if (target instanceof Handler)
-                targetId = ((Handler) target).getSinkId();
-            else
-                targetId = (String) target.getId();
-
-            graphTopology.createEdge(sourceId, targetId);
+            if (!graphTopology.createEdge(source, target))
+                return false;
         }
+
+        return true;
     }
 }

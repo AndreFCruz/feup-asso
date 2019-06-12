@@ -3,19 +3,17 @@ package api;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import graph.GraphLoader;
+import graph.GraphTopology;
 import manager.InfoSecCooker;
-import nodes.Handler;
 import nodes.Node;
 import nodes.NodeFactory;
-import nodes.Sink;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-
-import static nodes.NodeFactory.*;
 
 class Controllers {
     private static void parseQuery(String query, Map<String, Object> parameters) throws UnsupportedEncodingException {
@@ -120,72 +118,6 @@ class Controllers {
         }
     }
 
-    public static class CreateSource implements HttpHandler {
-        private InfoSecCooker infoSecCooker;
-
-        CreateSource(InfoSecCooker infoSecCooker) {
-            this.infoSecCooker = infoSecCooker;
-        }
-
-        @Override
-        public void handle(HttpExchange he) throws IOException {
-            Map<String, Object> parameters = parseBody(he);
-            Node source = infoSecCooker.graph.getGraphTopology().createSource(convertSourceNameToSourceType(parameters.get("name").toString()));
-            Map<String, Object> response = new HashMap<>();
-            response.put("sourceKey", source.getId());
-            sendJSONResponse(he, response);
-        }
-    }
-
-    public static class CreateSink implements HttpHandler {
-        private InfoSecCooker infoSecCooker;
-
-        CreateSink(InfoSecCooker infoSecCooker) {
-            this.infoSecCooker = infoSecCooker;
-        }
-
-        @Override
-        public void handle(HttpExchange he) throws IOException {
-            Map<String, Object> parameters = parseBody(he);
-            Sink sink = infoSecCooker.graph.getGraphTopology().createSink(convertSinkNameToSinkType(parameters.get("name").toString()));
-            Map<String, Object> response = new HashMap<>();
-            response.put("sinkKey", sink.getId());
-            sendJSONResponse(he, response);
-        }
-    }
-
-    public static class CreateHandler implements HttpHandler {
-        private InfoSecCooker infoSecCooker;
-
-        CreateHandler(InfoSecCooker infoSecCooker) {
-            this.infoSecCooker = infoSecCooker;
-        }
-
-        @Override
-        public void handle(HttpExchange he) throws IOException {
-            Map<String, Object> parameters = parseBody(he);
-            Handler handler = infoSecCooker.graph.getGraphTopology().createHandler(convertHandlerNameToHandlerType(parameters.get("name").toString()));
-            Map<String, Object> response = new HashMap<>();
-            response.put("handlerKey", handler.getId());
-            sendJSONResponse(he, response);
-        }
-    }
-
-    public static class CreateEdge implements HttpHandler {
-        private InfoSecCooker infoSecCooker;
-
-        CreateEdge(InfoSecCooker infoSecCooker) {
-            this.infoSecCooker = infoSecCooker;
-        }
-
-        @Override
-        public void handle(HttpExchange he) throws IOException {
-            Map<String, Object> parameters = parseBody(he);
-            infoSecCooker.graph.getGraphTopology().createEdge(parameters.get("sourceId").toString(), parameters.get("sinkId").toString());
-            sendJSONResponse(he, new HashMap<>());
-        }
-    }
-
     public static class RunGraph implements HttpHandler {
         private InfoSecCooker infoSecCooker;
 
@@ -279,16 +211,18 @@ class Controllers {
     }
 
     public static class CheckEdge implements HttpHandler {
-        private InfoSecCooker infoSecCooker;
-
-        CheckEdge(InfoSecCooker infoSecCooker) {
-            this.infoSecCooker = infoSecCooker;
-        }
-
         @Override
         public void handle(HttpExchange he) throws IOException {
             JSONObject body = parseBodyToJSONObj(he);
-            boolean success = infoSecCooker.graph.getGraphTopology().checkValidEdge(body.get("output"), body.get("input"));
+
+            JSONObject outputObj = body.getJSONObject("output");
+            JSONObject inputObj = body.getJSONObject("input");
+
+            GraphTopology graphTopology = new GraphTopology();
+            Node outputNode = GraphLoader.createNode(graphTopology, outputObj);
+            Node inputNode = GraphLoader.createNode(graphTopology, inputObj);
+
+            boolean success = graphTopology.checkValidEdge(outputNode, inputNode);
             sendJSONResponse(he, success);
         }
     }
