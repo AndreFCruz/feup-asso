@@ -50,7 +50,7 @@ public class GraphRunnable {
         System.out.println("#...#");
     }
 
-    public GraphTopology getGraphTopology() {
+        public GraphTopology getGraphTopology() {
         return graphTopology;
     }
 

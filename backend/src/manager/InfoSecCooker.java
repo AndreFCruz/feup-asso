@@ -21,6 +21,9 @@ public class InfoSecCooker {
         if (graphTopology == null)
             return false;
 
+        if(this.graph != null)
+            this.graph.stop();
+
         this.graph = new GraphRunnable(graphTopology);
         return true;
     }
