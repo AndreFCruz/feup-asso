@@ -1,4 +1,7 @@
 import React from 'react';
+import { save } from 'save-file';
+import ReactDOM from 'react-dom';
+import Files from 'react-files';
 import axios from "axios";
 import {
   GraphView, // required
@@ -308,6 +311,59 @@ export class Graph extends React.Component {
     this.setState({selectedOption});
   };
 
+  onFilesChange(files) {
+
+    let reader = new FileReader();
+    reader.onload = () => {
+      var data = reader.result;
+      if(this.loadGraph(data))
+      {
+        console.log('Loaded graph successfully!');
+      }
+      else
+      {
+        console.log('The graph couldn`t be loaded. Please check if the submitted graph is in the right format!');
+      }
+    };
+    reader.readAsText(files[0]);
+
+  };
+
+  saveGraph() {
+    save(JSON.stringify(this.state.graph), 'graph.json');
+  }
+
+  loadGraph(graphObj) {
+
+    if (graphObj == null)
+        return false;
+
+    let jsonGraph = JSON.parse(graphObj);
+
+    let nodes = jsonGraph.nodes;
+    let edges = jsonGraph.edges;
+
+    if (nodes == null || edges == null)
+        return false;
+
+    const graph = this.state.graph;
+
+    graph.nodes = nodes;
+    graph.edges = edges;
+
+    this.setState({
+      graph,
+      selected: null,
+      totalNodes: nodes.length,
+    });
+
+    return true;
+  }
+ 
+  onFilesError(error, file) {
+   console.log('error code ' + error.code + ': ' + error.message)
+  };
+
   render() {
     function sequenceToOptions(seq) {
       return seq.map(el => Object.assign({}, { value: el, label: el }));
@@ -333,9 +389,6 @@ export class Graph extends React.Component {
     
     let secondOptions = nodeTypes[selectedOption1];
     secondOptions = sequenceToOptions(secondOptions);
-
-
-    console.log(this.state.graph);
 
 
     return (
@@ -377,6 +430,40 @@ export class Graph extends React.Component {
           </div>
           <div className="send-backend-run">
             <button onClick={this.onRunGraph.bind(this)}>Run</button>
+          </div>
+          <div>
+            <span>Load graph:</span>
+            <div className="files">
+              <Files
+                className='files-dropzone'
+                onChange={this.onFilesChange.bind(this)}
+                onError={this.onFilesError}
+                accepts={['.json']}
+                multiple
+                maxFiles={3}
+                maxFileSize={10000000}
+                minFileSize={0}
+                clickable
+              >
+                Drop files here or click to upload
+              </Files>
+            </div>
+            <div className="files">
+              <Files
+                onChange={this.onFilesChange.bind(this)}
+                onError={this.onFilesError}
+                accepts={['.json']}
+                maxFiles={1}
+                maxFileSize={10000000}
+                minFileSize={0}
+                clickable
+              >
+                <button>Upload</button>
+              </Files>
+            </div>
+          </div>
+          <div>
+            <button onClick={this.saveGraph.bind(this)}>Save</button>
           </div>
         </div>
 
