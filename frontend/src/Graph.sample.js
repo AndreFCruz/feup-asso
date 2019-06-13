@@ -1,44 +1,81 @@
-export const sample1 = {
-    "nodes": [
-      {
-        "id": 1,
-        "title": "Node A",
-        "x": 258.3976135253906,
-        "y": 331.9783248901367,
-        "type": "empty"
-      },
-      {
-        "id": 2,
-        "title": "Node B",
-        "x": 593.9393920898438,
-        "y": 260.6060791015625,
-        "type": "empty"
-      },
-      {
-        "id": 3,
-        "title": "Node C",
-        "x": 237.5757598876953,
-        "y": 61.81818389892578,
-        "type": "custom"
-      },
-      {
-        "id": 4,
-        "title": "Node C",
-        "x": 600.5757598876953,
-        "y": 600.81818389892578,
-        "type": "custom"
-      }
-    ],
-    "edges": [
-      {
-        "source": 1,
-        "target": 2,
-        "type": "emptyEdge"
-      },
-      {
-        "source": 2,
-        "target": 4,
-        "type": "emptyEdge"
-      }
-    ]
-  }
+import {
+  SOURCE_TYPE,
+  HANDLER_TYPE,
+  SINK_TYPE,
+  STANDARD_EDGE_TYPE,
+} from "./Graph.configs";
+
+// TODO Nodes should have property "node.subtype" set to their function (e.g. FILE_WRITER)
+export const sample = {
+  nodes: [
+    {
+      id: 'source.INTEGER_GENERATOR',
+      title: 'INTEGER_GENERATOR',
+      type: SOURCE_TYPE,
+      x: 100,
+      y: 0,
+    },
+    {
+      id: 'source.STRING_GENERATOR',
+      title: 'STRING_GENERATOR',
+      type: SOURCE_TYPE,
+      x: 100,
+      y: 200,
+    },
+    {
+      id: 'handler.MD5_CONVERTER',
+      title: 'MD5_CONVERTER',
+      type: HANDLER_TYPE,
+      x: 300,
+      y: 0,
+    },
+    {
+      id: 'handler.UPPER_CASE_CONVERTER',
+      title: 'UPPER_CASE_CONVERTER',
+      type: HANDLER_TYPE,
+      x: 300,
+      y: 200,
+    },
+    {
+      id: 'sink.FILE_WRITER',
+      title: 'FILE_WRITER',
+      type: SINK_TYPE,
+      x: 500,
+      y: 0,
+    },
+    {
+      id: 'sink.PRINTER',
+      title: 'PRINTER',
+      type: SINK_TYPE,
+      x: 500,
+      y: 200,
+    },
+  ],
+  edges: [
+    {
+      source: 'source.INTEGER_GENERATOR',
+      target: 'handler.MD5_CONVERTER',
+      type: STANDARD_EDGE_TYPE,
+    },
+    {
+      source: 'source.STRING_GENERATOR',
+      target: 'handler.MD5_CONVERTER',
+      type: STANDARD_EDGE_TYPE,
+    },
+    {
+      source: 'handler.MD5_CONVERTER',
+      target: 'sink.FILE_WRITER',
+      type: STANDARD_EDGE_TYPE,
+    },
+    {
+      source: 'source.STRING_GENERATOR',
+      target: 'handler.UPPER_CASE_CONVERTER',
+      type: STANDARD_EDGE_TYPE,
+    },
+    {
+      source: 'handler.UPPER_CASE_CONVERTER',
+      target: 'sink.PRINTER',
+      type: STANDARD_EDGE_TYPE,
+    },
+  ],
+}

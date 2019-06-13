@@ -6,6 +6,17 @@ import java.util.Map;
 public abstract class Registry<K, T> {
     private Map<K, T> map = new HashMap<>();
 
+    static public <V> Registry<String, V> makeStringRegistry() {
+        return new Registry<>() {
+            private int counter = 0;
+
+            @Override
+            protected String generateKey(V obj) {
+                return Integer.toString(counter++);
+            }
+        };
+    }
+
     static public <V> Registry<Integer, V> makeIntRegistry() {
         return new Registry<>() {
             private int counter = 0;
@@ -17,7 +28,7 @@ public abstract class Registry<K, T> {
         };
     }
 
-    static public <V> Registry<String, V> makeStringRegistry() {
+    static public <V> Registry<String, V> makeHashStringRegistry() {
         return new Registry<>() {
             @Override
             protected String generateKey(V obj) {

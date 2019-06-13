@@ -1,6 +1,5 @@
 package nodes.implementations.handlers;
 
-
 import nodes.Handler;
 
 public class Uppercase extends Handler<String, String> {

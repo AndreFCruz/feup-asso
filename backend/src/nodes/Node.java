@@ -2,12 +2,12 @@ package nodes;
 
 import java.util.Map;
 
-public abstract class Node {
+public abstract class Node<Id> {
 
     /**
      * This node's unique ID.
      */
-    private int id;
+    private Id id;
 
     /**
      * This node's settings.
@@ -15,11 +15,12 @@ public abstract class Node {
      */
     private Map<String, String> settings;
 
-    public void initialize(int id) {
+    Id initialize(Id id) {
         this.id = id;
+        return id;
     }
 
-    public int getId() {
+    public Id getId() {
         return this.id;
     }
 

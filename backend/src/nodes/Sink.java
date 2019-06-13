@@ -1,22 +1,18 @@
 package nodes;
 
 import pubsub.Subscriber;
+import pubsub.helpers.EntityQueue;
 
 import java.util.concurrent.BlockingQueue;
 
-public abstract class Sink<In, Out> extends Node implements Subscriber<In, Out>, Runnable {
-
-    /**
-     * Helper class definition for Sinks with no return type.
-     * @param <T> The input data type.
-     */
-    public static abstract class EndSink<T> extends Sink<T, Void> {}
+public abstract class Sink<In, Out> extends Node<String> implements Subscriber<In, Out>, Runnable {
 
     private BlockingQueue<In> queue;
 
-    public void initialize(int id, BlockingQueue<In> queue) {
-        super.initialize(id);
-        this.queue = queue;
+    public String initialize(EntityQueue<In> entityQueue) {
+        super.initialize(entityQueue.entityId);
+        this.queue = entityQueue.queue;
+        return this.getId();
     }
 
     /**
@@ -38,5 +34,13 @@ public abstract class Sink<In, Out> extends Node implements Subscriber<In, Out>,
         } catch (InterruptedException e) {
             System.out.println("Subscriber " + this.getId() + " Thread interrupted");
         }
+    }
+
+    /**
+     * Helper class definition for Sinks with no return type.
+     *
+     * @param <T> The input data type.
+     */
+    public static abstract class EndSink<T> extends Sink<T, Void> {
     }
 }

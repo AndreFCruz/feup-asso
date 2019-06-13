@@ -1,13 +1,12 @@
 package nodes;
 
-import manager.Broker;
+import pubsub.Broker;
 import pubsub.Publisher;
+import pubsub.helpers.EntityQueue;
 
 import java.util.concurrent.BlockingQueue;
 
-public abstract class Source<Out> extends Node implements Publisher<Out>, Runnable {
-
-
+public abstract class Source<Out> extends Node<String> implements Publisher<Out>, Runnable {
 
     /**
      * Queue of outgoing items of type T.
@@ -19,10 +18,11 @@ public abstract class Source<Out> extends Node implements Publisher<Out>, Runnab
      */
     private Broker<Out> broker;
 
-    public void initialize(int id, BlockingQueue<Out> queue, Broker<Out> broker) {
-        super.initialize(id);
-        this.queue = queue;
+    public String initialize(EntityQueue<Out> entityQueue, Broker<Out> broker) {
+        super.initialize(entityQueue.entityId);
+        this.queue = entityQueue.queue;
         this.broker = broker;
+        return this.getId();
     }
 
     /**
