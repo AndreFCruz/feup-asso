@@ -14,6 +14,12 @@ public class GraphLoader {
         // Create Publishers and populate registry
         Source stringSource = graphTopology.createSource(NodeFactory.SourceType.STRING_GENERATOR);
         Source integerSource = graphTopology.createSource(NodeFactory.SourceType.INTEGER_GENERATOR);
+        Source readFileSource = graphTopology.createSource(NodeFactory.SourceType.READ_FILE);
+        Map<String, String> settings = new HashMap<>() {{
+            put("path", "./todo.txt");
+        }};
+
+        readFileSource.initializeSettings(settings);
 
         // Create Handlers
         Handler md5Converter = graphTopology.createHandler(NodeFactory.HandlerType.MD5_CONVERTER);
@@ -29,7 +35,7 @@ public class GraphLoader {
         graphTopology.createEdge(integerSource, printerSink);
         graphTopology.createEdge(stringSource, uppercase);
         graphTopology.createEdge(uppercase, fileWriterSink);
-
+        graphTopology.createEdge(readFileSource, printerSink);
         return graphTopology;
     }
 

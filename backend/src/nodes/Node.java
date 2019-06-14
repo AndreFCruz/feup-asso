@@ -5,15 +5,14 @@ import java.util.Map;
 public abstract class Node<Id> {
 
     /**
-     * This node's unique ID.
-     */
-    private Id id;
-
-    /**
      * This node's settings.
      * (e.g. name of file to extract from on a FileReaderSink)
      */
-    private Map<String, String> settings;
+    protected Map<String, String> settings;
+    /**
+     * This node's unique ID.
+     */
+    private Id id;
 
     Id initialize(Id id) {
         this.id = id;
@@ -24,4 +23,7 @@ public abstract class Node<Id> {
         return this.id;
     }
 
+    public void initializeSettings(Map<String, String> settings) {
+        this.settings = settings;
+    }
 }
