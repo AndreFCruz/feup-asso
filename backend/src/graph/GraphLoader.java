@@ -29,7 +29,11 @@ public class GraphLoader {
         // Create Sinks
         Sink printerSink = graphTopology.createSink(NodeFactory.SinkType.PRINTER);
         Sink fileWriterSink = graphTopology.createSink(NodeFactory.SinkType.FILE_WRITER);
+        settings = new HashMap<>() {{
+            put("path", "./Files/test1.txt");
+        }};
 
+        fileWriterSink.initializeSettings(settings);
 
         // Manage subscriptions
         graphTopology.createEdge(stringSource, printerSink);
