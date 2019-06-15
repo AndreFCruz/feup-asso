@@ -89,6 +89,10 @@ export class Graph extends React.Component {
 
   // Updates the graph with a new node
   onCreateNode(event) {
+    console.log(this.state);
+    if (isObjectEmpty(this.state.selectedOption) || isObjectEmpty(this.state.selectedOption2))
+      return;
+
     const graph = this.state.graph;
 
     let id = this.state.totalNodes + 1;
@@ -98,7 +102,7 @@ export class Graph extends React.Component {
     let title = select.options[select.selectedIndex].value;
 
     const viewNode = {
-      id: 'a' + id,
+      id: this.state.selectedOption.substring(2) + id,
       title,
       type,
       x: 10,
@@ -110,6 +114,9 @@ export class Graph extends React.Component {
       graph: graph,
       totalNodes: this.state.totalNodes + 1,
     });
+
+    console.log('NEW NODES');
+    console.log(graph.nodes);
   }
 
   // Deletes a node from the graph
@@ -407,7 +414,7 @@ export class Graph extends React.Component {
     firstOptions = sequenceToOptions(firstOptions);
 
     let selectedOption1 = this.state.selectedOption;
-    if (Object.keys(selectedOption1).length === 0) {
+    if (isObjectEmpty(selectedOption1)) {
       selectedOption1 = firstOptions[0].value;
     }
     
@@ -528,6 +535,10 @@ function isGraphAcyclic(graph) {
   }
 
   return true;
+}
+
+function isObjectEmpty(obj) {
+  return Object.keys(obj).length === 0;
 }
 
 // function generateSample(totalNodes) {
