@@ -18,7 +18,7 @@ public class FetchUrl extends Source<String> {
                 new InputStreamReader(
                         connection.getInputStream()));
     }
-    
+
     @Override
     public String produceMessage() throws InterruptedException {
         Thread.sleep(500);
