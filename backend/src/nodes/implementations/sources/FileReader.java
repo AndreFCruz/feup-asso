@@ -2,6 +2,7 @@ package nodes.implementations.sources;
 
 import nodes.Source;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -11,6 +12,10 @@ import java.util.stream.Stream;
 
 public class FileReader extends Source<String> {
     private Iterator<String> iterator;
+
+    public FileReader() {
+        this.registerSettings(new String[] {"path"});
+    }
 
     private synchronized static Stream<String> loadFile(String pathname) throws IOException {
         return Files.lines(Paths.get(pathname));
@@ -25,18 +30,17 @@ public class FileReader extends Source<String> {
         return null;
     }
 
+
     @Override
-    public boolean initializeSettings(Map<String, String> settings) {
-        if (settings == null || settings.get("path") == null)
-            return false;
+    protected void initSettingsHandler() {
+        String path = this.getSettingValue("path");
+        if (path == null) return;
 
         try {
-            Stream<String> lines = loadFile(settings.get("path"));
+            Stream<String> lines = loadFile(path);
             this.iterator = lines.iterator();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return true;
     }
 }

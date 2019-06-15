@@ -39,16 +39,14 @@ public class FetchUrl extends Source<String> {
     }
 
     @Override
-    public boolean initializeSettings(Map<String, String> settings) {
-        if (settings == null || settings.get("url") == null)
-            return false;
+    protected void initSettingsHandler() {
+        String url = this.getSettingValue("url");
+        if (url == null) return;
 
         try {
-            this.buffer = loadUrl(settings.get("url"));
+            this.buffer = loadUrl(url);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return true;
     }
 }

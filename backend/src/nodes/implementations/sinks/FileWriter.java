@@ -10,10 +10,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Collections;
-import java.util.Map;
 
 public class FileWriter extends Sink.EndSink<Object> {
     private Path file;
+
+    public FileWriter() {
+        this.registerSettings(new String[] {"path"});
+    }
 
     synchronized private Path createFile(String filePath) {
         Path file = Paths.get(filePath);
@@ -44,13 +47,10 @@ public class FileWriter extends Sink.EndSink<Object> {
         return null;
     }
 
+
     @Override
-    public boolean initializeSettings(Map<String, String> settings) {
-        if (settings == null || settings.get("path") == null)
-            return false;
-
-        this.file = createFile(settings.get("path"));
-
-        return this.file != null;
+    protected void initSettingsHandler() {
+        String path = this.getSettingValue("path");
+        if (path != null) this.file = createFile(path);
     }
 }
