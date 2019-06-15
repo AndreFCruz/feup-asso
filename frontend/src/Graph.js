@@ -381,6 +381,7 @@ export class Graph extends React.Component {
     return (
       <LoadingScreen
         loading={this.isLoading()}>
+        LOADING
       </LoadingScreen>
     );
   }

@@ -4,14 +4,27 @@ import React from 'react';
 
 export const NODE_KEY = 'id'; // Key used to identify nodes
 
+let DEFAULT_NODE_TYPES = {
+  "sources": {
+    "INTEGER_GENERATOR": {},
+    "STRING_GENERATOR": {},
+  },
+  "sinks": {
+    "FILE_WRITER": {"settings": {"path": "", "url": ""}},
+    "PRINTER": {},
+  },
+  "handlers": {
+    "MD5_CONVERTER": {},
+    "UPPER_CASE_CONVERTER": {},
+  },
+};
+
 export async function makeGraphConfigObject() {
 
   // Fetch available node types from backend server
-  // let nodeTypesResponse = await axios.get(process.env.REACT_APP_API_URL + '/node-types');
-
-  // NOTE Sample response from backend server
-  let nodeTypesResponse = {"sources":["INTEGER_GENERATOR","STRING_GENERATOR"],"sinks":["FILE_WRITER","PRINTER"],"handlers":["MD5_CONVERTER","UPPER_CASE_CONVERTER"]};
-  console.log(nodeTypesResponse);
+  let nodeTypesResponse = await axios.get(process.env.REACT_APP_API_URL + '/node-types')
+    .then(res => res.data)
+    .catch(_ => DEFAULT_NODE_TYPES);
 
   return {
     EdgeTypes: makeEdgeTypesObject(),
@@ -51,27 +64,30 @@ function makeEdgeTypesObject() {
 
 function makeNodeSubtypesObject(types) {
   let retObj = {};
-  for (const sourceType of types.sources) {
+  for (const sourceType of Object.getOwnPropertyNames(types.sources)) {
     retObj[sourceType] = {
       shape: SourceNodeShape,
       shapeId: '#' + SOURCE_TYPE,
       nodeType: SOURCE_TYPE,
+      settings: sourceType.settings || {},
     };
   }
 
-  for (const handlerType of types.handlers) {
+  for (const handlerType of Object.getOwnPropertyNames(types.handlers)) {
     retObj[handlerType] = {
       shape: HandlerNodeShape,
       shapeId: '#' + HANDLER_TYPE,
       nodeType: HANDLER_TYPE,
+      settings: handlerType.settings || {},
     };
   }
 
-  for (const sinkType of types.sinks) {
+  for (const sinkType of Object.getOwnPropertyNames(types.sinks)) {
     retObj[sinkType] = {
       shape: SinkNodeShape,
       shapeId: '#' + SINK_TYPE,
       nodeType: SINK_TYPE,
+      settings: sinkType.settings || {},
     };
   }
 
