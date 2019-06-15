@@ -3,6 +3,7 @@ package nodes;
 import pubsub.Broker;
 import pubsub.Publisher;
 import pubsub.helpers.EntityQueue;
+import utils.Log;
 
 import java.util.concurrent.BlockingQueue;
 
@@ -43,7 +44,7 @@ public abstract class Source<Out> extends Node<String> implements Publisher<Out>
                 this.publishMessage(this.produceMessage());
             }
         } catch (InterruptedException e) {
-            System.out.println("Publisher " + this.getId() + " Thread interrupted");
+            Log.log("[Source " + this.getId() + "] Thread interrupted");
         }
     }
 

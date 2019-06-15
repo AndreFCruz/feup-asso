@@ -26,25 +26,25 @@ public abstract class Node<Id> {
     }
 
     public boolean initializeSettings(Map<String, String> settingValues) {
-        boolean success = false;
         for (String key : this.settings.keySet()) {
             if (settingValues.containsKey(key)) {
                 this.settings.put(key, settingValues.get(key));
-                success = true;
+            } else {
+                return false;
             }
         }
 
-        if (success)
-            this.initSettingsHandler();
+        this.initSettingsHandler();
 
-        return success;
+        return true;
     }
 
     /**
      * Factory method for the node subclass to handle assets set-up after settings are set.
      * Override for handling this event.
      */
-    protected void initSettingsHandler() {}
+    protected void initSettingsHandler() {
+    }
 
     protected String getSettingValue(String key) {
         return this.settings.getOrDefault(key, null);
