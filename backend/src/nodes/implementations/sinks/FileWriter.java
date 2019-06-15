@@ -2,6 +2,8 @@ package nodes.implementations.sinks;
 
 import nodes.Sink;
 
+import java.util.Map;
+
 public class FileWriter extends Sink.EndSink<Object> {
 
 //    synchronized public SAVE_STATE saveFile(String fileName, String pathname, byte[] data) throws IOException {
@@ -30,5 +32,10 @@ public class FileWriter extends Sink.EndSink<Object> {
     public Void handleMessage(Object message) {
         System.out.println("Sink id " + this.getId() + " | Received the message: " + message);
         return null;
+    }
+
+    @Override
+    public boolean initializeSettings(Map<String, String> settings) {
+        return true;
     }
 }

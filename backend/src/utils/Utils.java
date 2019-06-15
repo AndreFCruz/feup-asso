@@ -1,5 +1,10 @@
 package utils;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -20,5 +25,35 @@ public class Utils {
             // Preserve interrupt status
             Thread.currentThread().interrupt();
         }
+    }
+
+    public static Map<String, Object> JSONObjectToMap(JSONObject jsonObj) throws JSONException {
+        Map<String, Object> map = new HashMap<>();
+        Iterator<String> keys = jsonObj.keys();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            Object value = jsonObj.get(key);
+            if (value instanceof JSONArray) {
+                value = JSONArrayToList((JSONArray) value);
+            } else if (value instanceof JSONObject) {
+                value = JSONObjectToMap((JSONObject) value);
+            }
+            map.put(key, value);
+        }
+        return map;
+    }
+
+    private static List<Object> JSONArrayToList(JSONArray array) throws JSONException {
+        List<Object> list = new ArrayList<>();
+        for (int i = 0; i < array.length(); i++) {
+            Object value = array.get(i);
+            if (value instanceof JSONArray) {
+                value = JSONArrayToList((JSONArray) value);
+            } else if (value instanceof JSONObject) {
+                value = JSONObjectToMap((JSONObject) value);
+            }
+            list.add(value);
+        }
+        return list;
     }
 }

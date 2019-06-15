@@ -3,6 +3,7 @@ package graph;
 import nodes.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,9 +15,9 @@ public class GraphLoader {
         // Create Publishers and populate registry
         Source stringSource = graphTopology.createSource(NodeFactory.SourceType.STRING_GENERATOR);
         Source integerSource = graphTopology.createSource(NodeFactory.SourceType.INTEGER_GENERATOR);
-        Source readFileSource = graphTopology.createSource(NodeFactory.SourceType.READ_FILE);
+        Source readFileSource = graphTopology.createSource(NodeFactory.SourceType.FILE_READER);
         Map<String, String> settings = new HashMap<>() {{
-            put("path", "./todo.txt");
+            put("path", "./Files/todo.txt");
         }};
 
         readFileSource.initializeSettings(settings);
@@ -95,7 +96,19 @@ public class GraphLoader {
                 throw new IllegalStateException("Unexpected value: " + nodeType);
         }
 
+        JSONObject settingsObj = (nodeObj.has("settings") ? nodeObj.getJSONObject("settings") : null);
+
+        Map<String, Object> settings = parseSettings(settingsObj);
+        node.initializeSettings(settings);
+
         return node;
+    }
+
+    private static Map<String, Object> parseSettings(JSONObject settings) {
+        if (settings == null)
+            return new HashMap<>();
+
+        return Utils.JSONObjectToMap(settings);
     }
 
     private static boolean loadEdges(GraphTopology graphTopology, JSONArray edges, Map<String, Node> nodesNameToNodeObject) {

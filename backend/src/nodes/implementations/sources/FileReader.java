@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public class ReadFile extends Source<String> {
+public class FileReader extends Source<String> {
     private Iterator<String> iterator;
 
     private synchronized static Stream<String> loadFile(String pathname) throws IOException {
@@ -26,13 +26,17 @@ public class ReadFile extends Source<String> {
     }
 
     @Override
-    public void initializeSettings(Map<String, String> settings) {
-        super.initializeSettings(settings);
+    public boolean initializeSettings(Map<String, String> settings) {
+        if (settings == null || settings.get("path") == null)
+            return false;
+
         try {
             Stream<String> lines = loadFile(settings.get("path"));
             this.iterator = lines.iterator();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return true;
     }
 }

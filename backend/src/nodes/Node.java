@@ -23,7 +23,7 @@ public abstract class Node<Id> {
         return this.id;
     }
 
-    public void initializeSettings(Map<String, String> settings) {
-        this.settings = settings;
+    public boolean initializeSettings(Map<String, String> settings) {
+        return true;
     }
 }
