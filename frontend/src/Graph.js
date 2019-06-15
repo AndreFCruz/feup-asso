@@ -169,7 +169,9 @@ export class Graph extends React.Component {
       console.warn(`Trying to create an input edge to the source node ${sinkNode}`);
     } else if (! isGraphAcyclic(this.state.graph)) {
       console.warn('Edge creation would create a cycle in the graph');
-    } else { // Else, create the edge (it's valid)
+    } else if (! this.isValidEdge(sourceViewNode,sinkViewNode)) {
+      console.warn('Trying to create invalid edge type between that source and sink');
+    } else{ // Else, create the edge (it's valid)
       graph.edges = [...graph.edges, viewEdge];
       
       this.setState({
@@ -177,6 +179,34 @@ export class Graph extends React.Component {
         selected: viewEdge
       });
     }
+  }
+
+  isValidEdge(sourceViewNode,sinkViewNode) {
+
+    const source = {
+      title: sourceViewNode.title,
+      type: sourceViewNode.type
+    };
+
+    const sink = {
+      title: sinkViewNode.title,
+      type: sinkViewNode.type
+    };
+
+    const edge = {
+      output: source,
+      input: sink,
+    };
+    axios.post(process.env.REACT_APP_API_URL + '/checkEdge', JSON.stringify(edge))
+    .then(response => {
+      if(response.data === true){
+        return true;
+      } 
+      else{
+        return false;
+      }
+    })
+    .catch(error => console.warn('Error on axios.post: ' + JSON.stringify(error)));
   }
 
   // Called when an edge is reattached to a different target.
