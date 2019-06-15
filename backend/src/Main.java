@@ -6,7 +6,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         InfoSecCooker infoSecCooker = new InfoSecCooker();
-        infoSecCooker.initializeDummyGraph();
+//        infoSecCooker.initializeDummyGraph();
         infoSecCooker.startGraph();
         infoSecCooker.startServer();
     }

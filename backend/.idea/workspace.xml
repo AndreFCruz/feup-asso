@@ -1,16 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="2e362bf2-8dc9-4785-a344-4fde7eebbcf3" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/lib.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nodes/Node.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/nodes/Node.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nodes/implementations/sinks/FileWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/nodes/implementations/sinks/FileWriter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nodes/implementations/sources/FetchUrl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/nodes/implementations/sources/FetchUrl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nodes/implementations/sources/FileReader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/nodes/implementations/sources/FileReader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/package-lock.json" afterDir="false" />
-    </list>
+    <list default="true" id="2e362bf2-8dc9-4785-a344-4fde7eebbcf3" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -36,11 +27,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/nodes/NodeFactory.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="280">
-              <caret line="27" column="40" selection-start-line="27" selection-start-column="40" selection-end-line="27" selection-end-column="40" />
+            <state relative-caret-position="582">
+              <caret line="49" column="5" selection-start-line="49" selection-start-column="5" selection-end-line="49" selection-end-column="5" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -48,7 +39,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/nodes/implementations/sinks/FileWriter.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="130">
@@ -471,18 +462,18 @@
       <workItem from="1560604545729" duration="156000" />
       <workItem from="1560604736633" duration="20000" />
       <workItem from="1560604797831" duration="61000" />
-      <workItem from="1560604872425" duration="2236000" />
+      <workItem from="1560604872425" duration="2447000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="15321000" />
+    <option name="totallyTimeSpent" value="15532000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="877" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1795422" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.1795422" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -499,7 +490,7 @@
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Messages" order="10" visible="true" weight="0.32866243" />
+      <window_info anchor="bottom" id="Messages" order="10" weight="0.32866243" />
       <window_info anchor="bottom" id="Database Changes" order="11" />
       <window_info anchor="bottom" id="Version Control" order="12" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -724,16 +715,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/nodes/NodeFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="27" column="40" selection-start-line="27" selection-start-column="40" selection-end-line="27" selection-end-column="40" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/nodes/implementations/sinks/FileWriter.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="130">
@@ -742,6 +723,16 @@
             <element signature="imports" expanded="true" />
             <element signature="e#419#420#0" expanded="true" />
             <element signature="e#481#482#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/nodes/NodeFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="582">
+          <caret line="49" column="5" selection-start-line="49" selection-start-column="5" selection-end-line="49" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>

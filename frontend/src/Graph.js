@@ -21,7 +21,7 @@ import {
   STANDARD_EDGE_TYPE,
   nodeTypes
 } from './Graph.configs';
-// import { Col, Row, Container } from "react-bootstrap";
+import { Col, Row, Container } from "react-bootstrap";
 import toposort from 'toposort';
 
 export class Graph extends React.Component {
@@ -392,10 +392,32 @@ export class Graph extends React.Component {
 
 
     return (
-      <div id='graph'>
+      
+    <Container id='graph'>
+      {/* TODO Eventually move this header to a side panel to the right of the GraphView */}
 
-        {/* TODO Eventually move this header to a side panel to the right of the GraphView */}
-        <div className="graph-header">
+      <Row>
+        <Col id='graph-view' sm={8}>
+          <GraphView
+                ref={(el) => (this.GraphView = el)}
+                nodeKey={NODE_KEY}
+                nodes={nodes}
+                edges={edges}
+                selected={selected}
+                nodeTypes={NodeTypes}
+                nodeSubtypes={NodeSubtypes}
+                edgeTypes={EdgeTypes}
+                onSelectNode={this.onSelectNode.bind(this)}
+                onCreateNode={this.onCreateNode.bind(this)}
+                onUpdateNode={this.onUpdateNode.bind(this)}
+                onDeleteNode={this.onDeleteNode.bind(this)}
+                onSelectEdge={this.onSelectEdge.bind(this)}
+                onSwapEdge={this.onSwapEdge.bind(this)}
+                onDeleteEdge={this.onDeleteEdge.bind(this)}
+                />
+        </Col>
+
+        <Col id='graph-settings' sm={4}>
           <div>
             <span id="number-nodes">Number of Nodes: {this.state.totalNodes.toString()}</span>
           </div>
@@ -465,27 +487,10 @@ export class Graph extends React.Component {
           <div>
             <button onClick={this.saveGraph.bind(this)}>Save</button>
           </div>
-        </div>
+        </Col>
 
-        <GraphView
-              ref={(el) => (this.GraphView = el)}
-              nodeKey={NODE_KEY}
-              nodes={nodes}
-              edges={edges}
-              selected={selected}
-              nodeTypes={NodeTypes}
-              nodeSubtypes={NodeSubtypes}
-              edgeTypes={EdgeTypes}
-              onSelectNode={this.onSelectNode.bind(this)}
-              onCreateNode={this.onCreateNode.bind(this)}
-              onUpdateNode={this.onUpdateNode.bind(this)}
-              onDeleteNode={this.onDeleteNode.bind(this)}
-              onSelectEdge={this.onSelectEdge.bind(this)}
-              onSwapEdge={this.onSwapEdge.bind(this)}
-              onDeleteEdge={this.onDeleteEdge.bind(this)}
-              />
-
-      </div>
+      </Row>
+    </Container>
     );
   }
 

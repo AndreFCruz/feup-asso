@@ -1,3 +1,17 @@
 #graph {
+    /* width: 100vw; */
+    margin: 0;
+}
+
+#graph > .row {
+    width: 100vw;
+}
+
+#graph #graph-view {
     height: 100vh;
+    width: 100%;
+}
+
+#graph #graph-settings {
+
 }
