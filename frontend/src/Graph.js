@@ -11,7 +11,7 @@ import {
   // GraphUtils // optional, useful utility functions
 } from 'react-digraph';
 import './Graph.css';
-import { sample as GRAPH_SAMPLE } from "./Graph.sample";
+// import { sample as GRAPH_SAMPLE } from "./Graph.sample";
 import {
   makeGraphConfigObject,
   NODE_KEY,
@@ -23,19 +23,22 @@ import {
 } from './Graph.configs';
 import { Col, Row, Container } from "react-bootstrap";
 import toposort from 'toposort';
+import LoadingScreen from "react-loading-screen";
 
 export class Graph extends React.Component {
 
   constructor(props) {
     super(props);
 
-    let sample = GRAPH_SAMPLE;
-    let config = makeGraphConfigObject();
+    let sample = {
+      nodes: [], edges: []      
+    };
+
     this.state = {
       graph: sample,
       selected: {},
       totalNodes: sample.nodes.length,
-      graphConfig: config,
+      graphConfig: null,
       selectedOption: {},
       selectedOption2: {}
     }
@@ -43,11 +46,20 @@ export class Graph extends React.Component {
     this.GraphView = React.createRef();
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    let config = await makeGraphConfigObject();
+
+    this.setState({graphConfig: config});
+    // TODO async calls here such as makeGraphConfig
+
     // TODO:
     // - fetch types of nodes for Sources/Handlers/Sinks
     // - construct a GraphConfig object
     // - update state with this.setState({...});
+  }
+
+  isLoading() {
+    return this.state.graphConfig === null;
   }
 
   /*
@@ -288,6 +300,7 @@ export class Graph extends React.Component {
   }
 
   getNodeTypes() {
+    if (this.state.graphConfig === null) return {};
     let graphConfig = this.state.graphConfig;
     let nodeTypes = new Map();
     for (let prop in graphConfig.NodeTypes) {
@@ -364,7 +377,17 @@ export class Graph extends React.Component {
    console.log('error code ' + error.code + ': ' + error.message)
   };
 
+  renderLoadingScreen() {
+    return (
+      <LoadingScreen
+        loading={this.isLoading()}>
+      </LoadingScreen>
+    );
+  }
+
   render() {
+    if (this.isLoading()) return this.renderLoadingScreen();
+
     function sequenceToOptions(seq) {
       return seq.map(el => Object.assign({}, { value: el, label: el }));
     }
@@ -392,105 +415,103 @@ export class Graph extends React.Component {
 
 
     return (
-      
-    <Container id='graph'>
-      {/* TODO Eventually move this header to a side panel to the right of the GraphView */}
+      <Container id='graph'>
 
-      <Row>
-        <Col id='graph-view' sm={8}>
-          <GraphView
-                ref={(el) => (this.GraphView = el)}
-                nodeKey={NODE_KEY}
-                nodes={nodes}
-                edges={edges}
-                selected={selected}
-                nodeTypes={NodeTypes}
-                nodeSubtypes={NodeSubtypes}
-                edgeTypes={EdgeTypes}
-                onSelectNode={this.onSelectNode.bind(this)}
-                onCreateNode={this.onCreateNode.bind(this)}
-                onUpdateNode={this.onUpdateNode.bind(this)}
-                onDeleteNode={this.onDeleteNode.bind(this)}
-                onSelectEdge={this.onSelectEdge.bind(this)}
-                onSwapEdge={this.onSwapEdge.bind(this)}
-                onDeleteEdge={this.onDeleteEdge.bind(this)}
-                />
-        </Col>
+        <Row>
+          <Col id='graph-view' sm={8}>
+            <GraphView
+                  ref={(el) => (this.GraphView = el)}
+                  nodeKey={NODE_KEY}
+                  nodes={nodes}
+                  edges={edges}
+                  selected={selected}
+                  nodeTypes={NodeTypes}
+                  nodeSubtypes={NodeSubtypes}
+                  edgeTypes={EdgeTypes}
+                  onSelectNode={this.onSelectNode.bind(this)}
+                  onCreateNode={this.onCreateNode.bind(this)}
+                  onUpdateNode={this.onUpdateNode.bind(this)}
+                  onDeleteNode={this.onDeleteNode.bind(this)}
+                  onSelectEdge={this.onSelectEdge.bind(this)}
+                  onSwapEdge={this.onSwapEdge.bind(this)}
+                  onDeleteEdge={this.onDeleteEdge.bind(this)}
+                  />
+          </Col>
 
-        <Col id='graph-settings' sm={4}>
-          <div>
-            <span id="number-nodes">Number of Nodes: {this.state.totalNodes.toString()}</span>
-          </div>
-          <div className="create-node">
-            <span>Add Node: </span>
-            
-            <select id='firstOption' onChange={this.handleChange1.bind(this)}>
-              {firstOptions.map(node => <option value={node.value}>{node.value}</option>)}
-            </select>
-
-            <select id='secondOption'>
-              {secondOptions.map(node => <option value={node.value}>{node.value}</option>)}
-            </select>
-
-            <button onClick={this.onCreateNode.bind(this)}>Create</button>
-          </div>
-          <div className="create-edge">
-            <span>Add Edge: </span>
-            <select id="source">
-              {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
-            </select>
-            <select id="sink">
-              {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
-            </select>
-            <button onClick={this.onCreateEdge.bind(this)}>Create</button>
-          </div>
-          <div>
-            <span>Pan to Node: </span>
-            <select id="panToSelection" onChange={this.onSelectPanNode.bind(this)}>
-              {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
-            </select>
-          </div>
-          <div className="send-backend-run">
-            <button onClick={this.onRunGraph.bind(this)}>Run</button>
-          </div>
-          <div>
-            <span>Load graph:</span>
-            <div className="files">
-              <Files
-                className='files-dropzone'
-                onChange={this.onFilesChange.bind(this)}
-                onError={this.onFilesError}
-                accepts={['.json']}
-                multiple
-                maxFiles={3}
-                maxFileSize={10000000}
-                minFileSize={0}
-                clickable
-              >
-                Drop files here or click to upload
-              </Files>
+          <Col id='graph-settings' sm={4}>
+            <div>
+              <span id="number-nodes">Number of Nodes: {this.state.totalNodes.toString()}</span>
             </div>
-            <div className="files">
-              <Files
-                onChange={this.onFilesChange.bind(this)}
-                onError={this.onFilesError}
-                accepts={['.json']}
-                maxFiles={1}
-                maxFileSize={10000000}
-                minFileSize={0}
-                clickable
-              >
-                <button>Upload</button>
-              </Files>
-            </div>
-          </div>
-          <div>
-            <button onClick={this.saveGraph.bind(this)}>Save</button>
-          </div>
-        </Col>
+            <div className="create-node">
+              <span>Add Node: </span>
+              
+              <select id='firstOption' onChange={this.handleChange1.bind(this)}>
+                {firstOptions.map(node => <option value={node.value}>{node.value}</option>)}
+              </select>
 
-      </Row>
-    </Container>
+              <select id='secondOption'>
+                {secondOptions.map(node => <option value={node.value}>{node.value}</option>)}
+              </select>
+
+              <button onClick={this.onCreateNode.bind(this)}>Create</button>
+            </div>
+            <div className="create-edge">
+              <span>Add Edge: </span>
+              <select id="source">
+                {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
+              </select>
+              <select id="sink">
+                {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
+              </select>
+              <button onClick={this.onCreateEdge.bind(this)}>Create</button>
+            </div>
+            <div>
+              <span>Pan to Node: </span>
+              <select id="panToSelection" onChange={this.onSelectPanNode.bind(this)}>
+                {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
+              </select>
+            </div>
+            <div className="send-backend-run">
+              <button onClick={this.onRunGraph.bind(this)}>Run</button>
+            </div>
+            <div>
+              <span>Load graph:</span>
+              <div className="files">
+                <Files
+                  className='files-dropzone'
+                  onChange={this.onFilesChange.bind(this)}
+                  onError={this.onFilesError}
+                  accepts={['.json']}
+                  multiple
+                  maxFiles={3}
+                  maxFileSize={10000000}
+                  minFileSize={0}
+                  clickable
+                >
+                  Drop files here or click to upload
+                </Files>
+              </div>
+              <div className="files">
+                <Files
+                  onChange={this.onFilesChange.bind(this)}
+                  onError={this.onFilesError}
+                  accepts={['.json']}
+                  maxFiles={1}
+                  maxFileSize={10000000}
+                  minFileSize={0}
+                  clickable
+                >
+                  <button>Upload</button>
+                </Files>
+              </div>
+            </div>
+            <div>
+              <button onClick={this.saveGraph.bind(this)}>Save</button>
+            </div>
+          </Col>
+
+        </Row>
+      </Container>
     );
   }
 

@@ -4,15 +4,14 @@ import React from 'react';
 
 export const NODE_KEY = 'id'; // Key used to identify nodes
 
-export function makeGraphConfigObject() {
+export async function makeGraphConfigObject() {
 
   // Fetch available node types from backend server
-  axios.get(process.env.REACT_APP_API_URL + '/node-types')
-    .then(response => console.log(response))
-    .catch(error => console.warn('Error on axios.get: ' + JSON.stringify(error)));
+  // let nodeTypesResponse = await axios.get(process.env.REACT_APP_API_URL + '/node-types');
 
   // NOTE Sample response from backend server
   let nodeTypesResponse = {"sources":["INTEGER_GENERATOR","STRING_GENERATOR"],"sinks":["FILE_WRITER","PRINTER"],"handlers":["MD5_CONVERTER","UPPER_CASE_CONVERTER"]};
+  console.log(nodeTypesResponse);
 
   return {
     EdgeTypes: makeEdgeTypesObject(),
