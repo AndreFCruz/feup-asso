@@ -4,6 +4,7 @@ import nodes.implementations.handlers.MD5Converter;
 import nodes.implementations.handlers.Uppercase;
 import nodes.implementations.sinks.FileWriter;
 import nodes.implementations.sinks.Printer;
+import nodes.implementations.sources.FetchUrl;
 import nodes.implementations.sources.FileReader;
 import nodes.implementations.sources.IntegerGenerator;
 import nodes.implementations.sources.StringGenerator;
@@ -17,6 +18,7 @@ public class NodeFactory {
         put(SourceType.INTEGER_GENERATOR, IntegerGenerator::new);
         put(SourceType.STRING_GENERATOR, StringGenerator::new);
         put(SourceType.FILE_READER, FileReader::new);
+        put(SourceType.FETCH_URL, FetchUrl::new);
     }};
     private static Map<HandlerType, Supplier<Handler>> handlerTypeToHandlerNode = new HashMap<>() {{
         put(HandlerType.MD5_CONVERTER, MD5Converter::new);
@@ -67,7 +69,8 @@ public class NodeFactory {
     public enum SourceType {
         INTEGER_GENERATOR,
         STRING_GENERATOR,
-        FILE_READER
+        FILE_READER,
+        FETCH_URL
     }
 
     public enum SinkType {
