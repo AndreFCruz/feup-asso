@@ -71,7 +71,6 @@ export class Graph extends React.Component {
 
     // Updates the graph with a new node
     onCreateNode(event) {
-        console.log(this.state);
         if (isObjectEmpty(this.state.selectedType) || isObjectEmpty(this.state.selectedSubType))
             return;
 
@@ -83,11 +82,13 @@ export class Graph extends React.Component {
         let select = document.getElementById('secondOption');
         let nodeSubType = select.options[select.selectedIndex].value;
 
-        let settings = this.state.graphConfig.NodeSubtypes[nodeSubType].settings || [];
-        settings = settings.map(el => new Map([[el, ""]]));
+        let settingsOptions = this.state.graphConfig.NodeSubtypes[nodeSubType].settings || [];
+        let settings = Object.assign({}, ...(settingsOptions.map(
+            el => { let tmp = {}; tmp[el] = ""; return tmp;}
+        )));
 
         const viewNode = {
-            id: this.state.selectedType.substring(2) + id,
+            id: this.state.selectedType.substring(0, 2) + id,
             title: nodeSubType + '-' + id,
             type: nodeType,
             subtype: nodeSubType,
