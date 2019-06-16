@@ -10,7 +10,8 @@ import {
     Col, Container, Row,
     Button, ButtonToolbar,
     Dropdown, DropdownButton,
-    Card
+    Card,
+    InputGroup, FormControl
 } from 'react-bootstrap';
 import toposort from 'toposort';
 import LoadingScreen from 'react-loading-screen';
@@ -421,6 +422,18 @@ class Graph extends React.Component {
         return {firstOptions, secondOptions};
     }
 
+    renderNodeSettings() {
+        let defaultReturn = (<div>...</div>);
+        if (this.state.selected === null || isObjectEmpty(this.state.selected)) {
+            return defaultReturn;
+        }
+        if (! this.state.selected.hasOwnProperty('settings')) return defaultReturn;
+
+        return (
+            Object.getOwnPropertyNames(this.state.selected.settings).map(el => <h5>{el}</h5>) // TODO input + handlers
+        );
+    }
+
     render() {
         if (this.isLoading()) 
             return this.renderLoadingScreen();
@@ -533,22 +546,6 @@ class Graph extends React.Component {
                                         clickable>
                                         <Button variant='outline-primary'>Upload</Button>
                                     </Files>
-                                    {/* <div className="files">
-                                        <Files
-                                            className='files-dropzone'
-                                            onChange={this
-                                            .onFilesChange
-                                            .bind(this)}
-                                            onError={Graph.onFilesError}
-                                            accepts={['.json']}
-                                            multiple
-                                            maxFiles={3}
-                                            maxFileSize={10000000}
-                                            minFileSize={0}
-                                            clickable>
-                                            Drop files here or click to upload
-                                        </Files>
-                                    </div> */}
                                 </div>
                                 <div>
                                     <Button variant='outline-primary'
@@ -558,8 +555,16 @@ class Graph extends React.Component {
                                 </div>
                             </Card.Body>                        
                         </Card>
-                    </Col>
 
+                        <Card>
+                            <Card.Body>
+                                <Card.Title>Node Settings</Card.Title>
+                                <div id='node-settings'>
+                                {this.renderNodeSettings()}
+                                </div>
+                            </Card.Body>
+                        </Card>
+                    </Col>
                 </Row>
             </Container>
         );
@@ -568,9 +573,7 @@ class Graph extends React.Component {
 }
 
 function isGraphAcyclic(graph) {
-    let directedEdges = graph
-        .edges
-        .map(el => [el.source, el.target]);
+    let directedEdges = graph.edges.map(el => [el.source, el.target]);
 
     try { // Try to obtain topological sort
         toposort(directedEdges);
