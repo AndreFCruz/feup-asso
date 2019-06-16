@@ -31,7 +31,7 @@ export class Graph extends React.Component {
     super(props);
 
     let sample = {
-      nodes: [], edges: []      
+      nodes: [], edges: []
     };
 
     this.state = {
@@ -153,7 +153,7 @@ export class Graph extends React.Component {
       target: sinkNode,
       type
     };
-    
+
     let sourceViewNode = this.getViewNode(sourceNode);
     let sinkViewNode =  this.getViewNode(sinkNode);
 
@@ -171,7 +171,7 @@ export class Graph extends React.Component {
       console.warn('Trying to create invalid edge type between that source and sink');
     } else{ // Else, create the edge (it's valid)
       graph.edges = [...graph.edges, viewEdge];
-      
+
       this.setState({
         graph,
         selected: viewEdge
@@ -313,7 +313,7 @@ export class Graph extends React.Component {
       console.log(response);
       if(response.data === true){
         this.sendRunRequest();
-      } 
+      }
       else{
         console.warn('There was an error parsing the graph.');
       }
@@ -408,7 +408,7 @@ export class Graph extends React.Component {
 
     return true;
   }
- 
+
   onFilesError(error, file) {
    console.log('error code ' + error.code + ': ' + error.message)
   };
@@ -446,7 +446,7 @@ export class Graph extends React.Component {
     if (isObjectEmpty(selectedType)) {
       selectedType = firstOptions[0].value;
     }
-    
+
     let secondOptions = nodeTypes[selectedType];
     secondOptions = sequenceToOptions(secondOptions);
 
@@ -479,13 +479,13 @@ export class Graph extends React.Component {
 
             <div className="create-node">
               <span>Add Node: </span>
-              
+
               <select id='firstOption' onChange={this.handleTypeSelectorChange.bind(this)}>
-                {firstOptions.map(node => <option value={node.value}>{node.value}</option>)}
+                {firstOptions.map((node, index) => <option key={index} value={node.value}>{node.value}</option>)}
               </select>
 
               <select id='secondOption' onChange={this.handleSubTypeSelectorChange.bind(this)}>
-                {secondOptions.map(node => <option value={node.value}>{node.value}</option>)}
+                {secondOptions.map((node, index) => <option key={index} value={node.value}>{node.value}</option>)}
               </select>
 
               <button onClick={this.onCreateNode.bind(this)}>Create</button>
