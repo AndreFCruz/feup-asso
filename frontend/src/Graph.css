@@ -30,3 +30,7 @@ h1 {
 .card {
     margin: 0.2em 0;
 }
+
+.card .md-form {
+    display: inline-block;
+}

@@ -11,7 +11,7 @@ import {
     Button, ButtonToolbar,
     Dropdown, DropdownButton,
     Card,
-    InputGroup, FormControl
+    InputGroup, FormControl, Form
 } from 'react-bootstrap';
 import toposort from 'toposort';
 import LoadingScreen from 'react-loading-screen';
@@ -422,15 +422,36 @@ class Graph extends React.Component {
         return {firstOptions, secondOptions};
     }
 
+    handleNodeSettingsChange(event) {
+        let settingProp = event.target['placeholder'];
+        let settingValue = event.target.value;
+
+        let selected = this.state.selected;
+        selected.settings[settingProp] = settingValue;
+
+        this.setState({selected});
+    }
+
     renderNodeSettings() {
-        let defaultReturn = (<div>...</div>);
+        let defaultReturn = (<div>(no node selected...)</div>);
         if (this.state.selected === null || isObjectEmpty(this.state.selected)) {
             return defaultReturn;
         }
         if (! this.state.selected.hasOwnProperty('settings')) return defaultReturn;
 
         return (
-            Object.getOwnPropertyNames(this.state.selected.settings).map(el => <h5>{el}</h5>) // TODO input + handlers
+            Object.getOwnPropertyNames(this.state.selected.settings).map(el =>
+                <Form.Group controlId={`form-for-${el}`} key={el}>
+                    <Row>
+                        <Col><Form.Label>{el}</Form.Label></Col>
+                        <Col>
+                            <Form.Control type="text" placeholder={el}
+                                value={this.state.selected.settings[el]}
+                                onChange={this.handleNodeSettingsChange.bind(this)}/>
+                        </Col>
+                    </Row>
+                </Form.Group>
+            )
         );
     }
 
