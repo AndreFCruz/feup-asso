@@ -10,6 +10,7 @@ import {
     Col, Container, Row,
     Button, ButtonToolbar,
     Dropdown, DropdownButton,
+    Card
 } from 'react-bootstrap';
 import toposort from 'toposort';
 import LoadingScreen from 'react-loading-screen';
@@ -170,23 +171,17 @@ class Graph extends React.Component {
 
         // Check if Edge is valid
         if (isDuplicated) {
-            this.props.alert
-                .error('Edge already exists');
+            this.props.alert.error('Edge already exists');
         } else if (sourceNode === sinkNode) {
-            this.props.alert
-                .error(`Trying to create an edge from node ${sourceViewNode.title} to itself`);
+            this.props.alert.error(`Trying to create an edge from node ${sourceViewNode.title} to itself`);
         } else if (sourceViewNode.type === SINK_TYPE) {
-            this.props.alert
-                .error(`Trying to create an output edge from the sink node ${sourceViewNode.title}`);
+            this.props.alert.error(`Trying to create an output edge from the sink node ${sourceViewNode.title}`);
         } else if (sinkViewNode.type === SOURCE_TYPE) {
-            this.props.alert
-                .error(`Trying to create an input edge to the source node ${sinkViewNode.title}`);
+            this.props.alert.error(`Trying to create an input edge to the source node ${sinkViewNode.title}`);
         } else if (!isGraphAcyclic(this.state.graph)) {
-            this.props.alert
-                .error('Edge creation would create a cycle in the graph');
+            this.props.alert.error('Edge creation would create a cycle in the graph');
         } else if (!await Graph.isValidEdge(sourceViewNode, sinkViewNode).catch(_ => false)) {
-            this.props.alert
-                .error('Trying to create invalid edge type between selected source and sink');
+            this.props.alert.error('Trying to create invalid edge type between selected source and sink');
         } else { // Else, create the edge (it's valid)
             graph.edges = [
                 ...graph.edges,
@@ -465,97 +460,106 @@ class Graph extends React.Component {
                     <Col id='graph-settings' sm={4}>
                         <h1>Control Panel</h1>
 
-                        <div className="create-node">
-                            <h5>Add Node</h5>
+                        <Card className="create-node">
+                            <Card.Body>
+                                <Card.Title>Add Node</Card.Title>
 
-                            <DropdownButton id='firstOption' title='Node Type' variant='outline-primary'>
-                                {firstOptions.map((node, idx) => <Dropdown.Item
-                                    key={idx}
-                                    onSelect={this.handleTypeSelectorChange.bind(this)}
-                                    eventKey={node.value}>{node.value}</Dropdown.Item>)}
-                            </DropdownButton>
+                                <DropdownButton id='firstOption' title='Node Type' variant='outline-primary'>
+                                    {firstOptions.map((node, idx) => <Dropdown.Item
+                                        key={idx}
+                                        onSelect={this.handleTypeSelectorChange.bind(this)}
+                                        eventKey={node.value}>{node.value}</Dropdown.Item>)}
+                                </DropdownButton>
 
-                            <DropdownButton id='secondOption' title='Sub-Node Type' variant='outline-primary'>
-                                {secondOptions.map((node, idx) => <Dropdown.Item
-                                    key={idx}
-                                    onSelect={this.handleSubTypeSelectorChange.bind(this)}
-                                    eventKey={node.value}>{node.value}</Dropdown.Item>)}
-                            </DropdownButton>
+                                <DropdownButton id='secondOption' title='Sub-Node Type' variant='outline-primary'>
+                                    {secondOptions.map((node, idx) => <Dropdown.Item
+                                        key={idx}
+                                        onSelect={this.handleSubTypeSelectorChange.bind(this)}
+                                        eventKey={node.value}>{node.value}</Dropdown.Item>)}
+                                </DropdownButton>
 
-                            <Button variant='outline-primary' onClick={this.onCreateNode.bind(this)}>Create</Button>
-                        </div>
-                        <div className="create-edge">
-                            <h5>Add Edge</h5>
+                                <Button variant='outline-primary' onClick={this.onCreateNode.bind(this)}>Create</Button>
+                            </Card.Body>
+                        </Card>
 
-                            <DropdownButton id='source' title='Edge Source' variant='outline-primary'
-                                onSelect={this.handleEdgeSourceChange.bind(this)}>
-                                {nodes.map((node) => <Dropdown.Item key={node[NODE_KEY]} eventKey={node[NODE_KEY]}>{node.title}</Dropdown.Item>)}
-                            </DropdownButton>
 
-                            <DropdownButton id='sink' title='Edge Target' variant='outline-primary'
-                                onSelect={this.handleEdgeTargetChange.bind(this)}>
-                                {nodes.map((node) => <Dropdown.Item key={node[NODE_KEY]} eventKey={node[NODE_KEY]}>{node.title}</Dropdown.Item>)}
-                            </DropdownButton>
+                        <Card className="create-edge">
+                            <Card.Body>
+                                <Card.Title>Add Edge</Card.Title>
+                                <DropdownButton id='source' title='Edge Source' variant='outline-primary'
+                                    onSelect={this.handleEdgeSourceChange.bind(this)}>
+                                    {nodes.map((node) => <Dropdown.Item key={node[NODE_KEY]} eventKey={node[NODE_KEY]}>{node.title}</Dropdown.Item>)}
+                                </DropdownButton>
 
-                            <Button variant='outline-primary'
-                                onClick={this.onCreateEdge.bind(this)}>Create</Button>
-                        </div>
-                        <div>
-                            <h5>Pan to Node</h5>
-                            <DropdownButton id='panToSelection' title='Select Node' variant='outline-primary'
-                                onSelect={this.onSelectPanNode.bind(this)}>
-                                {nodes.map((node) => <Dropdown.Item key={node[NODE_KEY]} eventKey={node[NODE_KEY]}>{node.title}</Dropdown.Item>)}
-                            </DropdownButton>
+                                <DropdownButton id='sink' title='Edge Target' variant='outline-primary'
+                                    onSelect={this.handleEdgeTargetChange.bind(this)}>
+                                    {nodes.map((node) => <Dropdown.Item key={node[NODE_KEY]} eventKey={node[NODE_KEY]}>{node.title}</Dropdown.Item>)}
+                                </DropdownButton>
 
-                        </div>
-
-                        <div>
-                            <div className="send-backend-run">
                                 <Button variant='outline-primary'
-                                    onClick={this
-                                    .onRunGraph
-                                    .bind(this)}>Run</Button>
-                            </div>
-                            <div id='graph-file-settings'>
-                                <span>Load graph:</span>
-                                <div className="files">
-                                    <Files
-                                        className='files-dropzone'
-                                        onChange={this
-                                        .onFilesChange
-                                        .bind(this)}
-                                        onError={Graph.onFilesError}
-                                        accepts={['.json']}
-                                        multiple
-                                        maxFiles={3}
-                                        maxFileSize={10000000}
-                                        minFileSize={0}
-                                        clickable>
-                                        Drop files here or click to upload
-                                    </Files>
+                                    onClick={this.onCreateEdge.bind(this)}>Create</Button>
+                            </Card.Body>
+                        </Card>
+
+                        <Card className='pan-to-node'>
+                            <Card.Body>
+                                <Card.Title>Pan to Node</Card.Title>
+                                <DropdownButton id='panToSelection' title='Select Node' variant='outline-primary'
+                                    onSelect={this.onSelectPanNode.bind(this)}>
+                                    {nodes.map((node) => <Dropdown.Item key={node[NODE_KEY]} eventKey={node[NODE_KEY]}>{node.title}</Dropdown.Item>)}
+                                </DropdownButton>
+                            </Card.Body>
+                        </Card>
+
+                        <Card className='graph-run-settings'>
+                            <Card.Body>
+                                <div className="send-backend-run">
+                                    <Button variant='outline-primary'
+                                        onClick={this
+                                        .onRunGraph
+                                        .bind(this)}>Run</Button>
                                 </div>
-                                <div className="files">
-                                    <Files
-                                        onChange={this
-                                        .onFilesChange
-                                        .bind(this)}
-                                        onError={Graph.onFilesError}
-                                        accepts={['.json']}
-                                        maxFiles={1}
-                                        maxFileSize={10000000}
-                                        minFileSize={0}
-                                        clickable>
-                                        <Button variant='outline-primary'>Upload</Button>
-                                    </Files>
+                                <div id='graph-file-settings'>
+                                    <span>Load graph:</span>
+                                    <div className="files">
+                                        <Files
+                                            className='files-dropzone'
+                                            onChange={this
+                                            .onFilesChange
+                                            .bind(this)}
+                                            onError={Graph.onFilesError}
+                                            accepts={['.json']}
+                                            multiple
+                                            maxFiles={3}
+                                            maxFileSize={10000000}
+                                            minFileSize={0}
+                                            clickable>
+                                            Drop files here or click to upload
+                                        </Files>
+                                    </div>
+                                    <div className="files">
+                                        <Files
+                                            onChange={this
+                                            .onFilesChange
+                                            .bind(this)}
+                                            onError={Graph.onFilesError}
+                                            accepts={['.json']}
+                                            maxFiles={1}
+                                            maxFileSize={10000000}
+                                            minFileSize={0}
+                                            clickable>
+                                            <Button variant='outline-primary'>Upload</Button>
+                                        </Files>
+                                    </div>
                                 </div>
-                            </div>
-                            <div>
-                                <Button variant='outline-primary'
-                                    onClick={this
-                                    .saveGraph
-                                    .bind(this)}>Save</Button>
-                            </div>
-                        </div>
+                                <div>
+                                    <Button variant='outline-primary'
+                                        onClick={this
+                                        .saveGraph
+                                        .bind(this)}>Save</Button>
+                                </div>
+                            </Card.Body>                        
+                        </Card>
                     </Col>
 
                 </Row>
