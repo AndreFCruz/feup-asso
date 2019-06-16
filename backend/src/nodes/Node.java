@@ -57,4 +57,8 @@ public abstract class Node<Id> {
         for (String key : availableSettings)
             this.settings.put(key, null);
     }
+
+    public String[] getSettingsKeys() {
+        return new String[]{};
+    }
 }

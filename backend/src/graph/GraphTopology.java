@@ -36,21 +36,21 @@ public class GraphTopology {
     }
 
     Source createSource(NodeFactory.SourceType sourceType) {
-        Source source = nodeFactory.createSource(sourceType);
+        Source source = NodeFactory.createSource(sourceType);
         String sourceKey = broker.register(source);
         sources.put(sourceKey, source);
         return source;
     }
 
     Sink createSink(NodeFactory.SinkType sinkType) {
-        Sink sink = nodeFactory.createSink(sinkType);
+        Sink sink = NodeFactory.createSink(sinkType);
         String sinkKey = broker.register(sink);
         sinks.put(sinkKey, sink);
         return sink;
     }
 
     Handler createHandler(NodeFactory.HandlerType handlerType) {
-        Handler handler = nodeFactory.createHandler(handlerType);
+        Handler handler = NodeFactory.createHandler(handlerType);
         String handlerKey = broker.register(handler);
         handlers.put(handlerKey, handler);
         return handler;

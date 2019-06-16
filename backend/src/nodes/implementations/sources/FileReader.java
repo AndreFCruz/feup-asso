@@ -2,19 +2,18 @@ package nodes.implementations.sources;
 
 import nodes.Source;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.stream.Stream;
 
 public class FileReader extends Source<String> {
+    private static String[] settingsKeys = new String[]{"path"};
     private Iterator<String> iterator;
 
     public FileReader() {
-        this.registerSettings(new String[] {"path"});
+        this.registerSettings(settingsKeys);
     }
 
     private synchronized static Stream<String> loadFile(String pathname) throws IOException {
@@ -42,5 +41,10 @@ public class FileReader extends Source<String> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public String[] getSettingsKeys() {
+        return settingsKeys;
     }
 }

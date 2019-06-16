@@ -75,6 +75,15 @@ class Controllers {
     private static void sendJSONResponse(HttpExchange he, Object responseObject) throws IOException {
         Gson gson = new Gson();
         String response = gson.toJson(responseObject);
+        sendResponse(he, response);
+    }
+
+    private static void sendJSONObjectResponse(HttpExchange he, JSONObject responseObject) throws IOException {
+        String response = responseObject.toString();
+        sendResponse(he, response);
+    }
+
+    private static void sendResponse(HttpExchange he, String response) throws IOException {
         he.getResponseHeaders().set("Content-Type", "application/json");
 
         // Allow CORS
@@ -98,12 +107,33 @@ class Controllers {
         public void handle(HttpExchange he) throws IOException {
             if (!he.getRequestMethod().equalsIgnoreCase("GET"))
                 return;
+            JSONObject response = new JSONObject();
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("sources", NodeFactory.getSourceNames());
-            response.put("handlers", NodeFactory.getHandlerNames());
-            response.put("sinks", NodeFactory.getSinkNames());
-            sendJSONResponse(he, response);
+            NodeFactory.SourceType[] sources = NodeFactory.getSourceNames();
+            JSONObject sourcesMap = new JSONObject();
+            for (NodeFactory.SourceType source : sources) {
+                String[] settings = NodeFactory.createSource(source).getSettingsKeys();
+                sourcesMap.put(source.toString(), new JSONObject().put("settings", settings));
+            }
+
+            NodeFactory.HandlerType[] handlers = NodeFactory.getHandlerNames();
+            JSONObject handlersMap = new JSONObject();
+            for (NodeFactory.HandlerType handler : handlers) {
+                String[] settings = NodeFactory.createHandler(handler).getSettingsKeys();
+                handlersMap.put(handler.toString(), new JSONObject().put("settings", settings));
+            }
+
+            NodeFactory.SinkType[] sinks = NodeFactory.getSinkNames();
+            JSONObject sinksMap = new JSONObject();
+            for (NodeFactory.SinkType sink : sinks) {
+                String[] settings = NodeFactory.createSink(sink).getSettingsKeys();
+                sinksMap.put(sink.toString(), new JSONObject().put("settings", settings));
+            }
+            
+            response.put("sources", sourcesMap);
+            response.put("handlers", handlersMap);
+            response.put("sinks", sinksMap);
+            sendJSONObjectResponse(he, response);
         }
     }
 
