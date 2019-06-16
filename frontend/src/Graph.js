@@ -37,10 +37,10 @@ export class Graph extends React.Component {
     this.state = {
       graph: sample,
       selected: {},
-      totalNodes: sample.nodes.length,
+      nodeCounter: sample.nodes.length,
       graphConfig: null,
-      selectedOption: {},
-      selectedOption2: {}
+      selectedType: "",
+      selectedSubType: ""
     }
 
     this.GraphView = React.createRef();
@@ -48,14 +48,9 @@ export class Graph extends React.Component {
 
   async componentDidMount() {
     let config = await makeGraphConfigObject();
-
+    console.log('** GRAPH CONFIG **');
+    console.log(config);
     this.setState({graphConfig: config});
-    // TODO async calls here such as makeGraphConfig
-
-    // TODO:
-    // - fetch types of nodes for Sources/Handlers/Sinks
-    // - construct a GraphConfig object
-    // - update state with this.setState({...});
   }
 
   isLoading() {
@@ -90,33 +85,38 @@ export class Graph extends React.Component {
   // Updates the graph with a new node
   onCreateNode(event) {
     console.log(this.state);
-    if (isObjectEmpty(this.state.selectedOption) || isObjectEmpty(this.state.selectedOption2))
+    if (isObjectEmpty(this.state.selectedType) || isObjectEmpty(this.state.selectedSubType))
       return;
 
     const graph = this.state.graph;
 
-    let id = this.state.totalNodes + 1;
-    const type = this.state.selectedOption;
+    let id = this.state.nodeCounter + 1;
+    const nodeType = this.state.selectedType;
 
     let select = document.getElementById('secondOption');
-    let title = select.options[select.selectedIndex].value;
+    let nodeSubType = select.options[select.selectedIndex].value;
+
+    let settings = this.state.graphConfig.NodeSubtypes[nodeSubType].settings || [];
+    settings = settings.map(el => new Map([[el, ""]]));
 
     const viewNode = {
-      id: this.state.selectedOption.substring(2) + id,
-      title,
-      type,
+      id: this.state.selectedType.substring(2) + id,
+      title: nodeSubType + '-' + id,
+      type: nodeType,
+      subtype: nodeSubType,
       x: 10,
-      y: 0
+      y: 0,
+      settings: settings,
     };
+
+    console.log('** NEW NODE **');
+    console.log(viewNode);
 
     graph.nodes = [...graph.nodes, viewNode];
     this.setState({
       graph: graph,
-      totalNodes: this.state.totalNodes + 1,
+      nodeCounter: this.state.nodeCounter + 1,
     });
-
-    console.log('NEW NODES');
-    console.log(graph.nodes);
   }
 
   // Deletes a node from the graph
@@ -130,12 +130,10 @@ export class Graph extends React.Component {
 
     graph.nodes = nodeAdr;
     graph.edges = newEdges;
-    let totalNodes = this.state.totalNodes - 1;
 
     this.setState({
       graph,
       selected: null,
-      totalNodes: totalNodes,
     });
   }
 
@@ -254,7 +252,7 @@ export class Graph extends React.Component {
 
   // makeItLarge() {
   //   const graph = this.state.graph;
-  //   const generatedSample = generateSample(this.state.totalNodes);
+  //   const generatedSample = generateSample(this.state.nodeCounter);
   //   graph.nodes = generatedSample.nodes;
   //   graph.edges = generatedSample.edges;
   //   this.setState(this.state);
@@ -296,7 +294,7 @@ export class Graph extends React.Component {
 
     this.setState(
       {
-        totalNodes: parseInt(event.target.value || '0', 10)
+        nodeCounter: parseInt(event.target.value || '0', 10)
       },
       // this.makeItLarge.bind(this)
     );
@@ -348,10 +346,18 @@ export class Graph extends React.Component {
   }
 
 
-  handleChange1(){
+  handleTypeSelectorChange() {
     let select = document.getElementById('firstOption');
-    let selectedOption = select.options[select.selectedIndex].value;
-    this.setState({selectedOption});
+    let selectedType = select.options[select.selectedIndex].value;
+    this.setState({selectedType});
+    console.log('Chaing opt1 to ' + selectedType);
+  };
+
+  handleSubTypeSelectorChange() {
+    let select = document.getElementById('secondOption');
+    let selectedSubType = select.options[select.selectedIndex].value;
+    this.setState({selectedSubType});
+    console.log('Chaing opt2 to ' + selectedSubType);
   };
 
   onFilesChange(files) {
@@ -397,7 +403,7 @@ export class Graph extends React.Component {
     this.setState({
       graph,
       selected: null,
-      totalNodes: nodes.length,
+      nodeCounter: nodes.length,
     });
 
     return true;
@@ -436,12 +442,12 @@ export class Graph extends React.Component {
     let firstOptions = Object.keys(nodeTypes);
     firstOptions = sequenceToOptions(firstOptions);
 
-    let selectedOption1 = this.state.selectedOption;
-    if (isObjectEmpty(selectedOption1)) {
-      selectedOption1 = firstOptions[0].value;
+    let selectedType = this.state.selectedType;
+    if (isObjectEmpty(selectedType)) {
+      selectedType = firstOptions[0].value;
     }
     
-    let secondOptions = nodeTypes[selectedOption1];
+    let secondOptions = nodeTypes[selectedType];
     secondOptions = sequenceToOptions(secondOptions);
 
 
@@ -470,17 +476,15 @@ export class Graph extends React.Component {
           </Col>
 
           <Col id='graph-settings' sm={4}>
-            <div>
-              <span id="number-nodes">Number of Nodes: {this.state.totalNodes.toString()}</span>
-            </div>
+
             <div className="create-node">
               <span>Add Node: </span>
               
-              <select id='firstOption' onChange={this.handleChange1.bind(this)}>
+              <select id='firstOption' onChange={this.handleTypeSelectorChange.bind(this)}>
                 {firstOptions.map(node => <option value={node.value}>{node.value}</option>)}
               </select>
 
-              <select id='secondOption'>
+              <select id='secondOption' onChange={this.handleSubTypeSelectorChange.bind(this)}>
                 {secondOptions.map(node => <option value={node.value}>{node.value}</option>)}
               </select>
 
@@ -564,7 +568,7 @@ function isObjectEmpty(obj) {
   return Object.keys(obj).length === 0;
 }
 
-// function generateSample(totalNodes) {
+// function generateSample(nodeCounter) {
 //   const generatedSample = {
 //     edges: [],
 //     nodes: []
@@ -572,7 +576,7 @@ function isObjectEmpty(obj) {
 //   let y = 0;
 //   let x = 0;
 
-//   const numNodes = totalNodes ? totalNodes : 0;
+//   const numNodes = nodeCounter ? nodeCounter : 0;
 //   // generate large array of nodes
 //   // These loops are fast enough. 1000 nodes = .45ms + .34ms
 //   // 2000 nodes = .86ms + .68ms
