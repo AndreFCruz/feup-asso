@@ -13,5 +13,12 @@
 }
 
 #graph #graph-settings {
-
+    display: flex; /* or inline-flex */
+    flex-direction: column;
 }
+
+#graph #graph-settings > * {
+    border: 1px solid darkblue;
+    padding: 1em 0;
+}
+
