@@ -34,11 +34,6 @@ public class FetchUrl extends Source<String> {
             e.printStackTrace();
         }
 
-        try {
-            this.buffer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         return null;
     }
 

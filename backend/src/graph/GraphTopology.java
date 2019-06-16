@@ -18,7 +18,7 @@ public class GraphTopology {
 
     // Broker
     Broker<Object> broker;
-
+    boolean hasErrors = false;
     // Edges | Node1(output) -> Array<Node(input)>
     private Map<String, ArrayList<String>> edges;
 

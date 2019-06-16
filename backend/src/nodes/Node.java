@@ -44,7 +44,7 @@ public abstract class Node<Id> {
      * Factory method for the node subclass to handle assets set-up after settings are set.
      * Override for handling this event.
      *
-     * @return
+     * @return true if it's load successfully
      */
     protected boolean initSettingsHandler() {
         return true;
