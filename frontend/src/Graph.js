@@ -11,7 +11,7 @@ import {
   // GraphUtils // optional, useful utility functions
 } from 'react-digraph';
 import './Graph.css';
-import { sample as GRAPH_SAMPLE } from "./Graph.sample";
+// import { sample as GRAPH_SAMPLE } from "./Graph.sample";
 import {
   makeGraphConfigObject,
   NODE_KEY,
@@ -23,31 +23,38 @@ import {
 } from './Graph.configs';
 import { Col, Row, Container } from "react-bootstrap";
 import toposort from 'toposort';
+import LoadingScreen from "react-loading-screen";
 
 export class Graph extends React.Component {
 
   constructor(props) {
     super(props);
 
-    let sample = GRAPH_SAMPLE;
-    let config = makeGraphConfigObject();
+    let sample = {
+      nodes: [], edges: []      
+    };
+
     this.state = {
       graph: sample,
       selected: {},
-      totalNodes: sample.nodes.length,
-      graphConfig: config,
-      selectedOption: {},
-      selectedOption2: {}
+      nodeCounter: sample.nodes.length,
+      graphConfig: null,
+      selectedType: "",
+      selectedSubType: ""
     }
 
     this.GraphView = React.createRef();
   }
 
-  componentDidMount() {
-    // TODO:
-    // - fetch types of nodes for Sources/Handlers/Sinks
-    // - construct a GraphConfig object
-    // - update state with this.setState({...});
+  async componentDidMount() {
+    let config = await makeGraphConfigObject();
+    console.log('** GRAPH CONFIG **');
+    console.log(config);
+    this.setState({graphConfig: config});
+  }
+
+  isLoading() {
+    return this.state.graphConfig === null;
   }
 
   /*
@@ -77,26 +84,38 @@ export class Graph extends React.Component {
 
   // Updates the graph with a new node
   onCreateNode(event) {
+    console.log(this.state);
+    if (isObjectEmpty(this.state.selectedType) || isObjectEmpty(this.state.selectedSubType))
+      return;
+
     const graph = this.state.graph;
 
-    let id = this.state.totalNodes + 1;
-    const type = this.state.selectedOption;
+    let id = this.state.nodeCounter + 1;
+    const nodeType = this.state.selectedType;
 
     let select = document.getElementById('secondOption');
-    let title = select.options[select.selectedIndex].value;
+    let nodeSubType = select.options[select.selectedIndex].value;
+
+    let settings = this.state.graphConfig.NodeSubtypes[nodeSubType].settings || [];
+    settings = settings.map(el => new Map([[el, ""]]));
 
     const viewNode = {
-      id: 'a' + id,
-      title,
-      type,
+      id: this.state.selectedType.substring(2) + id,
+      title: nodeSubType + '-' + id,
+      type: nodeType,
+      subtype: nodeSubType,
       x: 10,
-      y: 0
+      y: 0,
+      settings: settings,
     };
+
+    console.log('** NEW NODE **');
+    console.log(viewNode);
 
     graph.nodes = [...graph.nodes, viewNode];
     this.setState({
       graph: graph,
-      totalNodes: this.state.totalNodes + 1,
+      nodeCounter: this.state.nodeCounter + 1,
     });
   }
 
@@ -111,17 +130,15 @@ export class Graph extends React.Component {
 
     graph.nodes = nodeAdr;
     graph.edges = newEdges;
-    let totalNodes = this.state.totalNodes - 1;
 
     this.setState({
       graph,
       selected: null,
-      totalNodes: totalNodes,
     });
   }
 
   // Creates a new node between two edges
-  onCreateEdge(event) {
+  async onCreateEdge(event) {
 
     let sourceSelect = document.getElementById('source');
     let sinkSelect = document.getElementById('sink');
@@ -150,7 +167,9 @@ export class Graph extends React.Component {
       console.warn(`Trying to create an input edge to the source node ${sinkNode}`);
     } else if (! isGraphAcyclic(this.state.graph)) {
       console.warn('Edge creation would create a cycle in the graph');
-    } else { // Else, create the edge (it's valid)
+    } else if (! await this.isValidEdge(sourceViewNode,sinkViewNode)) {
+      console.warn('Trying to create invalid edge type between that source and sink');
+    } else{ // Else, create the edge (it's valid)
       graph.edges = [...graph.edges, viewEdge];
       
       this.setState({
@@ -158,6 +177,27 @@ export class Graph extends React.Component {
         selected: viewEdge
       });
     }
+  }
+
+  async isValidEdge(sourceViewNode,sinkViewNode) {
+
+    const source = {
+      title: sourceViewNode.title,
+      type: sourceViewNode.type
+    };
+
+    const sink = {
+      title: sinkViewNode.title,
+      type: sinkViewNode.type
+    };
+
+    const edge = {
+      output: source,
+      input: sink,
+    };
+
+    let {data} = await axios.post(process.env.REACT_APP_API_URL + '/checkEdge', JSON.stringify(edge));
+    return data;
   }
 
   // Called when an edge is reattached to a different target.
@@ -212,7 +252,7 @@ export class Graph extends React.Component {
 
   // makeItLarge() {
   //   const graph = this.state.graph;
-  //   const generatedSample = generateSample(this.state.totalNodes);
+  //   const generatedSample = generateSample(this.state.nodeCounter);
   //   graph.nodes = generatedSample.nodes;
   //   graph.edges = generatedSample.edges;
   //   this.setState(this.state);
@@ -254,7 +294,7 @@ export class Graph extends React.Component {
 
     this.setState(
       {
-        totalNodes: parseInt(event.target.value || '0', 10)
+        nodeCounter: parseInt(event.target.value || '0', 10)
       },
       // this.makeItLarge.bind(this)
     );
@@ -288,6 +328,7 @@ export class Graph extends React.Component {
   }
 
   getNodeTypes() {
+    if (this.state.graphConfig === null) return {};
     let graphConfig = this.state.graphConfig;
     let nodeTypes = new Map();
     for (let prop in graphConfig.NodeTypes) {
@@ -305,10 +346,18 @@ export class Graph extends React.Component {
   }
 
 
-  handleChange1(){
+  handleTypeSelectorChange() {
     let select = document.getElementById('firstOption');
-    let selectedOption = select.options[select.selectedIndex].value;
-    this.setState({selectedOption});
+    let selectedType = select.options[select.selectedIndex].value;
+    this.setState({selectedType});
+    console.log('Chaing opt1 to ' + selectedType);
+  };
+
+  handleSubTypeSelectorChange() {
+    let select = document.getElementById('secondOption');
+    let selectedSubType = select.options[select.selectedIndex].value;
+    this.setState({selectedSubType});
+    console.log('Chaing opt2 to ' + selectedSubType);
   };
 
   onFilesChange(files) {
@@ -354,7 +403,7 @@ export class Graph extends React.Component {
     this.setState({
       graph,
       selected: null,
-      totalNodes: nodes.length,
+      nodeCounter: nodes.length,
     });
 
     return true;
@@ -364,7 +413,18 @@ export class Graph extends React.Component {
    console.log('error code ' + error.code + ': ' + error.message)
   };
 
+  renderLoadingScreen() {
+    return (
+      <LoadingScreen
+        loading={this.isLoading()}>
+        LOADING
+      </LoadingScreen>
+    );
+  }
+
   render() {
+    if (this.isLoading()) return this.renderLoadingScreen();
+
     function sequenceToOptions(seq) {
       return seq.map(el => Object.assign({}, { value: el, label: el }));
     }
@@ -382,115 +442,111 @@ export class Graph extends React.Component {
     let firstOptions = Object.keys(nodeTypes);
     firstOptions = sequenceToOptions(firstOptions);
 
-    let selectedOption1 = this.state.selectedOption;
-    if (Object.keys(selectedOption1).length === 0) {
-      selectedOption1 = firstOptions[0].value;
+    let selectedType = this.state.selectedType;
+    if (isObjectEmpty(selectedType)) {
+      selectedType = firstOptions[0].value;
     }
     
-    let secondOptions = nodeTypes[selectedOption1];
+    let secondOptions = nodeTypes[selectedType];
     secondOptions = sequenceToOptions(secondOptions);
 
 
     return (
-      
-    <Container id='graph'>
-      {/* TODO Eventually move this header to a side panel to the right of the GraphView */}
+      <Container id='graph'>
 
-      <Row>
-        <Col id='graph-view' sm={8}>
-          <GraphView
-                ref={(el) => (this.GraphView = el)}
-                nodeKey={NODE_KEY}
-                nodes={nodes}
-                edges={edges}
-                selected={selected}
-                nodeTypes={NodeTypes}
-                nodeSubtypes={NodeSubtypes}
-                edgeTypes={EdgeTypes}
-                onSelectNode={this.onSelectNode.bind(this)}
-                onCreateNode={this.onCreateNode.bind(this)}
-                onUpdateNode={this.onUpdateNode.bind(this)}
-                onDeleteNode={this.onDeleteNode.bind(this)}
-                onSelectEdge={this.onSelectEdge.bind(this)}
-                onSwapEdge={this.onSwapEdge.bind(this)}
-                onDeleteEdge={this.onDeleteEdge.bind(this)}
-                />
-        </Col>
+        <Row>
+          <Col id='graph-view' sm={8}>
+            <GraphView
+                  ref={(el) => (this.GraphView = el)}
+                  nodeKey={NODE_KEY}
+                  nodes={nodes}
+                  edges={edges}
+                  selected={selected}
+                  nodeTypes={NodeTypes}
+                  nodeSubtypes={NodeSubtypes}
+                  edgeTypes={EdgeTypes}
+                  onSelectNode={this.onSelectNode.bind(this)}
+                  onCreateNode={this.onCreateNode.bind(this)}
+                  onUpdateNode={this.onUpdateNode.bind(this)}
+                  onDeleteNode={this.onDeleteNode.bind(this)}
+                  onSelectEdge={this.onSelectEdge.bind(this)}
+                  onSwapEdge={this.onSwapEdge.bind(this)}
+                  onDeleteEdge={this.onDeleteEdge.bind(this)}
+                  />
+          </Col>
 
-        <Col id='graph-settings' sm={4}>
-          <div>
-            <span id="number-nodes">Number of Nodes: {this.state.totalNodes.toString()}</span>
-          </div>
-          <div className="create-node">
-            <span>Add Node: </span>
-            
-            <select id='firstOption' onChange={this.handleChange1.bind(this)}>
-              {firstOptions.map(node => <option value={node.value}>{node.value}</option>)}
-            </select>
+          <Col id='graph-settings' sm={4}>
 
-            <select id='secondOption'>
-              {secondOptions.map(node => <option value={node.value}>{node.value}</option>)}
-            </select>
+            <div className="create-node">
+              <span>Add Node: </span>
+              
+              <select id='firstOption' onChange={this.handleTypeSelectorChange.bind(this)}>
+                {firstOptions.map(node => <option value={node.value}>{node.value}</option>)}
+              </select>
 
-            <button onClick={this.onCreateNode.bind(this)}>Create</button>
-          </div>
-          <div className="create-edge">
-            <span>Add Edge: </span>
-            <select id="source">
-              {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
-            </select>
-            <select id="sink">
-              {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
-            </select>
-            <button onClick={this.onCreateEdge.bind(this)}>Create</button>
-          </div>
-          <div>
-            <span>Pan to Node: </span>
-            <select id="panToSelection" onChange={this.onSelectPanNode.bind(this)}>
-              {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
-            </select>
-          </div>
-          <div className="send-backend-run">
-            <button onClick={this.onRunGraph.bind(this)}>Run</button>
-          </div>
-          <div>
-            <span>Load graph:</span>
-            <div className="files">
-              <Files
-                className='files-dropzone'
-                onChange={this.onFilesChange.bind(this)}
-                onError={this.onFilesError}
-                accepts={['.json']}
-                multiple
-                maxFiles={3}
-                maxFileSize={10000000}
-                minFileSize={0}
-                clickable
-              >
-                Drop files here or click to upload
-              </Files>
+              <select id='secondOption' onChange={this.handleSubTypeSelectorChange.bind(this)}>
+                {secondOptions.map(node => <option value={node.value}>{node.value}</option>)}
+              </select>
+
+              <button onClick={this.onCreateNode.bind(this)}>Create</button>
             </div>
-            <div className="files">
-              <Files
-                onChange={this.onFilesChange.bind(this)}
-                onError={this.onFilesError}
-                accepts={['.json']}
-                maxFiles={1}
-                maxFileSize={10000000}
-                minFileSize={0}
-                clickable
-              >
-                <button>Upload</button>
-              </Files>
+            <div className="create-edge">
+              <span>Add Edge: </span>
+              <select id="source">
+                {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
+              </select>
+              <select id="sink">
+                {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
+              </select>
+              <button onClick={this.onCreateEdge.bind(this)}>Create</button>
             </div>
-          </div>
-          <div>
-            <button onClick={this.saveGraph.bind(this)}>Save</button>
-          </div>
-        </Col>
+            <div>
+              <span>Pan to Node: </span>
+              <select id="panToSelection" onChange={this.onSelectPanNode.bind(this)}>
+                {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
+              </select>
+            </div>
+            <div className="send-backend-run">
+              <button onClick={this.onRunGraph.bind(this)}>Run</button>
+            </div>
+            <div>
+              <span>Load graph:</span>
+              <div className="files">
+                <Files
+                  className='files-dropzone'
+                  onChange={this.onFilesChange.bind(this)}
+                  onError={this.onFilesError}
+                  accepts={['.json']}
+                  multiple
+                  maxFiles={3}
+                  maxFileSize={10000000}
+                  minFileSize={0}
+                  clickable
+                >
+                  Drop files here or click to upload
+                </Files>
+              </div>
+              <div className="files">
+                <Files
+                  onChange={this.onFilesChange.bind(this)}
+                  onError={this.onFilesError}
+                  accepts={['.json']}
+                  maxFiles={1}
+                  maxFileSize={10000000}
+                  minFileSize={0}
+                  clickable
+                >
+                  <button>Upload</button>
+                </Files>
+              </div>
+            </div>
+            <div>
+              <button onClick={this.saveGraph.bind(this)}>Save</button>
+            </div>
+          </Col>
 
-      </Row>
-    </Container>
+        </Row>
+      </Container>
     );
   }
 
@@ -508,7 +564,11 @@ function isGraphAcyclic(graph) {
   return true;
 }
 
-// function generateSample(totalNodes) {
+function isObjectEmpty(obj) {
+  return Object.keys(obj).length === 0;
+}
+
+// function generateSample(nodeCounter) {
 //   const generatedSample = {
 //     edges: [],
 //     nodes: []
@@ -516,7 +576,7 @@ function isGraphAcyclic(graph) {
 //   let y = 0;
 //   let x = 0;
 
-//   const numNodes = totalNodes ? totalNodes : 0;
+//   const numNodes = nodeCounter ? nodeCounter : 0;
 //   // generate large array of nodes
 //   // These loops are fast enough. 1000 nodes = .45ms + .34ms
 //   // 2000 nodes = .86ms + .68ms
