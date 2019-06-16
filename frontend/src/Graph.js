@@ -276,9 +276,9 @@ class Graph extends React.Component {
         },);
     }
 
-    onSelectPanNode(event) {
+    onSelectPanNode(eventKey, event) {
         if (this.GraphView) {
-            this.GraphView.panToNode(event.target.value, true);
+            this.GraphView.panToNode(eventKey, true);
         }
     }
 
@@ -489,12 +489,12 @@ class Graph extends React.Component {
 
                             <DropdownButton id='source' title='Edge Source' variant='outline-primary'
                                 onSelect={this.handleEdgeSourceChange.bind(this)}>
-                                {nodes.map((node, idx) => <Dropdown.Item key={idx} eventKey={node.id}>{node.title}</Dropdown.Item>)}
+                                {nodes.map((node) => <Dropdown.Item key={node[NODE_KEY]} eventKey={node[NODE_KEY]}>{node.title}</Dropdown.Item>)}
                             </DropdownButton>
 
                             <DropdownButton id='sink' title='Edge Target' variant='outline-primary'
                                 onSelect={this.handleEdgeTargetChange.bind(this)}>
-                                {nodes.map((node, idx) => <Dropdown.Item key={idx} eventKey={node.id}>{node.title}</Dropdown.Item>)}
+                                {nodes.map((node) => <Dropdown.Item key={node[NODE_KEY]} eventKey={node[NODE_KEY]}>{node.title}</Dropdown.Item>)}
                             </DropdownButton>
 
                             <Button variant='outline-primary'
@@ -502,11 +502,11 @@ class Graph extends React.Component {
                         </div>
                         <div>
                             <h5>Pan to Node</h5>
-                            <select
-                                id="panToSelection"
-                                onChange={this.onSelectPanNode.bind(this)}>
-                                {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
-                            </select>
+                            <DropdownButton id='panToSelection' title='Select Node' variant='outline-primary'
+                                onSelect={this.onSelectPanNode.bind(this)}>
+                                {nodes.map((node) => <Dropdown.Item key={node[NODE_KEY]} eventKey={node[NODE_KEY]}>{node.title}</Dropdown.Item>)}
+                            </DropdownButton>
+
                         </div>
 
                         <div>
