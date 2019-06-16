@@ -8,9 +8,14 @@ let DEFAULT_NODE_TYPES = {
   "sources": {
     "INTEGER_GENERATOR": {},
     "STRING_GENERATOR": {},
+    "FETCH_URL": {
+      "settings": ["url"]
+    },
   },
   "sinks": {
-    "FILE_WRITER": {"settings": {"path": "", "url": ""}},
+    "FILE_WRITER": {
+      "settings": ["path"]
+    },
     "PRINTER": {},
   },
   "handlers": {
