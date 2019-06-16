@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
-import {Graph} from "./Graph.js";
+import Graph from "./Graph.js";
+
 
 class App extends React.Component {
 

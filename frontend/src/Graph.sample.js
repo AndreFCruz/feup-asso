@@ -8,8 +8,8 @@ export const sample = {
             "title": "INTEGER_GENERATOR-1",
             "type": SOURCE_TYPE,
             "subtype": "INTEGER_GENERATOR",
-            "x": 30.303024291992188,
-            "y": 60.6060791015625,
+            "x": 30,
+            "y": 30,
             "settings": {}
         },
         {
@@ -17,8 +17,8 @@ export const sample = {
             "title": "MD5_CONVERTER-2",
             "type": HANDLER_TYPE,
             "subtype": "MD5_CONVERTER",
-            "x": 420.6060485839844,
-            "y": 63.030303955078125,
+            "x": 230,
+            "y": 30,
             "settings": {}
         },
         {
@@ -26,8 +26,8 @@ export const sample = {
             "title": "STRING_GENERATOR-3",
             "type": SOURCE_TYPE,
             "subtype": "STRING_GENERATOR",
-            "x": 35.15150451660156,
-            "y": 276.3636474609375,
+            "x": 30,
+            "y": 230,
             "settings": {}
         },
         {
@@ -35,8 +35,8 @@ export const sample = {
             "title": "UPPER_CASE_CONVERTER-4",
             "type": HANDLER_TYPE,
             "subtype": "UPPER_CASE_CONVERTER",
-            "x": 416.9696960449219,
-            "y": 267.8787841796875,
+            "x": 230,
+            "y": 230,
             "settings": {}
         },
         {
@@ -44,8 +44,8 @@ export const sample = {
             "title": "FILE_WRITER-5",
             "type": SINK_TYPE,
             "subtype": "FILE_WRITER",
-            "x": 712.727294921875,
-            "y": 66.66667175292969,
+            "x": 430,
+            "y": 30,
             "settings": {"path": `./Files/${String(Math.floor(Math.random() * 9e15))}`}
         },
         {
@@ -53,8 +53,8 @@ export const sample = {
             "title": "PRINTER-6",
             "type": SINK_TYPE,
             "subtype": "PRINTER",
-            "x": 711.51513671875,
-            "y": 269.0909118652344,
+            "x": 430,
+            "y": 230,
             "settings": {}
         }
     ],

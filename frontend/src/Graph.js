@@ -8,9 +8,10 @@ import {sample as GRAPH_SAMPLE} from "./Graph.sample"
 import {makeGraphConfigObject, NODE_KEY, SINK_TYPE, SOURCE_TYPE, STANDARD_EDGE_TYPE} from './Graph.configs';
 import {Col, Container, Row} from "react-bootstrap";
 import toposort from 'toposort';
-import LoadingScreen from "react-loading-screen";
+import LoadingScreen from 'react-loading-screen';
+import { withAlert } from "react-alert";
 
-export class Graph extends React.Component {
+class Graph extends React.Component {
 
     constructor(props) {
         super(props);
@@ -26,7 +27,7 @@ export class Graph extends React.Component {
             nodeCounter: sample.nodes.length,
             graphConfig: null,
             selectedType: "",
-            selectedSubType: ""
+            selectedSubType: "",
         };
 
         this.GraphView = React.createRef();
@@ -71,8 +72,10 @@ export class Graph extends React.Component {
 
     // Updates the graph with a new node
     onCreateNode(event) {
-        if (isObjectEmpty(this.state.selectedType) || isObjectEmpty(this.state.selectedSubType))
+        if (isObjectEmpty(this.state.selectedType) || isObjectEmpty(this.state.selectedSubType)) {
+            this.props.alert.error('Please select an option from "Add Node"');
             return;
+        }
 
         const graph = this.state.graph;
 
@@ -87,9 +90,10 @@ export class Graph extends React.Component {
             el => { let tmp = {}; tmp[el] = ""; return tmp;}
         )));
 
+        let nodeTitle = nodeSubType + '-' + id
         const viewNode = {
             id: this.state.selectedType.substring(0, 2) + id,
-            title: nodeSubType + '-' + id,
+            title: nodeTitle,
             type: nodeType,
             subtype: nodeSubType,
             x: 10,
@@ -105,6 +109,8 @@ export class Graph extends React.Component {
             graph: graph,
             nodeCounter: this.state.nodeCounter + 1,
         });
+
+        this.props.alert.success('Successfully created new node');
     }
 
     // Deletes a node from the graph
@@ -123,6 +129,7 @@ export class Graph extends React.Component {
             graph,
             selected: null,
         });
+        // this.alert.show(`Successfully deleted node ${nodeId}`); // TODO
     }
 
     // Creates a new node between two edges
@@ -145,18 +152,28 @@ export class Graph extends React.Component {
         let sourceViewNode = this.getViewNode(sourceNode);
         let sinkViewNode = this.getViewNode(sinkNode);
 
+
+        // Check if Edge is duplicated
+        let isDuplicated = false;
+        this.state.graph.edges.forEach(el => {
+            if (el.source === sourceNode && el.target === sinkNode) {
+                isDuplicated = true;
+            }
+        });
+
         // Check if Edge is valid
-        // TODO check if edge is repeated
-        if (sourceNode === sinkNode) {
-            console.warn(`Trying to create an edge from node ${sourceNode} to itself`);
+        if (isDuplicated) {
+            this.props.alert.error('Edge already exists');
+        } else if (sourceNode === sinkNode) {
+            this.props.alert.error(`Trying to create an edge from node ${sourceViewNode.title} to itself`);
         } else if (sourceViewNode.type === SINK_TYPE) {
-            console.warn(`Trying to create an output edge from the sink node ${sourceNode}`);
+            this.props.alert.error(`Trying to create an output edge from the sink node ${sourceViewNode.title}`);
         } else if (sinkViewNode.type === SOURCE_TYPE) {
-            console.warn(`Trying to create an input edge to the source node ${sinkNode}`);
+            this.props.alert.error(`Trying to create an input edge to the source node ${sinkViewNode.title}`);
         } else if (!isGraphAcyclic(this.state.graph)) {
-            console.warn('Edge creation would create a cycle in the graph');
-        } else if (!await Graph.isValidEdge(sourceViewNode, sinkViewNode)) {
-            console.warn('Trying to create invalid edge type between that source and sink');
+            this.props.alert.error('Edge creation would create a cycle in the graph');
+        } else if (!await Graph.isValidEdge(sourceViewNode, sinkViewNode).catch(_ => false)) {
+            this.props.alert.error('Trying to create invalid edge type between selected source and sink');
         } else { // Else, create the edge (it's valid)
             graph.edges = [...graph.edges, viewEdge];
 
@@ -164,6 +181,7 @@ export class Graph extends React.Component {
                 graph,
                 selected: viewEdge
             });
+            this.props.alert.success('Successfully created a new edge');
         }
     }
 
@@ -238,44 +256,6 @@ export class Graph extends React.Component {
         return this.state.graph.nodes[i];
     }
 
-    // makeItLarge() {
-    //   const graph = this.state.graph;
-    //   const generatedSample = generateSample(this.state.nodeCounter);
-    //   graph.nodes = generatedSample.nodes;
-    //   graph.edges = generatedSample.edges;
-    //   this.setState(this.state);
-    // }
-
-    // addStartNode() {
-    //   const graph = this.state.graph;
-    //   // using a new array like this creates a new memory reference
-    //   // this will force a re-render
-    //   graph.nodes = [
-    //     {
-    //       id: Date.now(),
-    //       title: 'Node A',
-    //       type: this.state.graphConfig.NodeTypes.special,
-    //       x: 0,
-    //       y: 0
-    //     },
-    //     ...this.state.graph.nodes
-    //   ];
-    //   this.setState({
-    //     graph
-    //   });
-    // }
-
-    // deleteStartNode() {
-    //   const graph = this.state.graph;
-    //   graph.nodes.splice(0, 1);
-    //   // using a new array like this creates a new memory reference
-    //   // this will force a re-render
-    //   graph.nodes = [...this.state.graph.nodes];
-    //   this.setState({
-    //     graph
-    //   });
-    // }
-
     handleChange(event) {
         console.log('Handling Change onBlur');
         console.log(event);
@@ -284,7 +264,6 @@ export class Graph extends React.Component {
             {
                 nodeCounter: parseInt(event.target.value || '0', 10)
             },
-            // this.makeItLarge.bind(this)
         );
     }
 
@@ -567,41 +546,4 @@ function isObjectEmpty(obj) {
     return Object.keys(obj).length === 0;
 }
 
-// function generateSample(nodeCounter) {
-//   const generatedSample = {
-//     edges: [],
-//     nodes: []
-//   };
-//   let y = 0;
-//   let x = 0;
-
-//   const numNodes = nodeCounter ? nodeCounter : 0;
-//   // generate large array of nodes
-//   // These loops are fast enough. 1000 nodes = .45ms + .34ms
-//   // 2000 nodes = .86ms + .68ms
-//   // implying a linear relationship with number of nodes.
-//   for (let i = 1; i <= numNodes; i++) {
-//     if (i % 20 === 0) {
-//       y++;
-//       x = 0;
-//     } else {
-//       x++;
-//     }
-//     generatedSample.nodes.push({
-//       id: `a${i}`,
-//       title: `Node ${i}`,
-//       type: nodeTypes[Math.floor(nodeTypes.length * Math.random())],
-//       x: 0 + 200 * x,
-//       y: 0 + 200 * y
-//     });
-//   }
-//   // link each node to another node
-//   for (let i = 1; i < numNodes; i++) {
-//     generatedSample.edges.push({
-//       source: `a${i}`,
-//       target: `a${i + 1}`,
-//       type: edgeTypes[Math.floor(edgeTypes.length * Math.random())]
-//     });
-//   }
-//   return generatedSample;
-// }
+export default withAlert()(Graph)
