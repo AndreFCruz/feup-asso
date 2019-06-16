@@ -8,10 +8,10 @@ import {sample as GRAPH_SAMPLE} from "./Graph.sample";
 import {makeGraphConfigObject, NODE_KEY, SINK_TYPE, SOURCE_TYPE, STANDARD_EDGE_TYPE} from './Graph.configs';
 import {
     Col, Container, Row,
-    Button, ButtonToolbar,
+    Button,
     Dropdown, DropdownButton,
     Card,
-    InputGroup, FormControl, Form
+    Form,
 } from 'react-bootstrap';
 import toposort from 'toposort';
 import LoadingScreen from 'react-loading-screen';
