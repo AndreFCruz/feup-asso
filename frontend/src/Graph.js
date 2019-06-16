@@ -513,6 +513,7 @@ class Graph extends React.Component {
 
                         <Card className='graph-run-settings'>
                             <Card.Body>
+                                <Card.Title>Graph</Card.Title>
                                 <div className="send-backend-run">
                                     <Button variant='outline-primary'
                                         onClick={this
@@ -520,8 +521,19 @@ class Graph extends React.Component {
                                         .bind(this)}>Run</Button>
                                 </div>
                                 <div id='graph-file-settings'>
-                                    <span>Load graph:</span>
-                                    <div className="files">
+                                    <Files
+                                        onChange={this
+                                        .onFilesChange
+                                        .bind(this)}
+                                        onError={Graph.onFilesError}
+                                        accepts={['.json']}
+                                        maxFiles={1}
+                                        maxFileSize={10000000}
+                                        minFileSize={0}
+                                        clickable>
+                                        <Button variant='outline-primary'>Upload</Button>
+                                    </Files>
+                                    {/* <div className="files">
                                         <Files
                                             className='files-dropzone'
                                             onChange={this
@@ -536,21 +548,7 @@ class Graph extends React.Component {
                                             clickable>
                                             Drop files here or click to upload
                                         </Files>
-                                    </div>
-                                    <div className="files">
-                                        <Files
-                                            onChange={this
-                                            .onFilesChange
-                                            .bind(this)}
-                                            onError={Graph.onFilesError}
-                                            accepts={['.json']}
-                                            maxFiles={1}
-                                            maxFileSize={10000000}
-                                            minFileSize={0}
-                                            clickable>
-                                            <Button variant='outline-primary'>Upload</Button>
-                                        </Files>
-                                    </div>
+                                    </div> */}
                                 </div>
                                 <div>
                                     <Button variant='outline-primary'
