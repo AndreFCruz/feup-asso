@@ -4,15 +4,17 @@ import Files from 'react-files';
 import axios from "axios";
 import {GraphView} from 'react-digraph';
 import './Graph.css';
-import {sample as GRAPH_SAMPLE} from "./Graph.sample"
+import {sample as GRAPH_SAMPLE} from "./Graph.sample";
 import {makeGraphConfigObject, NODE_KEY, SINK_TYPE, SOURCE_TYPE, STANDARD_EDGE_TYPE} from './Graph.configs';
 import {
-  Col, Container, Row,
-  Button, ButtonToolbar
-} from "react-bootstrap";
+    Col, Container, Row,
+    Button, ButtonToolbar,
+    Dropdown, DropdownButton,
+} from 'react-bootstrap';
 import toposort from 'toposort';
 import LoadingScreen from 'react-loading-screen';
-import {withAlert} from "react-alert";
+import { withAlert } from "react-alert";
+
 
 class Graph extends React.Component {
 
@@ -28,7 +30,9 @@ class Graph extends React.Component {
             nodeCounter: sample.nodes.length,
             graphConfig: null,
             selectedType: "",
-            selectedSubType: ""
+            selectedSubType: "",
+            edgeSource: "",
+            edgeTarget: "",
         };
 
         this.GraphView = React.createRef();
@@ -73,10 +77,7 @@ class Graph extends React.Component {
     // Updates the graph with a new node
     onCreateNode(event) {
         if (isObjectEmpty(this.state.selectedType) || isObjectEmpty(this.state.selectedSubType)) {
-            this
-                .props
-                .alert
-                .error('Please select an option from "Add Node"');
+            this.props.alert.error('Please select an option from "Add Node"');
             return;
         }
 
@@ -84,9 +85,7 @@ class Graph extends React.Component {
 
         let id = this.state.nodeCounter + 1;
         const nodeType = this.state.selectedType;
-
-        let select = document.getElementById('secondOption');
-        let nodeSubType = select.options[select.selectedIndex].value;
+        let nodeSubType = this.state.selectedSubType;
 
         let settingsOptions = this.state.graphConfig.NodeSubtypes[nodeSubType].settings || [];
         let settings = Object.assign({}, ...(settingsOptions.map(el => {
@@ -97,10 +96,7 @@ class Graph extends React.Component {
 
         let nodeTitle = nodeSubType + '-' + id
         const viewNode = {
-            id: this
-                .state
-                .selectedType
-                .substring(0, 2) + id,
+            id: this.state.selectedType.substring(0, 2) + id,
             title: nodeTitle,
             type: nodeType,
             subtype: nodeSubType,
@@ -121,10 +117,7 @@ class Graph extends React.Component {
             nodeCounter: this.state.nodeCounter + 1
         });
 
-        this
-            .props
-            .alert
-            .success('Successfully created new node');
+        this.props.alert.success('Successfully created new node');
     }
 
     // Deletes a node from the graph
@@ -147,12 +140,14 @@ class Graph extends React.Component {
 
     // Creates a new node between two edges
     async onCreateEdge(event) {
+        console.log(event.target); debugger;
+        if (this.state.edgeSource === "" || this.state.edgeTarget === "") {
+            this.props.alert.error('Please select Source and Target nodes');
+            return;
+        }
 
-        let sourceSelect = document.getElementById('source');
-        let sinkSelect = document.getElementById('sink');
-
-        let sourceNode = sourceSelect.options[sourceSelect.selectedIndex].value;
-        let sinkNode = sinkSelect.options[sinkSelect.selectedIndex].value;
+        let sourceNode = this.state.edgeSource;
+        let sinkNode = this.state.edgeTarget;
         const type = STANDARD_EDGE_TYPE;
 
         const graph = this.state.graph;
@@ -167,46 +162,30 @@ class Graph extends React.Component {
 
         // Check if Edge is duplicated
         let isDuplicated = false;
-        this
-            .state
-            .graph
-            .edges
-            .forEach(el => {
-                if (el.source === sourceNode && el.target === sinkNode) {
-                    isDuplicated = true;
-                }
-            });
+        this.state.graph.edges.forEach(el => {
+            if (el.source === sourceNode && el.target === sinkNode) {
+                isDuplicated = true;
+            }
+        });
 
         // Check if Edge is valid
         if (isDuplicated) {
-            this
-                .props
-                .alert
+            this.props.alert
                 .error('Edge already exists');
         } else if (sourceNode === sinkNode) {
-            this
-                .props
-                .alert
+            this.props.alert
                 .error(`Trying to create an edge from node ${sourceViewNode.title} to itself`);
         } else if (sourceViewNode.type === SINK_TYPE) {
-            this
-                .props
-                .alert
+            this.props.alert
                 .error(`Trying to create an output edge from the sink node ${sourceViewNode.title}`);
         } else if (sinkViewNode.type === SOURCE_TYPE) {
-            this
-                .props
-                .alert
+            this.props.alert
                 .error(`Trying to create an input edge to the source node ${sinkViewNode.title}`);
         } else if (!isGraphAcyclic(this.state.graph)) {
-            this
-                .props
-                .alert
+            this.props.alert
                 .error('Edge creation would create a cycle in the graph');
         } else if (!await Graph.isValidEdge(sourceViewNode, sinkViewNode).catch(_ => false)) {
-            this
-                .props
-                .alert
+            this.props.alert
                 .error('Trying to create invalid edge type between selected source and sink');
         } else { // Else, create the edge (it's valid)
             graph.edges = [
@@ -215,9 +194,7 @@ class Graph extends React.Component {
             ];
 
             this.setState({graph, selected: viewEdge});
-            this
-                .props
-                .alert
+            this.props.alert
                 .success('Successfully created a new edge');
         }
     }
@@ -268,10 +245,7 @@ class Graph extends React.Component {
 
     // Helper to find the index of a given node
     getNodeIndex(searchNode) {
-        return this
-            .state
-            .graph
-            .nodes
+        return this.state.graph.nodes
             .findIndex((node) => {
                 return node[NODE_KEY] === searchNode[NODE_KEY];
             });
@@ -279,10 +253,7 @@ class Graph extends React.Component {
 
     // Helper to find the index of a given edge
     getEdgeIndex(searchEdge) {
-        return this
-            .state
-            .graph
-            .edges
+        return this.state.graph.edges
             .findIndex((edge) => {
                 return edge.source === searchEdge.source && edge.target === searchEdge.target;
             });
@@ -307,14 +278,11 @@ class Graph extends React.Component {
 
     onSelectPanNode(event) {
         if (this.GraphView) {
-            this
-                .GraphView
-                .panToNode(event.target.value, true);
+            this.GraphView.panToNode(event.target.value, true);
         }
     }
 
     onRunGraph() {
-
         axios
             .post(process.env.REACT_APP_API_URL + '/sendGraph', JSON.stringify(this.state.graph))
             .then(response => {
@@ -354,40 +322,41 @@ class Graph extends React.Component {
         return nodeTypes;
     }
 
-    handleTypeSelectorChange() {
-        let select = document.getElementById('firstOption');
-        let selectedType = select.options[select.selectedIndex].value;
-        this.setState({selectedType});
-        console.log('Changing opt1 to ' + selectedType);
-    };
+    handleTypeSelectorChange(eventKey, event) {
+        this.setState({selectedType: eventKey});
+        console.log(`Changing opt1 to "${eventKey}"`);
+    }
 
-    handleSubTypeSelectorChange() {
-        let select = document.getElementById('secondOption');
-        let selectedSubType = select.options[select.selectedIndex].value;
-        this.setState({selectedSubType});
-        console.log('Changing opt2 to ' + selectedSubType);
-    };
+    handleSubTypeSelectorChange(eventKey, event) {
+        this.setState({selectedSubType: eventKey});
+        console.log(`Changing opt2 to "${eventKey}"`);
+    }
+
+    handleEdgeSourceChange(eventKey, event) {
+        this.setState({edgeSource: eventKey});
+        console.log(`Changing edge source to "${eventKey}"`);
+    }
+
+    handleEdgeTargetChange(eventKey, event) {
+        this.setState({edgeTarget: eventKey});
+        console.log(`Changing edge target to "${eventKey}"`);
+    }
 
     onFilesChange(files) {
-
         let reader = new FileReader();
         reader.onload = () => {
             var data = reader.result;
             if (this.loadGraph(data)) {
-                this
-                    .props
-                    .alert
+                this.props.alert
                     .info('Loaded graph successfully!');
             } else {
-                this
-                    .props
-                    .alert
+                this.props.alert
                     .error('The graph couldn`t be loaded. Please check if the submitted graph is in the righ' +
                             't format!');
             }
         };
         reader.readAsText(files[0]);
-    };
+    }
 
     saveGraph() {
         save(JSON.stringify(this.state.graph), 'graph.json');
@@ -418,7 +387,7 @@ class Graph extends React.Component {
 
     static onFilesError(error, file) {
         console.log('error code ' + error.code + ': ' + error.message)
-    };
+    }
 
     renderLoadingScreen() {
         return (
@@ -473,7 +442,6 @@ class Graph extends React.Component {
 
         return (
             <Container id='graph'>
-
                 <Row>
                     <Col id='graph-view' sm={8}>
                         <GraphView
@@ -485,27 +453,13 @@ class Graph extends React.Component {
                             nodeTypes={NodeTypes}
                             nodeSubtypes={NodeSubtypes}
                             edgeTypes={EdgeTypes}
-                            onSelectNode={this
-                            .onSelectNode
-                            .bind(this)}
-                            onCreateNode={this
-                            .onCreateNode
-                            .bind(this)}
-                            onUpdateNode={this
-                            .onUpdateNode
-                            .bind(this)}
-                            onDeleteNode={this
-                            .onDeleteNode
-                            .bind(this)}
-                            onSelectEdge={this
-                            .onSelectEdge
-                            .bind(this)}
-                            onSwapEdge={this
-                            .onSwapEdge
-                            .bind(this)}
-                            onDeleteEdge={this
-                            .onDeleteEdge
-                            .bind(this)}/>
+                            onSelectNode={this.onSelectNode.bind(this)}
+                            onCreateNode={this.onCreateNode.bind(this)}
+                            onUpdateNode={this.onUpdateNode.bind(this)}
+                            onDeleteNode={this.onDeleteNode.bind(this)}
+                            onSelectEdge={this.onSelectEdge.bind(this)}
+                            onSwapEdge={this.onSwapEdge.bind(this)}
+                            onDeleteEdge={this.onDeleteEdge.bind(this)}/>
                     </Col>
 
                     <Col id='graph-settings' sm={4}>
@@ -514,59 +468,55 @@ class Graph extends React.Component {
                         <div className="create-node">
                             <h5>Add Node</h5>
 
-                            <select
-                                id='firstOption'
-                                onChange={this
-                                .handleTypeSelectorChange
-                                .bind(this)}>
-                                {firstOptions.map((node, index) => <option key={index} value={node.value}>{node.value}</option>)}
-                            </select>
+                            <DropdownButton id='firstOption' title='Node Type' variant='outline-primary'>
+                                {firstOptions.map((node, idx) => <Dropdown.Item
+                                    key={idx}
+                                    onSelect={this.handleTypeSelectorChange.bind(this)}
+                                    eventKey={node.value}>{node.value}</Dropdown.Item>)}
+                            </DropdownButton>
 
-                            <select
-                                id='secondOption'
-                                onChange={this
-                                .handleSubTypeSelectorChange
-                                .bind(this)}>
-                                {secondOptions.map((node, index) => <option key={index} value={node.value}>{node.value}</option>)}
-                            </select>
+                            <DropdownButton id='secondOption' title='Sub-Node Type' variant='outline-primary'>
+                                {secondOptions.map((node, idx) => <Dropdown.Item
+                                    key={idx}
+                                    onSelect={this.handleSubTypeSelectorChange.bind(this)}
+                                    eventKey={node.value}>{node.value}</Dropdown.Item>)}
+                            </DropdownButton>
 
-                            <Button
-                                onClick={this
-                                .onCreateNode
-                                .bind(this)}>Create</Button>
+                            <Button variant='outline-primary' onClick={this.onCreateNode.bind(this)}>Create</Button>
                         </div>
                         <div className="create-edge">
                             <h5>Add Edge</h5>
-                            <select id="source">
-                                {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
-                            </select>
-                            <select id="sink">
-                                {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
-                            </select>
-                            <Button
-                                onClick={this
-                                .onCreateEdge
-                                .bind(this)}>Create</Button>
+
+                            <DropdownButton id='source' title='Edge Source' variant='outline-primary'
+                                onSelect={this.handleEdgeSourceChange.bind(this)}>
+                                {nodes.map((node, idx) => <Dropdown.Item key={idx} eventKey={node.id}>{node.title}</Dropdown.Item>)}
+                            </DropdownButton>
+
+                            <DropdownButton id='sink' title='Edge Target' variant='outline-primary'
+                                onSelect={this.handleEdgeTargetChange.bind(this)}>
+                                {nodes.map((node, idx) => <Dropdown.Item key={idx} eventKey={node.id}>{node.title}</Dropdown.Item>)}
+                            </DropdownButton>
+
+                            <Button variant='outline-primary'
+                                onClick={this.onCreateEdge.bind(this)}>Create</Button>
                         </div>
                         <div>
                             <h5>Pan to Node</h5>
                             <select
                                 id="panToSelection"
-                                onChange={this
-                                .onSelectPanNode
-                                .bind(this)}>
+                                onChange={this.onSelectPanNode.bind(this)}>
                                 {nodes.map(node => <option key={node[NODE_KEY]} value={node[NODE_KEY]}>{node.title}</option>)}
                             </select>
                         </div>
 
                         <div>
                             <div className="send-backend-run">
-                                <Button
+                                <Button variant='outline-primary'
                                     onClick={this
                                     .onRunGraph
                                     .bind(this)}>Run</Button>
                             </div>
-                            <div>
+                            <div id='graph-file-settings'>
                                 <span>Load graph:</span>
                                 <div className="files">
                                     <Files
@@ -595,12 +545,12 @@ class Graph extends React.Component {
                                         maxFileSize={10000000}
                                         minFileSize={0}
                                         clickable>
-                                        <Button>Upload</Button>
+                                        <Button variant='outline-primary'>Upload</Button>
                                     </Files>
                                 </div>
                             </div>
                             <div>
-                                <Button
+                                <Button variant='outline-primary'
                                     onClick={this
                                     .saveGraph
                                     .bind(this)}>Save</Button>
