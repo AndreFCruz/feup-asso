@@ -104,9 +104,8 @@ public class GraphLoader {
         }
 
         JSONObject settingsObj = (nodeObj.has("settings") ? nodeObj.getJSONObject("settings") : null);
-        System.out.println(settingsObj);
         boolean success = node.initializeSettings(parseSettings(settingsObj));
-        System.out.println(success);
+
         if (!success)
             graphTopology.hasErrors = true;
 
