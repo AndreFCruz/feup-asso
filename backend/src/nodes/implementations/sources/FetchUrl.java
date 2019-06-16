@@ -43,15 +43,16 @@ public class FetchUrl extends Source<String> {
     }
 
     @Override
-    protected void initSettingsHandler() {
+    protected boolean initSettingsHandler() {
         String url = this.getSettingValue("url");
-        if (url == null) return;
+        if (url == null) return false;
 
         try {
             this.buffer = loadUrl(url);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return true;
     }
 
     @Override

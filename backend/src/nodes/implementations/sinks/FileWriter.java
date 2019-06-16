@@ -50,9 +50,13 @@ public class FileWriter extends Sink.EndSink<Object> {
 
 
     @Override
-    protected void initSettingsHandler() {
+    protected boolean initSettingsHandler() {
         String path = this.getSettingValue("path");
-        if (path != null) this.file = createFile(path);
+        if (path == null)
+            return false;
+
+        this.file = createFile(path);
+        return this.file != null;
     }
 
     @Override

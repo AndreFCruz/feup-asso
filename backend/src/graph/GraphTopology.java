@@ -19,12 +19,8 @@ public class GraphTopology {
     // Broker
     Broker<Object> broker;
 
-    // Edges
-    // Node1(output) -> Array<Node(input)>
+    // Edges | Node1(output) -> Array<Node(input)>
     private Map<String, ArrayList<String>> edges;
-
-    //NodeFactory
-    private NodeFactory nodeFactory;
 
     public GraphTopology() {
         this.sources = new HashMap<>();
@@ -32,7 +28,6 @@ public class GraphTopology {
         this.handlers = new HashMap<>();
         this.edges = new HashMap<>();
         this.broker = new Broker<>();
-        this.nodeFactory = new NodeFactory();
     }
 
     Source createSource(NodeFactory.SourceType sourceType) {

@@ -26,6 +26,9 @@ public abstract class Node<Id> {
     }
 
     public boolean initializeSettings(Map<String, String> settingValues) {
+        if (this.settings.isEmpty())
+            return true;
+
         for (String key : this.settings.keySet()) {
             if (settingValues.containsKey(key)) {
                 this.settings.put(key, settingValues.get(key));
@@ -34,16 +37,17 @@ public abstract class Node<Id> {
             }
         }
 
-        this.initSettingsHandler();
-
-        return true;
+        return this.initSettingsHandler();
     }
 
     /**
      * Factory method for the node subclass to handle assets set-up after settings are set.
      * Override for handling this event.
+     *
+     * @return
      */
-    protected void initSettingsHandler() {
+    protected boolean initSettingsHandler() {
+        return true;
     }
 
     protected String getSettingValue(String key) {
