@@ -7,10 +7,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Map;
 
 public class FetchUrl extends Source<String> {
+    private static String[] settingsKeys = new String[]{"url"};
     private BufferedReader buffer;
+
+    public FetchUrl() {
+        this.registerSettings(settingsKeys);
+    }
 
     private synchronized static BufferedReader loadUrl(String url) throws IOException {
         URLConnection connection = new URL(url).openConnection();
@@ -30,23 +34,25 @@ public class FetchUrl extends Source<String> {
             e.printStackTrace();
         }
 
-        try {
-            this.buffer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         return null;
     }
 
     @Override
-    protected void initSettingsHandler() {
+    protected boolean initSettingsHandler() {
         String url = this.getSettingValue("url");
-        if (url == null) return;
+        if (url == null) return false;
 
         try {
             this.buffer = loadUrl(url);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return true;
     }
+
+    @Override
+    public String[] getSettingsKeys() {
+        return settingsKeys;
+    }
+
 }

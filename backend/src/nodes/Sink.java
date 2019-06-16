@@ -2,6 +2,7 @@ package nodes;
 
 import pubsub.Subscriber;
 import pubsub.helpers.EntityQueue;
+import utils.Log;
 
 import java.util.concurrent.BlockingQueue;
 
@@ -32,7 +33,7 @@ public abstract class Sink<In, Out> extends Node<String> implements Subscriber<I
                 this.handleMessage(this.pullMessage());
             }
         } catch (InterruptedException e) {
-            System.out.println("Subscriber " + this.getId() + " Thread interrupted");
+            Log.log("[Sink " + this.getId() + "] Thread interrupted");
         }
     }
 

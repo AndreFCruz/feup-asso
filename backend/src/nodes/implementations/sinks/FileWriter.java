@@ -12,10 +12,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 
 public class FileWriter extends Sink.EndSink<Object> {
+    private static String[] settingsKeys = new String[]{"path"};
     private Path file;
 
     public FileWriter() {
-        this.registerSettings(new String[] {"path"});
+        this.registerSettings(settingsKeys);
     }
 
     synchronized private Path createFile(String filePath) {
@@ -49,8 +50,17 @@ public class FileWriter extends Sink.EndSink<Object> {
 
 
     @Override
-    protected void initSettingsHandler() {
+    protected boolean initSettingsHandler() {
         String path = this.getSettingValue("path");
-        if (path != null) this.file = createFile(path);
+        if (path == null)
+            return false;
+
+        this.file = createFile(path);
+        return this.file != null;
+    }
+
+    @Override
+    public String[] getSettingsKeys() {
+        return settingsKeys;
     }
 }

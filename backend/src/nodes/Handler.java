@@ -4,6 +4,7 @@ import pubsub.Broker;
 import pubsub.Publisher;
 import pubsub.Subscriber;
 import pubsub.helpers.EntityQueue;
+import utils.Log;
 
 public abstract class Handler<In, Out> extends Node<String> implements Subscriber<In, Out>, Publisher<Out>, Runnable {
 
@@ -65,7 +66,7 @@ public abstract class Handler<In, Out> extends Node<String> implements Subscribe
                 source.publishMessage(this.produceMessage());
             }
         } catch (InterruptedException e) {
-            System.out.println("Handler " + this.sink.getId() + "|" + this.source.getId() + " Thread interrupted");
+            Log.log("[Handler " + this.sink.getId() + "|" + this.source.getId() + "] Thread interrupted");
         }
     }
 }

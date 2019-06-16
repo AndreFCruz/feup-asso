@@ -53,15 +53,15 @@ public class NodeFactory {
         return SinkType.values();
     }
 
-    public Source createSource(SourceType nodeType) {
+    public static Source createSource(SourceType nodeType) {
         return sourceTypeToSourceNode.get(nodeType).get();
     }
 
-    public Handler createHandler(HandlerType nodeType) {
+    public static Handler createHandler(HandlerType nodeType) {
         return handlerTypeToHandlerNode.get(nodeType).get();
     }
 
-    public Sink createSink(SinkType nodeType) {
+    public static Sink createSink(SinkType nodeType) {
         return sinkTypeToSinkNode.get(nodeType).get();
     }
 

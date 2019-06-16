@@ -5,6 +5,7 @@ import nodes.Sink;
 import nodes.Source;
 import pubsub.helpers.EntityQueue;
 import pubsub.helpers.MessageEvent;
+import utils.Log;
 import utils.Registry;
 
 import java.util.ArrayList;
@@ -75,13 +76,13 @@ public class Broker<MT> implements Runnable {
         BlockingQueue<MT> pubQueue = registry.get(event.publisherId);
         MT msg = pubQueue.poll();
         if (msg == null) {
-            System.err.println("Was notified of inexistent Message");
+            Log.logError("Was notified of inexistent Message");
             return;
         }
 
         assert msg.hashCode() == event.messageHash;
         if (!event.isAlive()) {
-            System.out.println("Discarded message with expired Time-to-Live");
+            Log.logWarning("Discarded message with expired Time-to-Live");
             return;
         }
 
@@ -90,7 +91,7 @@ public class Broker<MT> implements Runnable {
             // Offer the published message to all subscribers
             boolean ret = this.registry.get(subId).offer(msg);
             if (!ret) {
-                System.out.println("Subscriber " + subId + " could not receive a message (Queue full?)");
+                Log.logWarning("Subscriber " + subId + " could not receive a message (Queue full?)");
                 // TODO if queue is full take oldest message and publish most recent ?
             }
         }
@@ -107,6 +108,6 @@ public class Broker<MT> implements Runnable {
             }
             this.handleMessageEvent(event);
         }
-        System.out.println("Thread interrupted: " + Thread.interrupted());
+        Log.log("[Broker] Thread interrupted");
     }
 }

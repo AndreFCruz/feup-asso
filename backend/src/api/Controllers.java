@@ -1,6 +1,5 @@
 package api;
 
-import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import graph.GraphLoader;
@@ -10,100 +9,47 @@ import nodes.Node;
 import nodes.NodeFactory;
 import org.json.JSONObject;
 
-import java.io.*;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import static api.Utils.*;
 
 class Controllers {
-    private static void parseQuery(String query, Map<String, Object> parameters) throws UnsupportedEncodingException {
-        if (query != null) {
-            String[] pairs = query.split("[&]");
-            for (String pair : pairs) {
-                String[] param = pair.split("[=]");
-                String key = null;
-                String value = null;
-                if (param.length > 0) {
-                    key = URLDecoder.decode(param[0],
-                            System.getProperty("file.encoding"));
-                }
-
-                if (param.length > 1) {
-                    value = URLDecoder.decode(param[1],
-                            System.getProperty("file.encoding"));
-                }
-
-                if (parameters.containsKey(key)) {
-                    Object obj = parameters.get(key);
-                    if (obj instanceof List<?>) {
-                        List<String> values = (List<String>) obj;
-                        values.add(value);
-
-                    } else if (obj instanceof String) {
-                        List<String> values = new ArrayList<>();
-                        values.add((String) obj);
-                        values.add(value);
-                        parameters.put(key, values);
-                    }
-                } else {
-                    parameters.put(key, value);
-                }
-            }
-        }
-    }
-
-    private static Map<String, Object> parseBody(HttpExchange he) throws IOException {
-        Map<String, Object> parameters = new HashMap<>();
-        InputStreamReader isr = new InputStreamReader(he.getRequestBody(), StandardCharsets.UTF_8);
-        BufferedReader br = new BufferedReader(isr);
-        String query = br.readLine();
-        parseQuery(query, parameters);
-        return parameters;
-    }
-
-    private static JSONObject parseBodyToJSONObj(HttpExchange he) throws IOException {
-        InputStreamReader isr = new InputStreamReader(he.getRequestBody(), StandardCharsets.UTF_8);
-        BufferedReader br = new BufferedReader(isr);
-        String line;
-        StringBuilder response = new StringBuilder();
-        while ((line = br.readLine()) != null)
-            response.append(line);
-
-        return new JSONObject(response.toString());
-    }
-
-    private static void sendJSONResponse(HttpExchange he, Object responseObject) throws IOException {
-        Gson gson = new Gson();
-        String response = gson.toJson(responseObject);
-        he.getResponseHeaders().set("Content-Type", "application/json");
-
-        // Allow CORS
-        he.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-
-        if (he.getRequestMethod().equalsIgnoreCase("OPTIONS")) {
-            he.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, OPTIONS");
-            he.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type,Authorization");
-            he.sendResponseHeaders(204, -1);
-            return;
-        }
-
-        he.sendResponseHeaders(200, response.length());
-        OutputStream os = he.getResponseBody();
-        os.write(response.getBytes());
-        os.close();
-    }
-
     public static class GetNodeTypes implements HttpHandler {
         @Override
         public void handle(HttpExchange he) throws IOException {
             if (!he.getRequestMethod().equalsIgnoreCase("GET"))
                 return;
+            JSONObject response = new JSONObject();
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("sources", NodeFactory.getSourceNames());
-            response.put("handlers", NodeFactory.getHandlerNames());
-            response.put("sinks", NodeFactory.getSinkNames());
-            sendJSONResponse(he, response);
+            NodeFactory.SourceType[] sources = NodeFactory.getSourceNames();
+            JSONObject sourcesMap = new JSONObject();
+            for (NodeFactory.SourceType source : sources) {
+                String[] settings = NodeFactory.createSource(source).getSettingsKeys();
+                sourcesMap.put(source.toString(), new JSONObject().put("settings", settings));
+            }
+
+            NodeFactory.HandlerType[] handlers = NodeFactory.getHandlerNames();
+            JSONObject handlersMap = new JSONObject();
+            for (NodeFactory.HandlerType handler : handlers) {
+                String[] settings = NodeFactory.createHandler(handler).getSettingsKeys();
+                handlersMap.put(handler.toString(), new JSONObject().put("settings", settings));
+            }
+
+            NodeFactory.SinkType[] sinks = NodeFactory.getSinkNames();
+            JSONObject sinksMap = new JSONObject();
+            for (NodeFactory.SinkType sink : sinks) {
+                String[] settings = NodeFactory.createSink(sink).getSettingsKeys();
+                sinksMap.put(sink.toString(), new JSONObject().put("settings", settings));
+            }
+
+            response.put("sources", sourcesMap);
+            response.put("handlers", handlersMap);
+            response.put("sinks", sinksMap);
+            sendJSONObjectResponse(he, response);
         }
     }
 
