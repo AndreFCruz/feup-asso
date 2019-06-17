@@ -290,7 +290,31 @@ class Graph extends React.Component {
         }
     }
 
+    isGraphValid(graph) {
+        // Check if it's a DAG
+        if (! isGraphAcyclic(graph)) return false;
+
+        // Check if settings are filled in
+        return graph.nodes
+            .map(n => {
+                if (n.settings == null || isObjectEmpty(n.settings))
+                    return true;
+
+                return Object.getOwnPropertyNames(n.settings)
+                    .map(propName =>
+                        n.settings[propName] != null && n.settings[propName].length > 0
+                    ).reduce((el1, el2) => el1 && el2);
+            })
+            .reduce((el1, el2) => el1 && el2); // Check if condition holds for all nodes
+    }
+
     onRunGraph() {
+        if (! this.isGraphValid(this.state.graph)) {
+            this.props.alert.error('Graph is invalid.');
+            return;
+        } else {
+            this.props.alert.success('Graph is valid! Running...');
+        }
 
         let graph = JSON.parse(JSON.stringify(this.state.graph));
         let recipes = this.state.graph.nodes.filter(n => n.subtype === "RECIPE");
