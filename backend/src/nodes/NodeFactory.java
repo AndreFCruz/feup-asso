@@ -1,14 +1,5 @@
 package nodes;
 
-import nodes.implementations.handlers.MD5Converter;
-import nodes.implementations.handlers.Uppercase;
-import nodes.implementations.sinks.FileWriter;
-import nodes.implementations.sinks.Printer;
-import nodes.implementations.sources.FetchUrl;
-import nodes.implementations.sources.FileReader;
-import nodes.implementations.sources.IntegerGenerator;
-import nodes.implementations.sources.StringGenerator;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -87,29 +78,30 @@ public class NodeFactory {
         String name();
     }
 
-    public enum SourceType {
+    public enum SourceType implements NodeType {
         INTEGER_GENERATOR,
         STRING_GENERATOR,
         FILE_READER,
         FETCH_URL
     }
 
-    public enum SinkType {
+    public enum SinkType implements NodeType {
         FILE_WRITER,
         PRINTER
     }
 
-    public enum HandlerType {
+    public enum HandlerType implements NodeType {
         MD5_HASH,
         TO_UPPERCASE,
         ROLLING_SUM,
-        PRODUCT,
+        PAIRWISE_PRODUCT,
+        ROLLING_AVERAGE,
+        IF,                 // If message is false, return null (no message)
+        REGEX_MATCH,        // Return whether message matches regex expression
+        IS_ALIVE,           // Ping site, return true/false whether it is alive
         AND,
         OR,
         XOR,
-        ROLLING_AVERAGE,
-        IF,                 // If message is false, return null (no message)
-        IS_ALIVE            // Ping site, return true/false whether it is alive
     }
 
 }
