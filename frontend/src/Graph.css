@@ -36,3 +36,8 @@ h1 {
 .card .md-form {
     display: inline-block;
 }
+
+#node-settings {
+    width: 100%;
+    padding: 0 1em;
+}
