@@ -98,7 +98,6 @@ public class NodeFactory {
         ROLLING_AVERAGE,
         IF,                 // If message is false, return null (no message)
         REGEX_MATCH,        // Return whether message matches regex expression
-        IS_ALIVE,           // Ping site, return true/false whether it is alive
         AND,
         OR,
         XOR,
