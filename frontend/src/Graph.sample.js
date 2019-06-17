@@ -15,7 +15,7 @@ export const sample = {
             "id": "ndlerNode2",
             "title": "MD5_CONVERTER-2",
             "type": HANDLER_TYPE,
-            "subtype": "MD5_CONVERTER",
+            "subtype": "MD5_HASH",
             "x": 230,
             "y": 30,
             "settings": {}
@@ -33,7 +33,7 @@ export const sample = {
             "id": "ndlerNode4",
             "title": "UPPER_CASE_CONVERTER-4",
             "type": HANDLER_TYPE,
-            "subtype": "UPPER_CASE_CONVERTER",
+            "subtype": "TO_UPPERCASE",
             "x": 230,
             "y": 230,
             "settings": {}
