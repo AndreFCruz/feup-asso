@@ -35,6 +35,7 @@ class Graph extends React.Component {
             selectedSubType: "",
             edgeSource: "",
             edgeTarget: "",
+            panNode: ""
         };
 
         this.GraphView = React.createRef();
@@ -45,7 +46,6 @@ class Graph extends React.Component {
         console.log('** GRAPH CONFIG **');
         console.log(config);
         this.setState({graphConfig: config});
-        this.setSelectedTypeAndSubType();
     }
 
     isLoading() {
@@ -286,6 +286,7 @@ class Graph extends React.Component {
     onSelectPanNode(eventKey, event) {
         if (this.GraphView) {
             this.GraphView.panToNode(eventKey, true);
+            this.setState({panNode: this.getViewNode(eventKey).title})
         }
     }
 
@@ -544,12 +545,6 @@ class Graph extends React.Component {
         }));
     }
 
-    setSelectedTypeAndSubType() {
-        const {firstOptions, secondOptions} = this.selectOptions();
-        this.setState({selectedType: firstOptions[0].value});
-        this.setState({selectedSubType: secondOptions[0].value})
-    }
-
     selectOptions() {
         let nodeTypes = this.getNodeTypes();
         let firstOptions = Object.keys(nodeTypes);
@@ -612,6 +607,8 @@ class Graph extends React.Component {
         const EdgeTypes = this.state.graphConfig.EdgeTypes;
 
         const {firstOptions, secondOptions} = this.selectOptions();
+        let edgeNodeSource = this.getViewNode(this.state.edgeSource);
+        let edgeNodeTarget = this.getViewNode(this.state.edgeTarget);
 
         return (
             <Container id='graph'>
@@ -642,14 +639,14 @@ class Graph extends React.Component {
                             <Card.Body>
                                 <Card.Title>Add Node</Card.Title>
 
-                                <DropdownButton id='firstOption' title='Node Type' variant='outline-primary'>
+                                <DropdownButton id='firstOption' title={this.state.selectedType || 'Node Type'} variant='outline-primary'>
                                     {firstOptions.map((node, idx) => <Dropdown.Item
                                         key={idx}
                                         onSelect={this.handleTypeSelectorChange.bind(this)}
                                         eventKey={node.value}>{node.value}</Dropdown.Item>)}
                                 </DropdownButton>
 
-                                <DropdownButton id='secondOption' title='Sub-Node Type' variant='outline-primary'>
+                                <DropdownButton id='secondOption' title={this.state.selectedSubType || 'Sub-Node Type'} variant='outline-primary'>
                                     {secondOptions.map((node, idx) => <Dropdown.Item
                                         key={idx}
                                         onSelect={this.handleSubTypeSelectorChange.bind(this)}
@@ -664,12 +661,12 @@ class Graph extends React.Component {
                         <Card className="create-edge">
                             <Card.Body>
                                 <Card.Title>Add Edge</Card.Title>
-                                <DropdownButton id='source' title='Edge Source' variant='outline-primary'
+                                <DropdownButton id='source' title={(edgeNodeSource ? edgeNodeSource.title : null) || 'Edge Source'} variant='outline-primary'
                                     onSelect={this.handleEdgeSourceChange.bind(this)}>
                                     {nodes.map((node) => <Dropdown.Item key={node[NODE_KEY]} eventKey={node[NODE_KEY]}>{node.title}</Dropdown.Item>)}
                                 </DropdownButton>
 
-                                <DropdownButton id='sink' title='Edge Target' variant='outline-primary'
+                                <DropdownButton id='sink' title={(edgeNodeTarget ? edgeNodeTarget.title : null) || 'Edge Target'} variant='outline-primary'
                                     onSelect={this.handleEdgeTargetChange.bind(this)}>
                                     {nodes.map((node) => <Dropdown.Item key={node[NODE_KEY]} eventKey={node[NODE_KEY]}>{node.title}</Dropdown.Item>)}
                                 </DropdownButton>
@@ -682,7 +679,7 @@ class Graph extends React.Component {
                         <Card className='pan-to-node'>
                             <Card.Body>
                                 <Card.Title>Pan to Node</Card.Title>
-                                <DropdownButton id='panToSelection' title='Select Node' variant='outline-primary'
+                                <DropdownButton id='panToSelection' title={this.state.panNode || 'Select Node'} variant='outline-primary'
                                     onSelect={this.onSelectPanNode.bind(this)}>
                                     {nodes.map((node) => <Dropdown.Item key={node[NODE_KEY]} eventKey={node[NODE_KEY]}>{node.title}</Dropdown.Item>)}
                                 </DropdownButton>
