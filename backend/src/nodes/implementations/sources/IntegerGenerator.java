@@ -1,8 +1,13 @@
 package nodes.implementations.sources;
 
+import nodes.NodeFactory;
 import nodes.Source;
 
 public class IntegerGenerator extends Source<Integer> {
+    static {
+        NodeFactory.registerNode(NodeFactory.SourceType.INTEGER_GENERATOR, IntegerGenerator::new);
+    }
+
     private int MAX_NUMBER_GENERATED = (int) Math.exp(6);
 
     @Override

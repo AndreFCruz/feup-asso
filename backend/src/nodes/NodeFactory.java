@@ -14,21 +14,29 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class NodeFactory {
-    private static Map<SourceType, Supplier<Source>> sourceTypeToSourceNode = new HashMap<>() {{
-        put(SourceType.INTEGER_GENERATOR, IntegerGenerator::new);
-        put(SourceType.STRING_GENERATOR, StringGenerator::new);
-        put(SourceType.FILE_READER, FileReader::new);
-        put(SourceType.FETCH_URL, FetchUrl::new);
-    }};
-    private static Map<HandlerType, Supplier<Handler>> handlerTypeToHandlerNode = new HashMap<>() {{
-        put(HandlerType.MD5_CONVERTER, MD5Converter::new);
-        put(HandlerType.UPPER_CASE_CONVERTER, Uppercase::new);
-    }};
-    private static Map<SinkType, Supplier<Sink>> sinkTypeToSinkNode = new HashMap<>() {{
-        put(SinkType.FILE_WRITER, FileWriter::new);
-        put(SinkType.PRINTER, Printer::new);
-    }};
+    private static Map<SourceType, Supplier<Source>> sourceTypeToSourceNode = new HashMap<>();
+    private static Map<HandlerType, Supplier<Handler>> handlerTypeToHandlerNode = new HashMap<>();
+    private static Map<SinkType, Supplier<Sink>> sinkTypeToSinkNode = new HashMap<>();
 
+    /**
+     * Functions for registering new nodes on this factory
+     * (in order to extend this NodeFactory's nodes without changing core source code)
+     */
+    public static Supplier<Source> registerNode(SourceType sourceType, Supplier<Source> constructor) {
+        return NodeFactory.sourceTypeToSourceNode.put(sourceType, constructor);
+    }
+
+    public static Supplier<Handler> registerNode(HandlerType handlerType, Supplier<Handler> constructor) {
+        return NodeFactory.handlerTypeToHandlerNode.put(handlerType, constructor);
+    }
+
+    public static Supplier<Sink> registerNode(SinkType sinkType, Supplier<Sink> constructor) {
+        return NodeFactory.sinkTypeToSinkNode.put(sinkType, constructor);
+    }
+
+    /**
+     * Functions for getting a Node Supplier (constructor) from their String type names.
+     */
     public static SourceType convertSourceNameToSourceType(String sourceName) {
         return SourceType.valueOf(sourceName);
     }
@@ -41,6 +49,9 @@ public class NodeFactory {
         return SinkType.valueOf(sinkName);
     }
 
+    /**
+     * Fetch all Node names of the given type (Source/Handler/Sink).
+     */
     public static SourceType[] getSourceNames() {
         return SourceType.values();
     }
@@ -53,6 +64,9 @@ public class NodeFactory {
         return SinkType.values();
     }
 
+    /**
+     * Create Node of the given type (Source/Handler/Sink)
+     */
     public static Source createSource(SourceType nodeType) {
         return sourceTypeToSourceNode.get(nodeType).get();
     }
@@ -65,6 +79,13 @@ public class NodeFactory {
         return sinkTypeToSinkNode.get(nodeType).get();
     }
 
+
+    /**
+     * Hierarchy for Node Types.
+     */
+    interface NodeType {
+        String name();
+    }
 
     public enum SourceType {
         INTEGER_GENERATOR,
@@ -79,8 +100,16 @@ public class NodeFactory {
     }
 
     public enum HandlerType {
-        MD5_CONVERTER,
-        UPPER_CASE_CONVERTER,
+        MD5_HASH,
+        TO_UPPERCASE,
+        ROLLING_SUM,
+        PRODUCT,
+        AND,
+        OR,
+        XOR,
+        ROLLING_AVERAGE,
+        IF,                 // If message is false, return null (no message)
+        IS_ALIVE            // Ping site, return true/false whether it is alive
     }
 
 }

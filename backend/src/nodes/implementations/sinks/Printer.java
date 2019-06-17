@@ -1,8 +1,12 @@
 package nodes.implementations.sinks;
 
+import nodes.NodeFactory;
 import nodes.Sink;
 
 public class Printer extends Sink.EndSink<Object> {
+    static {
+        NodeFactory.registerNode(NodeFactory.SinkType.PRINTER, Printer::new);
+    }
 
     // May block when handling message
     @Override

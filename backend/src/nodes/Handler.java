@@ -63,7 +63,9 @@ public abstract class Handler<In, Out> extends Node<String> implements Subscribe
     public void run() {
         try {
             while (!Thread.interrupted()) {
-                source.publishMessage(this.produceMessage());
+                Out msg = this.produceMessage();
+                if (msg != null)
+                    source.publishMessage(msg);
             }
         } catch (InterruptedException e) {
             Log.log("[Handler " + this.sink.getId() + "|" + this.source.getId() + "] Thread interrupted");

@@ -63,6 +63,7 @@ public abstract class Node<Id> {
     }
 
     public String[] getSettingsKeys() {
-        return new String[]{};
+        String[] ret = new String[settings.size()];
+        return settings.keySet().toArray(ret);
     }
 }

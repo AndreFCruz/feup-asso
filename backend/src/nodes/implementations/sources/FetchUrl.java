@@ -1,5 +1,6 @@
 package nodes.implementations.sources;
 
+import nodes.NodeFactory;
 import nodes.Source;
 
 import java.io.BufferedReader;
@@ -9,6 +10,10 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class FetchUrl extends Source<String> {
+    static {
+        NodeFactory.registerNode(NodeFactory.SourceType.FETCH_URL, FetchUrl::new);
+    }
+
     private static String[] settingsKeys = new String[]{"url"};
     private BufferedReader buffer;
 
@@ -48,11 +53,6 @@ public class FetchUrl extends Source<String> {
             e.printStackTrace();
         }
         return true;
-    }
-
-    @Override
-    public String[] getSettingsKeys() {
-        return settingsKeys;
     }
 
 }

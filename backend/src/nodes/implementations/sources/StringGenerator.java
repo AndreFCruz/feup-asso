@@ -1,9 +1,14 @@
 package nodes.implementations.sources;
 
+import nodes.NodeFactory;
 import nodes.Source;
 
 public class StringGenerator extends Source<String> {
-    private int MAX_STRING_LENGTH = 10;
+    static {
+        NodeFactory.registerNode(NodeFactory.SourceType.STRING_GENERATOR, StringGenerator::new);
+    }
+
+    private static int MAX_STRING_LENGTH = 10;
 
     @Override
     public String produceMessage() throws InterruptedException {

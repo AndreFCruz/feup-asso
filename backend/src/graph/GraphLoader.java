@@ -22,8 +22,8 @@ public class GraphLoader {
         }});
 
         // Create Handlers
-        Handler md5Converter = graphTopology.createHandler(NodeFactory.HandlerType.MD5_CONVERTER);
-        Handler uppercase = graphTopology.createHandler(NodeFactory.HandlerType.UPPER_CASE_CONVERTER);
+        Handler md5Converter = graphTopology.createHandler(NodeFactory.HandlerType.MD5_HASH);
+        Handler uppercase = graphTopology.createHandler(NodeFactory.HandlerType.TO_UPPERCASE);
 
         // Create Sinks
         Sink printerSink = graphTopology.createSink(NodeFactory.SinkType.PRINTER);

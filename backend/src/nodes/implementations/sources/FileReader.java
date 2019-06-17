@@ -1,5 +1,6 @@
 package nodes.implementations.sources;
 
+import nodes.NodeFactory;
 import nodes.Source;
 import utils.Log;
 
@@ -11,6 +12,10 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 
 public class FileReader extends Source<String> {
+    static {
+        NodeFactory.registerNode(NodeFactory.SourceType.FILE_READER, FileReader::new);
+    }
+
     private static String[] settingsKeys = new String[]{"path"};
     private Iterator<String> iterator;
 
@@ -56,8 +61,4 @@ public class FileReader extends Source<String> {
         return true;
     }
 
-    @Override
-    public String[] getSettingsKeys() {
-        return settingsKeys;
-    }
 }
