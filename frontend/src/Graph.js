@@ -142,57 +142,68 @@ class Graph extends React.Component {
 
     // Creates a new node between two edges
     async onCreateEdge(event) {
-        console.log(event.target); debugger;
-        if (this.state.edgeSource === "" || this.state.edgeTarget === "") {
-            this.props.alert.error('Please select Source and Target nodes');
-            return;
-        }
+      console.log(event.target);
+      if (this.state.edgeSource === "" || this.state.edgeTarget === "") {
+          this.props.alert.error('Please select Source and Target nodes');
+          return;
+      }
 
-        let sourceNode = this.state.edgeSource;
-        let sinkNode = this.state.edgeTarget;
-        const type = STANDARD_EDGE_TYPE;
+      let sourceNode = this.state.edgeSource;
+      let sinkNode = this.state.edgeTarget;
 
-        const graph = this.state.graph;
-        const viewEdge = {
-            source: sourceNode,
-            target: sinkNode,
-            type
-        };
+      let sourceViewNode = this.getViewNode(sourceNode);
+      let sinkViewNode = this.getViewNode(sinkNode);
 
-        let sourceViewNode = this.getViewNode(sourceNode);
-        let sinkViewNode = this.getViewNode(sinkNode);
+      if(sourceViewNode.subtype === "RECIPE"){
+        sourceViewNode = sourceViewNode.output;
+      }
+      if(sinkViewNode.subtype === "RECIPE"){
+        sinkViewNode = sinkViewNode.input;
+      }
 
-        // Check if Edge is duplicated
-        let isDuplicated = false;
-        this.state.graph.edges.forEach(el => {
-            if (el.source === sourceNode && el.target === sinkNode) {
-                isDuplicated = true;
-            }
-        });
+      console.log(sinkNode);
+      console.log(sinkViewNode);
 
-        // Check if Edge is valid
-        if (isDuplicated) {
-            this.props.alert.error('Edge already exists');
-        } else if (sourceNode === sinkNode) {
-            this.props.alert.error(`Trying to create an edge from node ${sourceViewNode.title} to itself`);
-        } else if (sourceViewNode.type === SINK_TYPE) {
-            this.props.alert.error(`Trying to create an output edge from the sink node ${sourceViewNode.title}`);
-        } else if (sinkViewNode.type === SOURCE_TYPE) {
-            this.props.alert.error(`Trying to create an input edge to the source node ${sinkViewNode.title}`);
-        } else if (!isGraphAcyclic(this.state.graph)) {
-            this.props.alert.error('Edge creation would create a cycle in the graph');
-        } else if (!await Graph.isValidEdge(sourceViewNode, sinkViewNode).catch(_ => false)) {
-            this.props.alert.error('Trying to create invalid edge type between selected source and sink');
-        } else { // Else, create the edge (it's valid)
-            graph.edges = [
-                ...graph.edges,
-                viewEdge
-            ];
+      const type = STANDARD_EDGE_TYPE;
 
-            this.setState({graph, selected: viewEdge});
-            this.props.alert
-                .success('Successfully created a new edge');
-        }
+      const graph = this.state.graph;
+      const viewEdge = {
+          source: sourceNode,
+          target: sinkNode,
+          type
+      };
+
+      // Check if Edge is duplicated
+      let isDuplicated = false;
+      this.state.graph.edges.forEach(el => {
+          if (el.source === sourceNode && el.target === sinkNode) {
+              isDuplicated = true;
+          }
+      });
+
+      // Check if Edge is valid
+      if (isDuplicated) {
+          this.props.alert.error('Edge already exists');
+      } else if (sourceNode === sinkNode) {
+          this.props.alert.error(`Trying to create an edge from node ${sourceViewNode.title} to itself`);
+      } else if (sourceViewNode.type === SINK_TYPE) {
+          this.props.alert.error(`Trying to create an output edge from the sink node ${sourceViewNode.title}`);
+      } else if (sinkViewNode.type === SOURCE_TYPE) {
+          this.props.alert.error(`Trying to create an input edge to the source node ${sinkViewNode.title}`);
+      } else if (!isGraphAcyclic(this.state.graph)) {
+          this.props.alert.error('Edge creation would create a cycle in the graph');
+      } else if (!await Graph.isValidEdge(sourceViewNode, sinkViewNode).catch(_ => false)) {
+          this.props.alert.error('Trying to create invalid edge type between selected source and sink');
+      } else { // Else, create the edge (it's valid)
+          graph.edges = [
+              ...graph.edges,
+              viewEdge
+          ];
+
+          this.setState({graph, selected: viewEdge});
+          this.props.alert
+              .success('Successfully created a new edge');
+      }
     }
 
     static async isValidEdge(sourceViewNode, sinkViewNode) {
@@ -279,8 +290,50 @@ class Graph extends React.Component {
     }
 
     onRunGraph() {
+
+        let graph = JSON.parse(JSON.stringify(this.state.graph));
+        let recipes = this.state.graph.nodes.filter(n => n.subtype === "RECIPE");
+        recipes.forEach(recipe => {
+          const recipeGraph = JSON.parse(recipe.graph);
+          let nodes = recipeGraph.nodes;
+          let edges = recipeGraph.edges;
+          nodes.forEach(node => {
+            node.id = node.id + recipe.title;
+          });
+          edges.forEach(edge => {
+            edge.source =  edge.source+ recipe.title;
+            edge.target =  edge.target+ recipe.title;
+          });
+
+          let graphEdges = graph.edges.filter(edge => edge.target !== recipe.id && edge.source !== recipe.id);
+
+          let outputEdges = graph.edges.filter(edge => edge.source === recipe.id);
+          outputEdges.forEach(edge => {
+            edge.source =  recipe.output.id;
+          });
+
+          let inputEdges = graph.edges.filter(edge => edge.target === recipe.id);
+          inputEdges.forEach(edge => {
+            edge.target =  recipe.input.id;
+          });
+
+          graph.edges = [
+            ...graphEdges,
+            ...edges,
+            ...inputEdges,
+            ...outputEdges
+          ];
+          graph.nodes = [
+            ...graph.nodes,
+            ...nodes
+          ];
+        });
+
+        console.log(graph);
+        graph.nodes = graph.nodes.filter(node => node.subtype !== "RECIPE");
+
         axios
-            .post(process.env.REACT_APP_API_URL + '/sendGraph', JSON.stringify(this.state.graph))
+            .post(process.env.REACT_APP_API_URL + '/sendGraph', JSON.stringify(graph))
             .then(response => {
                 console.log(response);
                 if (response.data === true) {
@@ -383,6 +436,97 @@ class Graph extends React.Component {
 
     static onFilesError(error, file) {
         console.log('error code ' + error.code + ': ' + error.message)
+    }
+
+    saveRecipe() {
+      let handlers = this.state.graph.nodes.filter(n => n.type === "handlerNode");
+      if(handlers.length !== this.state.graph.nodes.length){
+        this.props.alert
+                    .error('Recipes must be only composed by handler nodes!');
+        return;
+      }
+      let sources = this.state.graph.nodes.filter(n => this.state.graph.edges.filter(e => e.target === n.id).length === 0);
+      if(sources.length>1){
+        this.props.alert
+                    .error('You can`t export a recipe with more than 1 handler input node!');
+        return;
+      }
+      console.log(sources);
+      let sinks = this.state.graph.nodes.filter(n => this.state.graph.edges.filter(e => e.source === n.id).length === 0);
+      if(sinks.length>1){
+        this.props.alert
+                    .error('You can`t export a recipe with more than 1 handler output node!');
+        return;
+      }
+      save(JSON.stringify(this.state.graph), 'recipe.json');
+    }
+
+    onNewRecipe(files) {
+      let reader = new FileReader();
+      reader.onload = () => {
+          var data = reader.result;
+          if (this.loadRecipe(data)) {
+              this.props.alert
+                  .info('Imported recipe successfully!');
+          } else {
+              this.props.alert
+                  .error('The recipe couldn`t be loaded. Please check if the submitted recipe is in the righ' +
+                          't format!');
+          }
+      };
+      reader.readAsText(files[0]);
+    }
+
+    loadRecipe(graphObj) {
+
+      if (graphObj == null) 
+          return false;
+      
+      let jsonGraph = JSON.parse(graphObj);
+
+      let nodes = jsonGraph.nodes;
+      let edges = jsonGraph.edges;
+
+      if (nodes == null || edges == null) 
+          return false;
+      
+      const graph = this.state.graph;
+
+      let id = this.state.nodeCounter + 1;
+      const nodeType = "handlerNode";
+      let nodeSubType = "RECIPE";
+
+      let nodeTitle = nodeSubType + '-' + id
+      let input = jsonGraph.nodes.filter(n => jsonGraph.edges.filter(e => e.target === n.id).length === 0)[0];
+      let output = jsonGraph.nodes.filter(n => jsonGraph.edges.filter(e => e.source === n.id).length === 0)[0];
+
+      input.id = input.id + nodeTitle;
+      output.id = output.id + nodeTitle;
+
+      const viewNode = {
+        id: "ndlerNode" + id,
+        title: nodeTitle,
+        type: nodeType,
+        subtype: nodeSubType,
+        graph: graphObj,
+        input: input,
+        output: output,
+        x: 10,
+        y: 0
+      };
+
+      graph.nodes = [
+        ...graph.nodes,
+        viewNode
+      ];
+      this.setState({
+          graph: graph,
+          nodeCounter: this.state.nodeCounter + 1
+      });
+
+      console.log(this.state.graph);
+
+      return true;
     }
 
     renderLoadingScreen() {
@@ -552,6 +696,32 @@ class Graph extends React.Component {
                                         onClick={this
                                         .saveGraph
                                         .bind(this)}>Save</Button>
+                                </div>
+                            </Card.Body>                        
+                        </Card>
+
+                        <Card className='recipe-settings'>
+                            <Card.Body>
+                                <Card.Title>Recipe</Card.Title>
+                                <div id='recipe-file-settings'>
+                                    <Files
+                                        onChange={this
+                                        .onNewRecipe
+                                        .bind(this)}
+                                        onError={Graph.onFilesError}
+                                        accepts={['.json']}
+                                        maxFiles={1}
+                                        maxFileSize={10000000}
+                                        minFileSize={0}
+                                        clickable>
+                                        <Button variant='outline-primary'>Import</Button>
+                                    </Files>
+                                </div>
+                                <div>
+                                    <Button variant='outline-primary'
+                                        onClick={this
+                                        .saveRecipe
+                                        .bind(this)}>Export</Button>
                                 </div>
                             </Card.Body>                        
                         </Card>
