@@ -10,7 +10,7 @@ public class RegexMatch extends Handler<String, Boolean> {
         NodeFactory.registerNode(NodeFactory.HandlerType.REGEX_MATCH, RegexMatch::new);
     }
 
-    static private String SettingsKey = "regex expression";
+    static private String SettingsKey = "regex";
 
     RegexMatch() {
         this.registerSettings(new String[]{SettingsKey});

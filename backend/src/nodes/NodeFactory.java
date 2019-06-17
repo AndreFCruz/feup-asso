@@ -98,9 +98,14 @@ public class NodeFactory {
         ROLLING_AVERAGE,
         IF,                 // If message is false, return null (no message)
         REGEX_MATCH,        // Return whether message matches regex expression
+        REGEX_REPLACE,
         AND,
         OR,
         XOR,
+        PARSE_INT,
+        PARSE_FLOAT,
+        TO_STRING,
+        PREDICT_FLOAT
     }
 
 }
