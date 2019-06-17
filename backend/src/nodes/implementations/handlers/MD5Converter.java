@@ -11,10 +11,6 @@ import java.security.NoSuchAlgorithmException;
  * Convert a given Object into its MD5 hash String.
  */
 public class MD5Converter extends Handler<Object, String> {
-    static {
-        NodeFactory.registerNode(NodeFactory.HandlerType.MD5_HASH, MD5Converter::new);
-    }
-
     private static String getMd5(String input) {
         try {
 

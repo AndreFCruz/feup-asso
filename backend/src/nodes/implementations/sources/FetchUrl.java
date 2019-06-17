@@ -10,11 +10,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class FetchUrl extends Source<String> {
-    static {
-        NodeFactory.registerNode(NodeFactory.SourceType.FETCH_URL, FetchUrl::new);
-    }
-
-    private static String[] settingsKeys = new String[]{"url"};
+    private static final String[] settingsKeys = new String[]{"url"};
     private BufferedReader buffer;
 
     public FetchUrl() {
@@ -24,8 +20,7 @@ public class FetchUrl extends Source<String> {
     private synchronized static BufferedReader loadUrl(String url) throws IOException {
         URLConnection connection = new URL(url).openConnection();
         return new BufferedReader(
-                new InputStreamReader(
-                        connection.getInputStream()));
+                new InputStreamReader(connection.getInputStream()));
     }
 
     @Override

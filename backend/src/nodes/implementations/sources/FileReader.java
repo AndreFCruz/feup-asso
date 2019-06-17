@@ -12,10 +12,6 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 
 public class FileReader extends Source<String> {
-    static {
-        NodeFactory.registerNode(NodeFactory.SourceType.FILE_READER, FileReader::new);
-    }
-
     private static String[] settingsKeys = new String[]{"path"};
     private Iterator<String> iterator;
 

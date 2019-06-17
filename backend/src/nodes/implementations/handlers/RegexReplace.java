@@ -5,15 +5,14 @@ import nodes.NodeFactory;
 
 import java.util.regex.Pattern;
 
+/**
+ * Match input Strings against a given Regular Expression, and replace matching Strings.
+ */
 public class RegexReplace extends Handler<String, String> {
-    static {
-        NodeFactory.registerNode(NodeFactory.HandlerType.REGEX_REPLACE, RegexReplace::new);
-    }
-
     static private String RegexSettingsKey = "regex";
     static private String ReplacementSettingsKey = "regex";
 
-    RegexReplace() {
+    public RegexReplace() {
         this.registerSettings(new String[]{
                 RegexSettingsKey, ReplacementSettingsKey
         });

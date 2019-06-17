@@ -1,5 +1,9 @@
 package nodes;
 
+import nodes.implementations.handlers.*;
+import nodes.implementations.sinks.*;
+import nodes.implementations.sources.*;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -8,6 +12,41 @@ public class NodeFactory {
     private static Map<SourceType, Supplier<Source>> sourceTypeToSourceNode = new HashMap<>();
     private static Map<HandlerType, Supplier<Handler>> handlerTypeToHandlerNode = new HashMap<>();
     private static Map<SinkType, Supplier<Sink>> sinkTypeToSinkNode = new HashMap<>();
+
+    static {
+        NodeFactory.registerSources();
+        NodeFactory.registerHandlers();
+        NodeFactory.registerSinks();
+    }
+
+    private static void registerSources() {
+        registerNode(SinkType.FILE_WRITER, FileWriter::new);
+        registerNode(SinkType.PRINTER, Printer::new);
+    }
+
+    private static void registerHandlers() {
+        registerNode(HandlerType.AND, AND::new);
+        registerNode(HandlerType.IF, If::new);
+        registerNode(HandlerType.MD5_HASH, MD5Converter::new);
+        registerNode(HandlerType.OR, OR::new);
+        registerNode(HandlerType.PARSE_FLOAT, ParseFloat::new);
+        registerNode(HandlerType.PARSE_INT, ParseInt::new);
+        registerNode(HandlerType.PAIRWISE_PRODUCT, Product::new);
+        registerNode(HandlerType.REGEX_MATCH, RegexMatch::new);
+        registerNode(HandlerType.REGEX_REPLACE, RegexReplace::new);
+        registerNode(HandlerType.ROLLING_AVERAGE, RollingAverage::new);
+        registerNode(HandlerType.ROLLING_SUM, RollingSum::new);
+        registerNode(HandlerType.TO_STRING, ToString::new);
+        registerNode(HandlerType.TO_UPPERCASE, Uppercase::new);
+        registerNode(HandlerType.XOR, XOR::new);
+    }
+
+    private static void registerSinks() {
+        registerNode(SourceType.FETCH_URL, FetchUrl::new);
+        registerNode(SourceType.FILE_READER, FileReader::new);
+        registerNode(SourceType.INTEGER_GENERATOR, IntegerGenerator::new);
+        registerNode(SourceType.STRING_GENERATOR, StringGenerator::new);
+    }
 
     /**
      * Functions for registering new nodes on this factory
@@ -105,7 +144,6 @@ public class NodeFactory {
         PARSE_INT,
         PARSE_FLOAT,
         TO_STRING,
-        PREDICT_FLOAT
     }
 
 }

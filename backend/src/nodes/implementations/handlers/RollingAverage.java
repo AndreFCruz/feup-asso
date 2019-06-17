@@ -8,10 +8,6 @@ import java.util.List;
  * Calculates rolling average along a configurable window.
  */
 public class RollingAverage extends RollingOp<Integer> {
-    static {
-        NodeFactory.registerNode(NodeFactory.HandlerType.ROLLING_AVERAGE, RollingAverage::new);
-    }
-
     @Override
     protected Integer executeRollingOp(List<Integer> values) {
         Integer sum = values.stream()

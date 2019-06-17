@@ -6,13 +6,9 @@ import nodes.NodeFactory;
 import java.util.regex.Pattern;
 
 public class RegexMatch extends Handler<String, Boolean> {
-    static {
-        NodeFactory.registerNode(NodeFactory.HandlerType.REGEX_MATCH, RegexMatch::new);
-    }
-
     static private String SettingsKey = "regex";
 
-    RegexMatch() {
+    public RegexMatch() {
         this.registerSettings(new String[]{SettingsKey});
     }
 

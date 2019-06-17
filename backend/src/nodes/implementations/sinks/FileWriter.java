@@ -14,10 +14,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 
 public class FileWriter extends Sink.EndSink<Object> {
-    static {
-        NodeFactory.registerNode(NodeFactory.SinkType.FILE_WRITER, FileWriter::new);
-    }
-
     private static String[] settingsKeys = new String[]{"path"};
     private Path file;
 
