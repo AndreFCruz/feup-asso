@@ -1,5 +1,7 @@
 # INFO.SEC.COOK3R
 
+![screenshot of main interface](./docs/screenshot.png)
+
 ### Goals
 
 ### Architecture
