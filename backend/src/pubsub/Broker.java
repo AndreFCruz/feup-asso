@@ -23,6 +23,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class Broker<MT> implements Runnable {
     private static int DEFAULT_QUEUE_CAPACITY = 10;
 
+    private static float BACK_PRESSURE_THRESHOLD = 0.5f;
+
     // Registry key(Source | Sink | inputHandler | outputHandler) -> queue
     private Registry<String, BlockingQueue<MT>> registry = Registry.makeStringRegistry();
     // publisherKey(Source | InputHandler) -> arraySubscriberKeys (Sink | OutputHandler)
@@ -34,7 +36,6 @@ public class Broker<MT> implements Runnable {
 
     /**
      * Register a new Entity
-     *
      * @return string key
      */
     public String register(Source source) {
@@ -104,6 +105,7 @@ public class Broker<MT> implements Runnable {
             return;
         }
 
+        int subsAtMaxCapacity = 0;
         ArrayList<String> subscribers = this.observers.getOrDefault(event.publisherId, new ArrayList<>());
         for (String subId : subscribers) {
             // Offer the published message to all subscribers
@@ -112,15 +114,19 @@ public class Broker<MT> implements Runnable {
             if (subQueue.remainingCapacity() == 0) {
                 // Discard oldest message if queue is at maximum capacity
                 subQueue.remove();
-
-                // Also, apply back pressure - NOTE: experimental feature
-                this.setBufferSize(event.publisherId, (pubQueue.size() / 2) + 1);
+                subsAtMaxCapacity++;
             }
 
             boolean success = subQueue.offer(msg);
             if (!success) {
                 Log.logWarning("Subscriber " + subId + " could not receive a message");
             }
+        }
+
+        // Check if subscribers are under pressure, and potentially apply back pressure
+        if (((float) subsAtMaxCapacity / subscribers.size()) >= BACK_PRESSURE_THRESHOLD) {
+            Log.log("Applying back pressure to publisher '" + event.publisherId + "'.");
+            this.setBufferSize(event.publisherId, (pubQueue.size() / 2) + 1);
         }
     }
 
