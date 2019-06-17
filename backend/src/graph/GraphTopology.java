@@ -30,6 +30,23 @@ public class GraphTopology {
         this.broker = new Broker<>();
     }
 
+    public static Class getGenericTypeNode(Node node, int index) {
+        Type mySuperclass = node.getClass().getGenericSuperclass();
+        Type[] tType = ((ParameterizedType) mySuperclass).getActualTypeArguments();
+        if (tType.length == 1 && index > 0)
+            index = 0;
+        String typeName = tType[index].getTypeName();
+
+        Class clazz = null;
+        try {
+            clazz = Class.forName(typeName);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return clazz;
+    }
+
     Source createSource(NodeFactory.SourceType sourceType) {
         Source source = NodeFactory.createSource(sourceType);
         String sourceKey = broker.register(source);
@@ -100,20 +117,5 @@ public class GraphTopology {
         Class inputTypeClass = getGenericTypeNode(inputNode, 0);
 
         return inputTypeClass.isAssignableFrom(outputTypeClass);
-    }
-
-    private Class getGenericTypeNode(Node node, int index) {
-        Type mySuperclass = node.getClass().getGenericSuperclass();
-        Type[] tType = ((ParameterizedType) mySuperclass).getActualTypeArguments();
-        String typeName = tType[index].getTypeName();
-
-        Class clazz = null;
-        try {
-            clazz = Class.forName(typeName);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        return clazz;
     }
 }

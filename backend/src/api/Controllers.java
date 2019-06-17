@@ -7,6 +7,7 @@ import graph.GraphTopology;
 import manager.InfoSecCooker;
 import nodes.Node;
 import nodes.NodeFactory;
+import nodes.Source;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -28,22 +29,41 @@ class Controllers {
             NodeFactory.SourceType[] sources = NodeFactory.getSourceNames();
             JSONObject sourcesMap = new JSONObject();
             for (NodeFactory.SourceType source : sources) {
-                String[] settings = NodeFactory.createSource(source).getSettingsKeys();
-                sourcesMap.put(source.toString(), new JSONObject().put("settings", settings));
+                JSONObject sourceObj = new JSONObject();
+
+                Source sourceNode = NodeFactory.createSource(source);
+                String[] settings = sourceNode.getSettingsKeys();
+
+                sourceObj.put("settings", settings);
+                sourceObj.put("outputType", GraphTopology.getGenericTypeNode(sourceNode, 0).getTypeName());
+                sourcesMap.put(source.toString(), sourceObj);
             }
 
             NodeFactory.HandlerType[] handlers = NodeFactory.getHandlerNames();
             JSONObject handlersMap = new JSONObject();
             for (NodeFactory.HandlerType handler : handlers) {
-                String[] settings = NodeFactory.createHandler(handler).getSettingsKeys();
-                handlersMap.put(handler.toString(), new JSONObject().put("settings", settings));
+                JSONObject handlerObj = new JSONObject();
+
+                Node handlerNode = NodeFactory.createHandler(handler);
+                String[] settings = handlerNode.getSettingsKeys();
+
+                handlerObj.put("settings", settings);
+                handlerObj.put("outputType", GraphTopology.getGenericTypeNode(handlerNode, 1).getTypeName());
+                handlerObj.put("inputType", GraphTopology.getGenericTypeNode(handlerNode, 0).getTypeName());
+                handlersMap.put(handler.toString(), handlerObj);
             }
 
             NodeFactory.SinkType[] sinks = NodeFactory.getSinkNames();
             JSONObject sinksMap = new JSONObject();
             for (NodeFactory.SinkType sink : sinks) {
-                String[] settings = NodeFactory.createSink(sink).getSettingsKeys();
-                sinksMap.put(sink.toString(), new JSONObject().put("settings", settings));
+                JSONObject sinkObj = new JSONObject();
+
+                Node sinkNode = NodeFactory.createSink(sink);
+                String[] settings = sinkNode.getSettingsKeys();
+
+                sinkObj.put("settings", settings);
+                sinkObj.put("inputType", GraphTopology.getGenericTypeNode(sinkNode, 0).getTypeName());
+                sinksMap.put(sink.toString(), sinkObj);
             }
 
             response.put("sources", sourcesMap);
@@ -160,7 +180,6 @@ class Controllers {
         @Override
         public void handle(HttpExchange he) throws IOException {
             JSONObject body = parseBodyToJSONObj(he);
-
             JSONObject outputObj = body.getJSONObject("output");
             JSONObject inputObj = body.getJSONObject("input");
 

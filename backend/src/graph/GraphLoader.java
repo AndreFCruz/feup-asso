@@ -23,7 +23,7 @@ public class GraphLoader {
         }});
 
         fetchUrlSource.initializeSettings(new HashMap<>() {{
-            put("url", "https://github.com/AndreFCruz/feup-asso");
+            put("url", "https://github.com/AndreFCruz");
         }});
 
         // Create Handlers

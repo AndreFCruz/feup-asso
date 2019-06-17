@@ -74,7 +74,7 @@ public class Broker<MT> implements Runnable {
      * @param bufferSize the new buffer size.
      * @return Whether the operation was successful.
      */
-    public boolean setBufferSize(String pubId, int bufferSize) {
+    private boolean setBufferSize(String pubId, int bufferSize) {
         BlockingQueue<MT> oldQueue = registry.get(pubId);
         BlockingQueue<MT> newQueue = new LinkedBlockingQueue<>(bufferSize);
         oldQueue.drainTo(newQueue, bufferSize);
