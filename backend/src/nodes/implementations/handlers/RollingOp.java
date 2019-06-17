@@ -6,6 +6,10 @@ import nodes.NodeFactory;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Performs a rolling operation along a configurable-sized window.
+ * @param <T> The type on which this Handler operates.
+ */
 public abstract class RollingOp<T> extends Handler<T, T> {
 
     private static String SettingsKey = "values_to_keep";

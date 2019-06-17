@@ -4,6 +4,9 @@ import nodes.NodeFactory;
 
 import java.util.List;
 
+/**
+ * Calculates rolling average along a configurable window.
+ */
 public class RollingAverage extends RollingOp<Integer> {
     static {
         NodeFactory.registerNode(NodeFactory.HandlerType.ROLLING_AVERAGE, RollingAverage::new);

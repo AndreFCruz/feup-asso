@@ -4,6 +4,9 @@ import nodes.NodeFactory;
 
 import java.util.List;
 
+/**
+ * Performs a rolling sum along a configurable-sized window.
+ */
 public class RollingSum extends RollingOp<Integer> {
     static {
         NodeFactory.registerNode(NodeFactory.HandlerType.ROLLING_SUM, RollingSum::new);
