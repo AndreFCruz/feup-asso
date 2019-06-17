@@ -1,7 +1,6 @@
 package nodes.implementations.handlers;
 
 import nodes.Handler;
-import nodes.NodeFactory;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;

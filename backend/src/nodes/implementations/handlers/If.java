@@ -1,7 +1,6 @@
 package nodes.implementations.handlers;
 
 import nodes.Handler;
-import nodes.NodeFactory;
 
 /**
  * If message is False stop signal here, else continue signal to following nodes.

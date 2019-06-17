@@ -1,7 +1,6 @@
 package nodes.implementations.handlers;
 
 import nodes.Handler;
-import nodes.NodeFactory;
 
 /**
  * Converts the given String to uppercase.

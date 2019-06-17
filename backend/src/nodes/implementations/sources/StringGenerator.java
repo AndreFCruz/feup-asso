@@ -1,6 +1,5 @@
 package nodes.implementations.sources;
 
-import nodes.NodeFactory;
 import nodes.Source;
 
 public class StringGenerator extends Source<String> {

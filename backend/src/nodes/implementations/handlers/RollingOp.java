@@ -1,7 +1,6 @@
 package nodes.implementations.handlers;
 
 import nodes.Handler;
-import nodes.NodeFactory;
 
 import java.util.LinkedList;
 import java.util.List;

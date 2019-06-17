@@ -1,8 +1,6 @@
 package nodes.implementations.sinks;
 
-import nodes.NodeFactory;
 import nodes.Sink;
-import nodes.implementations.sources.FileReader;
 import utils.Log;
 
 import java.io.IOException;

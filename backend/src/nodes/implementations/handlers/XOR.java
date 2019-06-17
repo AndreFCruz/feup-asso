@@ -1,8 +1,6 @@
 package nodes.implementations.handlers;
 
 
-import nodes.NodeFactory;
-
 import java.util.List;
 
 public class XOR extends RollingOp<Boolean> {

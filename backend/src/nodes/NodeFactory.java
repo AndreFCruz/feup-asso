@@ -1,8 +1,12 @@
 package nodes;
 
 import nodes.implementations.handlers.*;
-import nodes.implementations.sinks.*;
-import nodes.implementations.sources.*;
+import nodes.implementations.sinks.FileWriter;
+import nodes.implementations.sinks.Printer;
+import nodes.implementations.sources.FetchUrl;
+import nodes.implementations.sources.FileReader;
+import nodes.implementations.sources.IntegerGenerator;
+import nodes.implementations.sources.StringGenerator;
 
 import java.util.HashMap;
 import java.util.Map;
