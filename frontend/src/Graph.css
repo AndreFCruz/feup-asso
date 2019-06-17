@@ -37,7 +37,7 @@ h1 {
     display: inline-block;
 }
 
-#node-settings {
+#node-settings, #node-input-output {
     width: 100%;
     padding: 0 1em;
 }

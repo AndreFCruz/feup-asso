@@ -642,6 +642,34 @@ class Graph extends React.Component {
         );
     }
 
+    renderNodeInputOutput() {
+        let defaultReturn = (<div>(no node selected...)</div>);
+        if (this.state.selected === null || isObjectEmpty(this.state.selected)) {
+            return defaultReturn;
+        }
+
+        let nodeType = this.state.graphConfig.NodeSubtypes[this.state.selected.subtype];
+        let inputType = nodeType.inputType;
+        let outputType = nodeType.outputType;
+
+        let inputJSX = (<Col></Col>);
+        if (inputType !== null && inputType.length > 0) {
+            inputJSX = (<Col>Input: "{inputType}"</Col>);
+        }
+
+        let outputJSX = (<Col></Col>);
+        if (outputType !== null && outputType.length > 0) {
+            outputJSX = (<Col>Output: "{outputType}"</Col>);
+        }
+
+        return (
+            <Row>
+                {inputJSX}
+                {outputJSX}
+            </Row>
+        );
+    }
+
     render() {
         if (this.isLoading()) 
             return this.renderLoadingScreen();
@@ -812,6 +840,16 @@ class Graph extends React.Component {
                                 </div>
                             </Card.Body>
                         </Card>
+
+                        <Card>
+                            <Card.Body>
+                                <Card.Title>Node Input &amp; Output</Card.Title>
+                                <div id='node-input-output'>
+                                {this.renderNodeInputOutput()}
+                                </div>
+                            </Card.Body>
+                        </Card>
+
                     </Col>
                 </Row>
             </Container>

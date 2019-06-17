@@ -75,6 +75,8 @@ function makeNodeSubtypesObject(types) {
             shapeId: '#' + SOURCE_TYPE,
             nodeType: SOURCE_TYPE,
             settings: types.sources[sourceType].settings || [],
+            inputType: types.sources[sourceType].inputType || "",
+            outputType: types.sources[sourceType].outputType || "",
         };
     }
 
@@ -84,6 +86,8 @@ function makeNodeSubtypesObject(types) {
             shapeId: '#' + HANDLER_TYPE,
             nodeType: HANDLER_TYPE,
             settings: types.handlers[handlerType].settings || [],
+            inputType: types.handlers[handlerType].inputType || "",
+            outputType: types.handlers[handlerType].outputType || "",
         };
     }
 
@@ -93,6 +97,8 @@ function makeNodeSubtypesObject(types) {
             shapeId: '#' + SINK_TYPE,
             nodeType: SINK_TYPE,
             settings: types.sinks[sinkType].settings || [],
+            inputType: types.sinks[sinkType].inputType || "",
+            outputType: types.sinks[sinkType].outputType || "",
         };
     }
 
