@@ -36,6 +36,7 @@ public class NodeFactory {
         registerNode(HandlerType.PARSE_FLOAT, ParseFloat::new);
         registerNode(HandlerType.PARSE_INT, ParseInt::new);
         registerNode(HandlerType.PAIRWISE_PRODUCT, Product::new);
+        registerNode(HandlerType.REGEX_MATCH_BOOL, RegexMatchBool::new);
         registerNode(HandlerType.REGEX_MATCH, RegexMatch::new);
         registerNode(HandlerType.REGEX_REPLACE, RegexReplace::new);
         registerNode(HandlerType.ROLLING_AVERAGE, RollingAverage::new);
@@ -134,7 +135,8 @@ public class NodeFactory {
         PARSE_FLOAT,
         PARSE_INT,
         PAIRWISE_PRODUCT,
-        REGEX_MATCH, // Return whether message matches regex expression
+        REGEX_MATCH_BOOL, // Return whether message matches regex expression
+        REGEX_MATCH,
         REGEX_REPLACE,
         ROLLING_AVERAGE,
         ROLLING_SUM,

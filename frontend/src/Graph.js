@@ -4,7 +4,6 @@ import Files from 'react-files';
 import axios from "axios";
 import {GraphView} from 'react-digraph';
 import './Graph.css';
-import {sample as GRAPH_SAMPLE} from "./Graph.sample";
 import {makeGraphConfigObject, NODE_KEY, SINK_TYPE, SOURCE_TYPE, STANDARD_EDGE_TYPE} from './Graph.configs';
 import {
     Col, Container, Row,
@@ -16,6 +15,7 @@ import {
 import toposort from 'toposort';
 import LoadingScreen from 'react-loading-screen';
 import { withAlert } from "react-alert";
+// import {sample as GRAPH_SAMPLE} from "./Graph.sample";
 
 
 class Graph extends React.Component {
@@ -23,8 +23,8 @@ class Graph extends React.Component {
     constructor(props) {
         super(props);
 
-        // let sample = {     nodes: [], edges: [] };
-        let sample = GRAPH_SAMPLE;
+        let sample = {nodes: [], edges: []};
+        // let sample = GRAPH_SAMPLE;
 
         this.state = {
             graph: sample,
@@ -35,7 +35,8 @@ class Graph extends React.Component {
             selectedSubType: "",
             edgeSource: "",
             edgeTarget: "",
-            panNode: ""
+            panNode: "",
+            graphId: Math.random().toString(36).substr(2, 5),
         };
 
         this.GraphView = React.createRef();
@@ -98,7 +99,7 @@ class Graph extends React.Component {
 
         let nodeTitle = nodeSubType + '-' + id
         const viewNode = {
-            id: this.state.selectedType.substring(0, 2) + id,
+            id: this.state.graphId + '-' + this.state.selectedType.substring(0, 2) + id,
             title: nodeTitle,
             type: nodeType,
             subtype: nodeSubType,
@@ -467,7 +468,7 @@ class Graph extends React.Component {
     }
 
     deleteGraph() {
-        let sample = {     nodes: [], edges: [] };
+        let sample = { nodes: [], edges: [] };
         let cleanState = {
             graph: sample,
             selected: {},
@@ -476,7 +477,8 @@ class Graph extends React.Component {
             selectedSubType: "",
             edgeSource: "",
             edgeTarget: "",
-            panNode: ""
+            panNode: "",
+            graphId: Math.random().toString(36).substr(2, 5),
         };
         this.setState(cleanState);
     }
