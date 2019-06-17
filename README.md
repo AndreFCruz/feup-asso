@@ -130,8 +130,7 @@ Although easily extensible, we provide several already implemented nodes represe
 
 ## Q&A
 ### Who initiates the flow? The senders? The receivers?
-The senders start the flow by starting by producing messages and sending them to their queue which, in turn, through a broker, is sent to the subscribers. However, when 50% of the receivers have the queue full and cannot process more messages, a back pressure mechanism is applied in which the sender's queue is reduced to reduce the workload of the publisher.
-
+The message publishers initiate the flow by producing messages and notifying the message broker. However, when their outbound queue is full they stop producing messages. Given that the rate at which the outbound queue’s messages are consumed is controlled by its subscribers, this serves as a mechanism for signaling differences between message processing rates. When there’s a severe difference in message processing speeds, a back-pressure mechanism is applied (as described in the previous sections).
 
 ### Where does the (temporary) information live while waiting to be processed? 
 The information lives in outbound and inbound queues, which are mediated by the Broker as described in the previous sections.
@@ -160,16 +159,8 @@ Initially, the graph is validated by type-checking all edges (connections betwee
 During runtime, the system logs possible errors and warnings in a message that contains the time and the thread from where the error occurred. However, errors on any node are an isolated occurrence, and do not inherently affect other nodes.
 
 
-### Input as lists of things v.s. element by element? 
-Element by element, and in the arithmetic or other handlers that need more than one input the number of inputs expected to process is specified and, after that, an array with the processed result is returned. 
-
-
 ### When does it stop?
 Our implementation stops after the stop command (accessible by a button on the front-end client).
-
-
-## Design Review
-The architecture satisfies the original guidelines/goals, while maintaining modularity and obeying the open-closed principle.
 
 
 ## Running
