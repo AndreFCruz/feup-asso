@@ -21,6 +21,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @param <MT> Message Type
  */
 public class Broker<MT> implements Runnable {
+    private static int DEFAULT_QUEUE_CAPACITY = 10;
+
     // Registry key(Source | Sink | inputHandler | outputHandler) -> queue
     private Registry<String, BlockingQueue<MT>> registry = Registry.makeStringRegistry();
     // publisherKey(Source | InputHandler) -> arraySubscriberKeys (Sink | OutputHandler)
@@ -50,7 +52,7 @@ public class Broker<MT> implements Runnable {
     }
 
     private EntityQueue registerEntity() {
-        BlockingQueue<MT> queue = new LinkedBlockingQueue<>(); // TODO eventually limit queue size
+        BlockingQueue<MT> queue = new LinkedBlockingQueue<>(DEFAULT_QUEUE_CAPACITY);
         String entityId = this.registry.register(queue);
         return new EntityQueue(entityId, queue);
     }
@@ -89,10 +91,16 @@ public class Broker<MT> implements Runnable {
         ArrayList<String> subscribers = this.observers.getOrDefault(event.publisherId, new ArrayList<>());
         for (String subId : subscribers) {
             // Offer the published message to all subscribers
-            boolean ret = this.registry.get(subId).offer(msg);
-            if (!ret) {
-                Log.logWarning("Subscriber " + subId + " could not receive a message (Queue full?)");
-                // TODO if queue is full take oldest message and publish most recent ?
+            BlockingQueue<MT> subQueue = this.registry.get(subId);
+
+            if (subQueue.remainingCapacity() == 0) {
+                // Take oldest message if queue is at maximum capacity
+                subQueue.remove();
+            }
+            
+            boolean success = subQueue.offer(msg);
+            if (!success) {
+                Log.logWarning("Subscriber " + subId + " could not receive a message");
             }
         }
     }
