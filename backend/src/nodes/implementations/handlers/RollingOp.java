@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * Performs a rolling operation along a configurable-sized window.
+ *
  * @param <T> The type on which this Handler operates.
  */
 public abstract class RollingOp<T> extends Handler<T, T> {
@@ -15,7 +16,7 @@ public abstract class RollingOp<T> extends Handler<T, T> {
     private LinkedList<T> window = new LinkedList<>();
 
     RollingOp() {
-        this.registerSettings(new String[] {SettingsKey});
+        this.registerSettings(new String[]{SettingsKey});
     }
 
     Integer getNumbersToKeep() {

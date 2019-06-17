@@ -16,9 +16,14 @@ public class GraphLoader {
         Source stringSource = graphTopology.createSource(NodeFactory.SourceType.STRING_GENERATOR);
         Source integerSource = graphTopology.createSource(NodeFactory.SourceType.INTEGER_GENERATOR);
         Source readFileSource = graphTopology.createSource(NodeFactory.SourceType.FILE_READER);
+        Source fetchUrlSource = graphTopology.createSource(NodeFactory.SourceType.FETCH_URL);
 
         readFileSource.initializeSettings(new HashMap<>() {{
             put("path", "./Files/todo.txt");
+        }});
+
+        fetchUrlSource.initializeSettings(new HashMap<>() {{
+            put("url", "https://github.com/AndreFCruz/feup-asso");
         }});
 
         // Create Handlers
@@ -41,6 +46,7 @@ public class GraphLoader {
         graphTopology.createEdge(stringSource, md5Converter);
         graphTopology.createEdge(md5Converter, fileWriterSink);
         graphTopology.createEdge(readFileSource, printerSink);
+        graphTopology.createEdge(fetchUrlSource, printerSink);
 
         return graphTopology;
     }

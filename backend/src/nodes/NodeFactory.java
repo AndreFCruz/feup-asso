@@ -56,16 +56,16 @@ public class NodeFactory {
      * Functions for registering new nodes on this factory
      * (in order to extend this NodeFactory's nodes without changing core source code)
      */
-    public static Supplier<Source> registerNode(SourceType sourceType, Supplier<Source> constructor) {
-        return NodeFactory.sourceTypeToSourceNode.put(sourceType, constructor);
+    private static void registerNode(SourceType sourceType, Supplier<Source> constructor) {
+        NodeFactory.sourceTypeToSourceNode.put(sourceType, constructor);
     }
 
-    public static Supplier<Handler> registerNode(HandlerType handlerType, Supplier<Handler> constructor) {
-        return NodeFactory.handlerTypeToHandlerNode.put(handlerType, constructor);
+    private static void registerNode(HandlerType handlerType, Supplier<Handler> constructor) {
+        NodeFactory.handlerTypeToHandlerNode.put(handlerType, constructor);
     }
 
-    public static Supplier<Sink> registerNode(SinkType sinkType, Supplier<Sink> constructor) {
-        return NodeFactory.sinkTypeToSinkNode.put(sinkType, constructor);
+    private static void registerNode(SinkType sinkType, Supplier<Sink> constructor) {
+        NodeFactory.sinkTypeToSinkNode.put(sinkType, constructor);
     }
 
     /**
@@ -114,18 +114,11 @@ public class NodeFactory {
     }
 
 
-    /**
-     * Hierarchy for Node Types.
-     */
-    interface NodeType {
-        String name();
-    }
-
     public enum SourceType implements NodeType {
-        INTEGER_GENERATOR,
-        STRING_GENERATOR,
+        FETCH_URL,
         FILE_READER,
-        FETCH_URL
+        INTEGER_GENERATOR,
+        STRING_GENERATOR
     }
 
     public enum SinkType implements NodeType {
@@ -134,20 +127,27 @@ public class NodeFactory {
     }
 
     public enum HandlerType implements NodeType {
-        MD5_HASH,
-        TO_UPPERCASE,
-        ROLLING_SUM,
-        PAIRWISE_PRODUCT,
-        ROLLING_AVERAGE,
-        IF,                 // If message is false, return null (no message)
-        REGEX_MATCH,        // Return whether message matches regex expression
-        REGEX_REPLACE,
         AND,
+        IF, // If message is false, return null (no message)
+        MD5_HASH,
         OR,
-        XOR,
-        PARSE_INT,
         PARSE_FLOAT,
+        PARSE_INT,
+        PAIRWISE_PRODUCT,
+        REGEX_MATCH, // Return whether message matches regex expression
+        REGEX_REPLACE,
+        ROLLING_AVERAGE,
+        ROLLING_SUM,
         TO_STRING,
+        TO_UPPERCASE,
+        XOR
+    }
+
+    /**
+     * Hierarchy for Node Types.
+     */
+    interface NodeType {
+        String name();
     }
 
 }

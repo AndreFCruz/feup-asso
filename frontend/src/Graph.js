@@ -378,6 +378,13 @@ class Graph extends React.Component {
             .catch(error => console.warn('Error on axios.get: ' + JSON.stringify(error)));
     }
 
+    sendStopRequest() {
+        axios
+            .get(process.env.REACT_APP_API_URL + '/stopGraph', JSON.stringify({}))
+            .then(response => console.log(response))
+            .catch(error => console.warn('Error on axios.get: ' + JSON.stringify(error)));
+    }
+
     getNodeTypes() {
         if (this.state.graphConfig === null) 
             return {};
@@ -458,6 +465,21 @@ class Graph extends React.Component {
         this.setState({graph, selected: null, nodeCounter: nodes.length});
 
         return true;
+    }
+
+    deleteGraph() {
+        let sample = {     nodes: [], edges: [] };
+        let cleanState = {
+            graph: sample,
+            selected: {},
+            nodeCounter: sample.nodes.length,
+            selectedType: "",
+            selectedSubType: "",
+            edgeSource: "",
+            edgeTarget: "",
+            panNode: ""
+        };
+        this.setState(cleanState);
     }
 
     static onFilesError(error, file) {
@@ -678,7 +700,7 @@ class Graph extends React.Component {
                                         eventKey={node.value}>{node.value}</Dropdown.Item>)}
                                 </DropdownButton>
 
-                                <Button variant='outline-primary' onClick={this.onCreateNode.bind(this)}>Create</Button>
+                                <Button variant='outline-success' onClick={this.onCreateNode.bind(this)}>Create</Button>
                             </Card.Body>
                         </Card>
 
@@ -696,7 +718,7 @@ class Graph extends React.Component {
                                     {nodes.map((node) => <Dropdown.Item key={node[NODE_KEY]} eventKey={node[NODE_KEY]}>{node.title}</Dropdown.Item>)}
                                 </DropdownButton>
 
-                                <Button variant='outline-primary'
+                                <Button variant='outline-success'
                                     onClick={this.onCreateEdge.bind(this)}>Create</Button>
                             </Card.Body>
                         </Card>
@@ -715,10 +737,16 @@ class Graph extends React.Component {
                             <Card.Body>
                                 <Card.Title>Graph</Card.Title>
                                 <div className="send-backend-run">
-                                    <Button variant='outline-primary'
+                                    <Button variant='outline-success'
                                         onClick={this
                                         .onRunGraph
                                         .bind(this)}>Run</Button>
+                                </div>
+                                <div className="send-backend-stop">
+                                    <Button variant='outline-danger'
+                                        onClick={this
+                                        .sendStopRequest
+                                        .bind(this)}>Stop</Button>
                                 </div>
                                 <div id='graph-file-settings'>
                                     <Files
@@ -739,6 +767,12 @@ class Graph extends React.Component {
                                         onClick={this
                                         .saveGraph
                                         .bind(this)}>Save</Button>
+                                </div>
+                                <div>
+                                    <Button variant='danger'
+                                        onClick={this
+                                        .deleteGraph
+                                        .bind(this)}>Delete</Button>
                                 </div>
                             </Card.Body>                        
                         </Card>

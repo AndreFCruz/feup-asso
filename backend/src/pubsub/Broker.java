@@ -36,6 +36,7 @@ public class Broker<MT> implements Runnable {
 
     /**
      * Register a new Entity
+     *
      * @return string key
      */
     public String register(Source source) {
@@ -67,9 +68,10 @@ public class Broker<MT> implements Runnable {
     /**
      * Sets the buffer size of the given Publisher to a new value.
      * This serves as a mechanism for applying back pressure, as the publisher will block
-     *  until its queue has available slots before continuing to publish new messages.
-     * @param pubId         the Publisher's ID.
-     * @param bufferSize    the new buffer size.
+     * until its queue has available slots before continuing to publish new messages.
+     *
+     * @param pubId      the Publisher's ID.
+     * @param bufferSize the new buffer size.
      * @return Whether the operation was successful.
      */
     public boolean setBufferSize(String pubId, int bufferSize) {

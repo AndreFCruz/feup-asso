@@ -1,6 +1,7 @@
 package nodes.implementations.sources;
 
 import nodes.Source;
+import utils.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -44,7 +45,8 @@ public class FetchUrl extends Source<String> {
         try {
             this.buffer = loadUrl(url);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.logWarning("URL fetching problems!");
+            return false;
         }
         return true;
     }
