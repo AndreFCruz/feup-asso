@@ -621,6 +621,7 @@ class Graph extends React.Component {
 
     renderNodeSettings() {
         let defaultReturn = (<div>(no node selected...)</div>);
+        console.log(this.state.selected);
         if (this.state.selected === null || isObjectEmpty(this.state.selected)) {
             return defaultReturn;
         }
@@ -649,6 +650,8 @@ class Graph extends React.Component {
         }
 
         let nodeType = this.state.graphConfig.NodeSubtypes[this.state.selected.subtype];
+        if (!nodeType) return defaultReturn;
+
         let inputType = nodeType.inputType;
         let outputType = nodeType.outputType;
 
