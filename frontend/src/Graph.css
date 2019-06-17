@@ -8,7 +8,8 @@
 }
 
 #graph #graph-view {
-    height: 100vh;
+    max-height: 100vh;
+    overflow: scroll;
     width: 100%;
 }
 

@@ -1,6 +1,5 @@
 import {HANDLER_TYPE, SINK_TYPE, SOURCE_TYPE, STANDARD_EDGE_TYPE,} from "./Graph.configs";
 
-// TODO Nodes should have property "node.subtype" set to their function (e.g. FILE_WRITER)
 export const sample = {
     "nodes": [
         {
