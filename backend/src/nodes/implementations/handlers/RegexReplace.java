@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
  */
 public class RegexReplace extends Handler<String, String> {
     static private String RegexSettingsKey = "regex";
-    static private String ReplacementSettingsKey = "regex";
+    static private String ReplacementSettingsKey = "replacement";
 
     public RegexReplace() {
         this.registerSettings(new String[]{
