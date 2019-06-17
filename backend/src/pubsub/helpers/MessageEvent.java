@@ -10,7 +10,7 @@ public class MessageEvent {
         this(publisherId, messageHash, null);
     }
 
-    private MessageEvent(String publisherId, int messageHash, Long timeToLive) {
+    public MessageEvent(String publisherId, int messageHash, Long timeToLive) {
         this.publisherId = publisherId;
         this.messageHash = messageHash;
         this.timeToLive = timeToLive;

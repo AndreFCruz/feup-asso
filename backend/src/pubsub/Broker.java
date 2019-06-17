@@ -96,6 +96,19 @@ public class Broker<MT> implements Runnable {
         eventQueue.put(new MessageEvent(publisherId, messageHash));
     }
 
+    /**
+     * Method used for publishers to notify the Broker that there's a new message to
+     * be handled.
+     *
+     * @param publisherId Id of the publishing Publisher
+     * @param messageHash Hash of the message
+     * @param timeToLive  Message's time to live (data validity)
+     * @throws InterruptedException
+     */
+    public void notifyNewMessage(String publisherId, int messageHash, Long timeToLive) throws InterruptedException {
+        eventQueue.put(new MessageEvent(publisherId, messageHash, timeToLive));
+    }
+
     private void handleMessageEvent(MessageEvent event) {
         BlockingQueue<MT> pubQueue = registry.get(event.publisherId);
         MT msg = pubQueue.poll();
