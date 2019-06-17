@@ -26,6 +26,7 @@ public class RegexReplace extends Handler<String, String> {
             return null;
         }
 
-        return Pattern.compile(regexp).matcher(message).replaceAll(replacement);
+        return message.replaceAll(regexp, message);
+//        return Pattern.compile(regexp).matcher(message).replaceAll(replacement);
     }
 }
