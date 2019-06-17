@@ -22,6 +22,7 @@ This architecture consists of the following basic components:
  - _Sinks_, which act as data targets, and thus have no outputs;
  - _Filters_ (or _Handlers_), which transform or _filter_ the data they receive via the _pipes_ (perform operations on said data);
  - _Pipes_, which act as connectors that pass data between all the other components; thus, _pipes_ are a directional stream of data that (in our implementation) are implemented by a data buffer (a limited-capacity queue), in order to ensure flexibility and leeway between different components.
+ 
 This network of interconnected components form a _Graph_, with the _Sources_/_Sinks_/_Filters_ acting as Nodes of the Graph, and the _Pipes_ acting as its edges. This Graph represents our _Recipe_.
 
 **Related classes:** Node, Source, Sink, Handler.
@@ -29,7 +30,7 @@ This network of interconnected components form a _Graph_, with the _Sources_/_Si
 
 
 ### Publisher-Subscriber
-In a lower-level of abstraction, we employ the **Publisher-Subscriber** pattern for exchanging messages between Nodes of the Graph. This enables a message producer (_Publisher_) to announce events to multiple interested consumers (_Subscriber_s) asynchronously, without coupling the message senders to their receivers.
+In a lower-level of abstraction, we employ the **Publisher-Subscriber** pattern for exchanging messages between Nodes of the Graph. This enables a message producer (_Publisher_) to announce events to multiple interested consumers (_Subscriber_) asynchronously, without coupling the message senders to their receivers.
 
 Furthermore, the messaging subsystem includes an outbound queue for each Producer, as well as an inbound queue for each Subscriber (both queues are implemented as a limited-capacity _BlockingQueue_). These exchange of messages is mediated by a **Message Broker**, which is responsible for copying messages from one outbound queue to all subscribers’ inbound queues (all subscribers are offered a copy of the published message).
 
@@ -41,10 +42,13 @@ Furthermore, the messaging subsystem includes an outbound queue for each Produce
 
 #### A couple details
 To facilitate extensibility and ease the process of finding common resources, we employ the **Registry** pattern.
+
 Every time a new client (be it publisher or subscriber) registers on the Broker’s Registry, he is granted a unique identifier and a queue. If the client is a _Publisher_ it will be used to post messages. If the client is a _Subscriber_ it will be used to receive subscribed messages.
+
 In this way, new subscribers and publishers must only conform to the set known interfaces and register themselves on the Broker in order to be found by other services.
 
-Additionally, when a Publisher publishes a message on its queue it must notify the Broker. The message-arrival-event carries a **message hash** and, optionally, a **time-to-live**, that ensure data _integrity_ and _validity_. On its own thread, and in a completely parallelizable manner, the _Broker_ handles all message-arrival-events asynchronously, and messages whose time-to-live has expired are discarded.
+Additionally, when a Publisher publishes a message on its queue it must notify the Broker. 
+The message-arrival-event carries a **message hash** and, optionally, a **time-to-live**, that ensure data _integrity_ and _validity_. On its own thread, and in a completely parallelizable manner, the _Broker_ handles all message-arrival-events asynchronously, and messages whose time-to-live has expired are discarded.
 
 
 ##### Back pressure
@@ -66,22 +70,24 @@ Multiple nodes/functionalities are already implemented (including arithmetic ope
 
 
 ### Client-Server
-The system was implemented with a client-server architecture. A React application was used for the client side and a Java application for the backend side. The client side has several features related to the graph: create different sorts of nodes (sources,handlers,sinks), create edges between existing nodes, move the camera to a certain node, save the current graph state, load a previously created graph, run the graph and generate recipes. The backend side uses an HTTP server, supported by Java, to deal with client requests. Some of the routes that were implemented are:
-/node-types - GET request which provides the client side with the entire list of different nodes.
-/checkEdge - POST request used when validating an edge creation. Checks if a certain node type can be connected to another one.
-/sendGraph - POST request used to send the client’s graph to the backend.
-/runGraph - POST request used to run the graph algorithm.
-/stopGraph - POST request used to stop the graph algorithm.
+The system was implemented with a client-server architecture. 
+A React application was used for the client side and a Java application for the backend side. The client side has several features related to the graph: create different sorts of nodes (sources,handlers,sinks), create edges between existing nodes, move the camera to a certain node, save the current graph state, load a previously created graph, run the graph and generate recipes. 
+The backend side uses an HTTP server, supported by Java, to deal with client requests. Some of the routes that were implemented are:
+ - /node-types - GET request which provides the client side with the entire list of different nodes.
+ - /checkEdge - POST request used when validating an edge creation. Checks if a certain node type can be connected to another one.
+ - /sendGraph - POST request used to send the client’s graph to the backend.
+ - /runGraph - POST request used to run the graph algorithm.
+ - /stopGraph - POST request used to stop the graph algorithm.
 
 
 
 ### Other Design Patterns
-Factory - Used in the backend while creating the Sources/Sinks and Handlers which are subclasses of the abstract class Node.
-Strategy - Used on the different Sources/Sinks and Handlers algorithms. StringGenerator, FileReader and FetchUrl are some of the algorithms that are encapsulated in the Source’s strategy behaviour.
-Composite - Used when dealing with imported Recipes. These are groups of handler nodes linked together to achieve a certain goal. By using the composite we can treat the entire recipe as a single Node.
-Builder - Used on the creation of the graph by separating its construction from its representation, allowing different graphs generated by the same process. 
-Memento - Used to save the graph’s state, allowing to restore to that state later. It was also used during the creation of recipes for the same reason.
-Template method - The _Handler_ abstract class cedes the .handleMessage(...) function to be implemented by its subclasses; the _RollingOp_ handler cedes its .executeRollingOp(...) to be implemented by its subclasses; as well as several other abstract methods used when needed.
+ - Factory - Used in the backend while creating the Sources/Sinks and Handlers which are subclasses of the abstract class Node.
+ - Strategy - Used on the different Sources/Sinks and Handlers algorithms. StringGenerator, FileReader and FetchUrl are some of the algorithms that are encapsulated in the Source’s strategy behaviour.
+ - Composite - Used when dealing with imported Recipes. These are groups of handler nodes linked together to achieve a certain goal. By using the composite we can treat the entire recipe as a single Node.
+ - Builder - Used on the creation of the graph by separating its construction from its representation, allowing different graphs generated by the same process. 
+ - Memento - Used to save the graph’s state, allowing to restore to that state later. It was also used during the creation of recipes for the same reason.
+ - Template method - The _Handler_ abstract class cedes the .handleMessage(...) function to be implemented by its subclasses; the _RollingOp_ handler cedes its .executeRollingOp(...) to be implemented by its subclasses; as well as several other abstract methods used when needed.
 
 
 ## Along the way; “in the end, it’s the journey that matters”
