@@ -2,9 +2,10 @@ package utils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class Registry<K, T> {
-    private Map<K, T> map = new HashMap<>();
+    private Map<K, T> map = new ConcurrentHashMap<>();
 
     static public <V> Registry<String, V> makeStringRegistry() {
         return new Registry<>() {
@@ -43,6 +44,14 @@ public abstract class Registry<K, T> {
         K key = this.generateKey(obj);
         this.map.put(key, obj);
         return key;
+    }
+
+    public synchronized T update(K key, T newObject) {
+        if (this.map.containsKey(key)) {
+            return this.map.put(key, newObject);
+        } else {
+            return null;
+        }
     }
 
     public T get(K key) {

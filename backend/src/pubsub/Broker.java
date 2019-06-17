@@ -64,6 +64,22 @@ public class Broker<MT> implements Runnable {
     }
 
     /**
+     * Sets the buffer size of the given Publisher to a new value.
+     * This serves as a mechanism for applying back pressure, as the publisher will block
+     *  until its queue has available slots before continuing to publish new messages.
+     * @param pubId         the Publisher's ID.
+     * @param bufferSize    the new buffer size.
+     * @return Whether the operation was successful.
+     */
+    public boolean setBufferSize(String pubId, int bufferSize) {
+        BlockingQueue<MT> oldQueue = registry.get(pubId);
+        BlockingQueue<MT> newQueue = new LinkedBlockingQueue<>(bufferSize);
+        oldQueue.drainTo(newQueue, bufferSize);
+
+        return registry.update(pubId, newQueue) != null;
+    }
+
+    /**
      * Method used for publishers to notify the Broker that there's a new message to
      * be handled.
      *
@@ -94,10 +110,13 @@ public class Broker<MT> implements Runnable {
             BlockingQueue<MT> subQueue = this.registry.get(subId);
 
             if (subQueue.remainingCapacity() == 0) {
-                // Take oldest message if queue is at maximum capacity
+                // Discard oldest message if queue is at maximum capacity
                 subQueue.remove();
+
+                // Also, apply back pressure - NOTE: experimental feature
+                this.setBufferSize(event.publisherId, (pubQueue.size() / 2) + 1);
             }
-            
+
             boolean success = subQueue.offer(msg);
             if (!success) {
                 Log.logWarning("Subscriber " + subId + " could not receive a message");

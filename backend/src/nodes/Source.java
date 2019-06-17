@@ -33,7 +33,7 @@ public abstract class Source<Out> extends Node<String> implements Publisher<Out>
      * @throws InterruptedException Thrown when interrupted
      */
     void publishMessage(Out message) throws InterruptedException {
-        this.queue.put(message);
+        this.queue.put(message);    // May block if queue is full
         this.broker.notifyNewMessage(this.getId(), message.hashCode());
     }
 
