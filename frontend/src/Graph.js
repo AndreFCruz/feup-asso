@@ -35,11 +35,11 @@ class Graph extends React.Component {
             selectedSubType: "",
             edgeSource: "",
             edgeTarget: "",
-            panNode: ""
+            panNode: "",
+            graphId: Math.random().toString(36).substr(2, 5),
         };
 
         this.GraphView = React.createRef();
-        this.graphId = Math.random().toString(36).substr(2, 5);
     }
 
     async componentDidMount() {
@@ -99,7 +99,7 @@ class Graph extends React.Component {
 
         let nodeTitle = nodeSubType + '-' + id
         const viewNode = {
-            id: this.graphId + '-' + this.state.selectedType.substring(0, 2) + id,
+            id: this.state.graphId + '-' + this.state.selectedType.substring(0, 2) + id,
             title: nodeTitle,
             type: nodeType,
             subtype: nodeSubType,
@@ -468,7 +468,7 @@ class Graph extends React.Component {
     }
 
     deleteGraph() {
-        let sample = {     nodes: [], edges: [] };
+        let sample = { nodes: [], edges: [] };
         let cleanState = {
             graph: sample,
             selected: {},
@@ -477,7 +477,8 @@ class Graph extends React.Component {
             selectedSubType: "",
             edgeSource: "",
             edgeTarget: "",
-            panNode: ""
+            panNode: "",
+            graphId: Math.random().toString(36).substr(2, 5),
         };
         this.setState(cleanState);
     }

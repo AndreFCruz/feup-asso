@@ -4,21 +4,18 @@ import nodes.Handler;
 
 import java.util.regex.Pattern;
 
-/**
- * Matches the inbound message against a RegularExpression, and passes it onwards if it's a match.
- */
-public class RegexMatch extends Handler<String, String> {
+public class RegexMatchBool extends Handler<String, Boolean> {
     static private String SettingsKey = "regex";
 
-    public RegexMatch() {
+    public RegexMatchBool() {
         this.registerSettings(new String[]{SettingsKey});
     }
 
     @Override
-    public String handleMessage(String message) throws InterruptedException {
+    public Boolean handleMessage(String message) throws InterruptedException {
         String regexp = this.getSettingValue(SettingsKey);
         if (regexp == null) return null;
 
-        return Pattern.matches(regexp, message) ? message : null;
+        return Pattern.matches(regexp, message);
     }
 }
