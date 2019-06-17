@@ -621,7 +621,7 @@ class Graph extends React.Component {
 
     renderNodeSettings() {
         let defaultReturn = (<div>(no node selected...)</div>);
-        console.log(this.state.selected);
+
         if (this.state.selected === null || isObjectEmpty(this.state.selected)) {
             return defaultReturn;
         }
@@ -645,6 +645,7 @@ class Graph extends React.Component {
 
     renderNodeInputOutput() {
         let defaultReturn = (<div>(no node selected...)</div>);
+        
         if (this.state.selected === null || isObjectEmpty(this.state.selected)) {
             return defaultReturn;
         }
